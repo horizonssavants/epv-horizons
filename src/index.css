@@ -1,0 +1,325 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand-blue-deep: #0D2E5C;
+  --color-brand-gold: #F5A623;
+  --color-brand-green: #2D8C3C;
+  --color-brand-blue-medium: #1A4F8B;
+  --color-brand-blue-light: #4A90D9;
+  --color-brand-gold-light: #FFD966;
+  --color-brand-green-light: #5DBB63;
+  --color-brand-dark: #2C2C2C;
+  --color-brand-muted: #6B7280;
+  --color-brand-border: #E5E7EB;
+  --color-brand-pale: #F9FAFB;
+
+  --font-sans: "Poppins", system-ui, sans-serif;
+  --font-serif: "Lora", system-ui, serif;
+}
+
+/* Base custom classes to match the branding and design guidelines */
+@layer base {
+  body {
+    font-family: 'Poppins', system-ui, sans-serif;
+    color: var(--color-brand-dark);
+    background-color: #FFFFFF;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Premium micro animations and background patterns */
+.pattern-sunburst {
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(245, 166, 35, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 0 0, rgba(13, 46, 92, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.decor-aurora {
+  position: relative;
+  overflow: hidden;
+}
+
+.decor-aurora::after {
+  content: "";
+  position: absolute;
+  top: -30%;
+  right: -20%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(74, 144, 217, 0.12) 0%, rgba(245, 166, 35, 0.04) 50%, transparent 100%);
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.decor-aurora-left::before {
+  content: "";
+  position: absolute;
+  bottom: -20%;
+  left: -20%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(93, 187, 99, 0.08) 0%, rgba(13, 46, 92, 0.03) 60%, transparent 100%);
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Grid & container styles conformant to responsive constraints */
+.shadow-premium {
+  box-shadow: 0 4px 20px -2px rgba(13, 46, 92, 0.06), 0 2px 8px 0 rgba(13, 46, 92, 0.04);
+}
+
+.shadow-premium-lg {
+  box-shadow: 0 10px 30px -5px rgba(13, 46, 92, 0.08), 0 4px 12px 0 rgba(13, 46, 92, 0.05);
+}
+
+/* Hide scrollbar for clean carousel rendering */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ─── Topographic contour pattern (Aiglon-inspired) ─────────── */
+.pattern-topo {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Cpath d='M-20 100 C60 70 140 130 200 100 S340 70 420 100' fill='none' stroke='white' stroke-width='1' opacity='0.07'/%3E%3Cpath d='M-20 70 C60 40 140 100 200 70 S340 40 420 70' fill='none' stroke='white' stroke-width='1' opacity='0.05'/%3E%3Cpath d='M-20 130 C60 100 140 160 200 130 S340 100 420 130' fill='none' stroke='white' stroke-width='1' opacity='0.05'/%3E%3Cpath d='M-20 40 C60 10 140 70 200 40 S340 10 420 40' fill='none' stroke='white' stroke-width='0.8' opacity='0.04'/%3E%3Cpath d='M-20 160 C60 130 140 190 200 160 S340 130 420 160' fill='none' stroke='white' stroke-width='0.8' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 400px 200px;
+  background-repeat: repeat;
+}
+
+/* ─── Scroll reveal animations ─────────────────────────────── */
+
+@keyframes bounceInUp {
+  0%   { opacity: 0; transform: translateY(48px) scale(0.92); }
+  55%  { opacity: 1; transform: translateY(-6px) scale(1.02); }
+  75%  { transform: translateY(3px) scale(0.99); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.82); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ─── Hero animations ─────────────────────────────────────── */
+
+/* Pancarte pendulaire — balancement doux */
+@keyframes sway {
+  0%, 100% { transform: rotate(-5deg); }
+  50%       { transform: rotate(5deg);  }
+}
+
+/* Fade-in-up avec stagger */
+@keyframes heroFadeInUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.hero-fade-in {
+  animation: heroFadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* 3D float pour éléments scolaires de fond */
+@keyframes float3D {
+  0%,100% { transform: translateY(0px)   rotate(-2deg) scale(1);    }
+  38%     { transform: translateY(-14px) rotate(3.5deg) scale(1.05); }
+  70%     { transform: translateY(-6px)  rotate(-1deg) scale(0.97); }
+}
+@keyframes float3DReverse {
+  0%,100% { transform: translateY(0px)   rotate(2deg)  scale(1);    }
+  38%     { transform: translateY(-10px) rotate(-4deg) scale(1.04); }
+  70%     { transform: translateY(-17px) rotate(1.5deg) scale(0.96);}
+}
+
+/* Bounce pour emojis décoratifs */
+@keyframes fadeInBounce {
+  0%   { opacity: 0; transform: scale(0.4) translateY(14px); }
+  62%  { opacity: 1; transform: scale(1.25) translateY(-5px); }
+  100% { opacity: 1; transform: scale(1)   translateY(0);    }
+}
+
+/* ─── Marquee infini horizontal (Section Témoignages) ── */
+@keyframes marqueeScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ─── Bulle de discussion avec queue triangulaire ────── */
+.speech-bubble-tail {
+  position: relative;
+}
+
+/* Triangle extérieur — couleur vert bordure */
+.speech-bubble-tail::before {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 22px;
+  width: 0;
+  height: 0;
+  border-top: 15px solid #22C55E;
+  border-right: 15px solid transparent;
+  z-index: 1;
+}
+
+/* Triangle intérieur — couleur fond blanc cassé */
+.speech-bubble-tail::after {
+  content: '';
+  position: absolute;
+  bottom: -11px;
+  left: 25px;
+  width: 0;
+  height: 0;
+  border-top: 12px solid #f8fafc;
+  border-right: 12px solid transparent;
+  z-index: 2;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TYPOGRAPHIE FLUIDE — rem scalent automatiquement
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (max-width: 480px)  { html { font-size: 14px; } }
+@media (min-width: 481px) and (max-width: 768px) { html { font-size: 15px; } }
+
+/* Corps padding-bottom mobile pour la bottom nav */
+@media (max-width: 1023px) {
+  body { padding-bottom: 5rem; }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MOBILE BOTTOM NAV — pilule flottante
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  background: #1C3A6E;
+  border-radius: 999px;
+  padding: 0.625rem 1rem;
+  gap: 0.25rem;
+  box-shadow: 0 8px 32px rgba(28,58,110,0.45);
+  border: 1px solid rgba(255,255,255,0.12);
+  transition: transform 0.32s cubic-bezier(0.4,0,0.2,1), opacity 0.32s ease;
+  white-space: nowrap;
+}
+.mobile-bottom-nav--hidden {
+  transform: translateX(-50%) translateY(calc(100% + 2rem));
+  opacity: 0;
+  pointer-events: none;
+}
+@media (min-width: 1024px) {
+  .mobile-bottom-nav { display: none; }
+}
+
+.mbn-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  color: rgba(255,255,255,0.65);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  border: none;
+  background: none;
+}
+.mbn-item:hover, .mbn-item.active {
+  background: rgba(255,255,255,0.15);
+  color: white;
+}
+.mbn-item--cta {
+  background: rgba(245,166,35,0.20);
+  color: #F5A623;
+}
+.mbn-item--cta:hover, .mbn-item--cta.active {
+  background: rgba(245,166,35,0.35);
+  color: #FFD966;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DRAWER MOBILE — panel droit animé
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(13,31,74,0.60);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.header-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 201;
+  width: min(360px, 88vw);
+  background: white;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.drawer-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: 0.875rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1E3A8A;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.drawer-nav-link:hover, .drawer-nav-link.active {
+  background: #EFF6FF;
+  color: #1E40AF;
+}
+.drawer-nav-link svg { flex-shrink: 0; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BURGER PILL — bouton hamburger pill animé
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.header-burger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1E40AF, #2563EB);
+  border-radius: 2rem;
+  padding: 0.5rem 0.875rem;
+  border: none;
+  cursor: pointer;
+  color: white;
+  transition: opacity 0.2s;
+}
+.header-burger:hover { opacity: 0.85; }
+@media (min-width: 1024px) {
+  .header-burger { display: none; }
+}
+
