@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, Eye, EyeOff, ShieldCheck, LockKeyhole } from 'lucide-react';
 import { signInNeon } from '../lib/auth.ts';
 
 interface AdminAuthPageProps {
@@ -97,11 +97,13 @@ export const AdminAuthPage: React.FC<AdminAuthPageProps> = ({ onSuccess, onBack 
   const [password, setPassword] = useState('');
   const [showPwd,  setShowPwd]  = useState(false);
   const [error,    setError]    = useState<string | null>(null);
+  const [debug,    setDebug]    = useState<{ status?: number; raw?: string } | null>(null);
   const [loading,  setLoading]  = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setDebug(null);
     setLoading(true);
     try {
       const data = await signInNeon(email, password);
@@ -109,7 +111,8 @@ export const AdminAuthPage: React.FC<AdminAuthPageProps> = ({ onSuccess, onBack 
       localStorage.setItem('is_admin', 'true');
       onSuccess({ role: 'admin', email });
     } catch (err: any) {
-      setError(err.message || 'Identifiants incorrects. Vérifiez votre email et mot de passe.');
+      setError(err.message || 'Identifiants incorrects.');
+      setDebug({ status: err.status, raw: err.raw });
     } finally {
       setLoading(false);
     }
@@ -158,12 +161,13 @@ export const AdminAuthPage: React.FC<AdminAuthPageProps> = ({ onSuccess, onBack 
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.15, duration: 0.5 }}
-              className="relative inline-block mb-5"
+              className="relative inline-flex items-center justify-center mb-5"
             >
-              <div className="absolute inset-0 bg-brand-gold/15 blur-2xl rounded-full scale-[2] pointer-events-none" />
-              <img src="/img/logo.jpg" alt="EPV"
-                className="relative w-16 h-16 rounded-2xl object-contain bg-white/95 p-1.5 mx-auto
-                           shadow-[0_0_30px_rgba(74,144,217,0.25)]" />
+              <div className="absolute inset-0 bg-brand-gold/20 blur-2xl rounded-full scale-[2] pointer-events-none" />
+              <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center"
+                style={{ background: 'rgba(245,166,35,0.12)', border: '1px solid rgba(245,166,35,0.25)' }}>
+                <LockKeyhole size={30} className="text-brand-gold" strokeWidth={1.8} />
+              </div>
             </motion.div>
 
             <h1 className="font-sans font-extrabold text-xl text-white uppercase tracking-[0.08em] mb-1">
@@ -185,9 +189,28 @@ export const AdminAuthPage: React.FC<AdminAuthPageProps> = ({ onSuccess, onBack 
           <form onSubmit={handleSubmit} className="space-y-6">
             <AnimatePresence>
               {error && (
-                <ErrorToast key="err" message={error} onDismiss={() => setError(null)} />
+                <ErrorToast key="err" message={error} onDismiss={() => { setError(null); setDebug(null); }} />
               )}
             </AnimatePresence>
+
+            {/* ── DEBUG PANEL ── */}
+            {debug && (
+              <div className="rounded-xl bg-black/40 border border-white/10 p-3 space-y-1.5 text-left">
+                <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-brand-gold">
+                  Debug — Réponse serveur
+                </p>
+                {debug.status && (
+                  <p className="text-[10px] font-mono text-white/60">
+                    HTTP <span className="text-red-400 font-bold">{debug.status}</span>
+                  </p>
+                )}
+                {debug.raw && (
+                  <pre className="text-[10px] font-mono text-white/50 whitespace-pre-wrap break-all max-h-32 overflow-y-auto">
+                    {debug.raw}
+                  </pre>
+                )}
+              </div>
+            )}
 
             <UnderlineInput label="Email administrateur" type="email" value={email} onChange={setEmail} placeholder="admin@epv.ci" />
 

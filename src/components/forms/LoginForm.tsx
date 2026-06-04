@@ -17,6 +17,7 @@ interface LoginFormProps {
 export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, id }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [debug, setDebug] = useState<{ status?: number; raw?: string } | null>(null);
   const [info, setInfo] = useState<string | null>(null);
 
   // States
@@ -31,7 +32,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, id }) => {
     setLoading(true);
 
     try {
-      // Connexion unifiée — email + téléphone comme mot de passe
       const data = await signInNeon(email, telephone);
       const prospect = data?.prospect ?? data?.data?.prospect;
       if (prospect) {
@@ -41,7 +41,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, id }) => {
         throw new Error('Dossier introuvable.');
       }
     } catch (err: any) {
-      setError(err.message || "Identifiants incorrects. Vérifiez votre email et numéro de téléphone.");
+      setError(err.message || "Identifiants incorrects.");
+      setDebug({ status: err.status, raw: err.raw });
     } finally {
       setLoading(false);
     }
@@ -88,8 +89,27 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, id }) => {
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border-l-4 border-red-400 text-red-600 text-xs font-semibold leading-relaxed">
-          {error}
+        <div className="mb-4 space-y-2">
+          <div className="p-3 bg-red-50 border-l-4 border-red-400 text-red-600 text-xs font-semibold leading-relaxed">
+            {error}
+          </div>
+          {debug && (
+            <div className="p-3 bg-slate-900 rounded-lg border border-slate-700 space-y-1">
+              <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-amber-400">
+                Debug — Réponse serveur
+              </p>
+              {debug.status && (
+                <p className="text-[10px] font-mono text-slate-400">
+                  HTTP <span className="text-red-400 font-bold">{debug.status}</span>
+                </p>
+              )}
+              {debug.raw && (
+                <pre className="text-[10px] font-mono text-slate-300 whitespace-pre-wrap break-all max-h-28 overflow-y-auto">
+                  {debug.raw}
+                </pre>
+              )}
+            </div>
+          )}
         </div>
       )}
 

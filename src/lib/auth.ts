@@ -28,8 +28,16 @@ async function authPost(path: string, body: object): Promise<any> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  const data = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(data?.error || data?.message || `Erreur ${r.status}`);
+  const rawText = await r.text().catch(() => '');
+  let data: any = {};
+  try { data = JSON.parse(rawText); } catch {}
+  if (!r.ok) {
+    const msg = data?.error || data?.message || rawText || `Erreur ${r.status}`;
+    const err = new Error(msg);
+    (err as any).status = r.status;
+    (err as any).raw = rawText;
+    throw err;
+  }
   return data;
 }
 
