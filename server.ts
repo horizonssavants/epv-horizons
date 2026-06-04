@@ -8,7 +8,6 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import os from "os";
-import { createServer as createViteServer } from "vite";
 import pg from "pg";
 import fs from "fs";
 import { randomBytes, scrypt, timingSafeEqual } from "crypto";
@@ -107,7 +106,7 @@ async function verifyPassword(password: string, stored: string): Promise<boolean
   });
 }
 
-// ── Store OTP en mémoire ─────────────────────────────────────────────────────
+// ── Store OTP en base de données (compatible serverless) ──────────────────────
 interface OtpEntry {
   otp: string;
   prospectId: string;
@@ -115,12 +114,26 @@ interface OtpEntry {
   expiresAt: number;
   attempts: number;
 }
-const otpStore = new Map<string, OtpEntry>();
-// Nettoyage automatique toutes les 5 min
-setInterval(() => {
-  const now = Date.now();
-  for (const [k, v] of otpStore) if (v.expiresAt < now) otpStore.delete(k);
-}, 5 * 60 * 1000);
+
+async function dbSetOtp(digits: string, entry: OtpEntry) {
+  await q(
+    `INSERT INTO configuration (cle, valeur, description, updated_at)
+     VALUES ($1, $2, 'OTP temporaire', NOW())
+     ON CONFLICT (cle) DO UPDATE SET valeur = $2, updated_at = NOW()`,
+    [`otp_${digits}`, JSON.stringify(entry)]
+  );
+}
+
+async function dbGetOtp(digits: string): Promise<OtpEntry | null> {
+  const { rows } = await q('SELECT valeur FROM configuration WHERE cle = $1', [`otp_${digits}`]);
+  if (!rows.length) return null;
+  const val = rows[0].valeur;
+  return (typeof val === 'string' ? JSON.parse(val) : val) as OtpEntry;
+}
+
+async function dbDelOtp(digits: string) {
+  await q('DELETE FROM configuration WHERE cle LIKE $1', [`otp_${digits}`]);
+}
 
 // Middleware — toute route protégée (parent ou admin)
 async function requireAuth(req: any, res: any, next: any) {
@@ -942,7 +955,7 @@ app.post('/api/parent/otp/send', async (req, res) => {
     const otp       = String(Math.floor(100000 + Math.random() * 900000));
     const expiresAt = Date.now() + 10 * 60 * 1000; // 10 min
 
-    otpStore.set(digits, { otp, prospectId: prospect.id, name: prospect.prenomParent, expiresAt, attempts: 0 });
+    await dbSetOtp(digits, { otp, prospectId: prospect.id, name: prospect.prenomParent, expiresAt, attempts: 0 });
 
     const msg = `🎓 *EPV Horizons Savants*\n\nBonjour ${prospect.prenomParent},\n\nVotre code d'accès à l'Espace Parent est :\n\n*${otp}*\n\n⏱ Valable 10 minutes.\n\n_Ne le partagez jamais._`;
     await logNotification('whatsapp', prospect.telephone, msg, 'Code OTP Espace Parent');
@@ -963,27 +976,28 @@ app.post('/api/parent/otp/verify', async (req, res) => {
   if (!telephone || !otp) return res.status(400).json({ error: 'Données manquantes.' });
 
   const digits = String(telephone).replace(/\D/g, '').slice(-8);
-  const entry  = otpStore.get(digits);
+  const entry  = await dbGetOtp(digits);
 
   if (!entry)
     return res.status(400).json({ error: 'Aucun code OTP actif. Demandez un nouveau code.' });
   if (Date.now() > entry.expiresAt) {
-    otpStore.delete(digits);
+    await dbDelOtp(digits);
     return res.status(400).json({ error: 'Code expiré. Demandez un nouveau code.' });
   }
   if (entry.attempts >= 5) {
-    otpStore.delete(digits);
+    await dbDelOtp(digits);
     return res.status(429).json({ error: 'Trop de tentatives. Demandez un nouveau code.' });
   }
   if (entry.otp !== String(otp).trim()) {
     entry.attempts++;
+    await dbSetOtp(digits, entry);
     return res.status(401).json({
       error: `Code incorrect — ${5 - entry.attempts} tentative(s) restante(s).`
     });
   }
 
   // ✅ Code valide — retourner TOUS les enfants du parent
-  otpStore.delete(digits);
+  await dbDelOtp(digits);
 
   const { rows: allRows } = await q(
     `SELECT * FROM prospects WHERE REGEXP_REPLACE(telephone,'\\D','','g') LIKE $1 ORDER BY created_at`,
@@ -1780,7 +1794,7 @@ async function startServer() {
     });
 
   if (process.env.NODE_ENV !== 'production') {
-    // IP locale réelle pour que le navigateur sache où se connecter (HMR)
+    const { createServer: createViteServer } = await import('vite');
     const localIP = Object.values(os.networkInterfaces()).flat()
       .find(i => i?.family === 'IPv4' && !i?.internal)?.address ?? 'localhost';
     const vite = await createViteServer({
@@ -1806,4 +1820,10 @@ async function startServer() {
   });
 }
 
-startServer();
+// Export pour Vercel serverless
+export { app, initDB };
+
+// Démarrage classique uniquement hors Vercel
+if (!process.env.VERCEL) {
+  startServer();
+}
