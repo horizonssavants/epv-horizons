@@ -629,17 +629,19 @@ async function logAction(action: string, module: string, detail: string) {
 const app = express();
 const PORT = 3000;
 
-// CORS — autoriser localhost, réseau local (192.168.x, 10.x) et APP_URL
+// CORS — localhost, réseau local, Vercel (.vercel.app) et APP_URL
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin) return cb(null, true); // curl, server-to-server
+    if (!origin) return cb(null, true); // curl, server-to-server, same-origin
     const ok =
       origin.startsWith('http://localhost') ||
       origin.startsWith('http://127.') ||
       /^http:\/\/10\./.test(origin) ||
       /^http:\/\/192\.168\./.test(origin) ||
       /^http:\/\/172\.(1[6-9]|2\d|3[01])\./.test(origin) ||
-      (process.env.APP_URL ? origin.startsWith(process.env.APP_URL) : false);
+      origin.endsWith('.vercel.app') ||               // tous les déploiements Vercel
+      origin === 'https://epv-nine.vercel.app' ||     // production explicite
+      (process.env.APP_URL ? origin === process.env.APP_URL : false);
     ok ? cb(null, true) : cb(new Error(`CORS bloqué: ${origin}`));
   },
   credentials: true,
