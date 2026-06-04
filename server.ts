@@ -574,7 +574,12 @@ async function sendInfobipWhatsApp(to: string, content: string): Promise<boolean
         content: { text: content },
       }),
     });
-    if (!r.ok) console.error(`[Infobip WA ${r.status}]`, await r.text());
+    if (!r.ok) {
+      const errBody = await r.text();
+      console.error(`[Infobip WA ERROR ${r.status}] To:${to} | ${errBody}`);
+    } else {
+      console.log(`[Infobip WA OK] Sent to ${to}`);
+    }
     return r.ok;
   } catch (e) { console.error('[Infobip WA]', e); return false; }
 }
