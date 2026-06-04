@@ -194,7 +194,8 @@ function buildUpdate(table: string, id: string, obj: Record<string, any>) {
 // ─── Schema init + seed ──────────────────────────────────────────────────────
 
 async function initDB() {
-  const schema = fs.readFileSync(new URL('./db/schema.sql', import.meta.url), 'utf-8');
+  const schemaPath = path.join(process.cwd(), 'db', 'schema.sql');
+  const schema = fs.readFileSync(schemaPath, 'utf-8');
   await q(schema);
 
   // Seed places (capacités max uniquement — compteurs calculés dynamiquement)
@@ -529,54 +530,68 @@ async function seedOperational(isEmpty: (t: string) => Promise<boolean>) {
   console.log('  DB: données opérationnelles seedées.');
 }
 
-// ─── Notifications ───────────────────────────────────────────────────────────
+// ─── Notifications — Infobip ─────────────────────────────────────────────────
 
-async function sendResendEmail(to: string, subject: string, content: string): Promise<boolean> {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey || apiKey.includes('MY_') || !apiKey.trim()) {
+function infobipPhone(raw: string): string {
+  const clean = raw.trim().replace(/[\s+\-().]/g, '');
+  if (clean.startsWith('225')) return clean;
+  if (clean.startsWith('0'))   return '225' + clean.slice(1);
+  return '225' + clean;
+}
+
+async function sendInfobipWhatsApp(to: string, content: string): Promise<boolean> {
+  const baseUrl = process.env.INFOBIP_BASE_URL;
+  const apiKey  = process.env.INFOBIP_API_KEY;
+  const sender  = process.env.INFOBIP_WHATSAPP_SENDER;
+  if (!baseUrl || !apiKey || !sender) {
+    console.log(`[WhatsApp Simulation] To: ${to} | ${content.slice(0, 80)}`);
+    return false;
+  }
+  try {
+    const r = await fetch(`https://${baseUrl}/whatsapp/1/message/text`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `App ${apiKey}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        from: sender,
+        to: infobipPhone(to),
+        content: { text: content },
+      }),
+    });
+    if (!r.ok) console.error(`[Infobip WA ${r.status}]`, await r.text());
+    return r.ok;
+  } catch (e) { console.error('[Infobip WA]', e); return false; }
+}
+
+async function sendInfobipEmail(to: string, subject: string, content: string): Promise<boolean> {
+  const baseUrl   = process.env.INFOBIP_BASE_URL;
+  const apiKey    = process.env.INFOBIP_API_KEY;
+  const fromEmail = process.env.INFOBIP_FROM_EMAIL || 'noreply@horizonssavants.com';
+  if (!baseUrl || !apiKey) {
     console.log(`[Email Simulation] To: ${to} | Subject: ${subject}`);
     return false;
   }
-  const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
-  const html = content.includes('<p>') ? content : `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px"><h2 style="color:#0D2E5C">EPV Horizons Savants</h2><div style="line-height:1.6;white-space:pre-line">${content}</div></div>`;
+  const html = content.includes('<p>') || content.includes('<h')
+    ? content
+    : `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px"><h2 style="color:#0D2E5C">EPV Horizons Savants</h2><div style="line-height:1.6;white-space:pre-line">${content}</div></div>`;
   try {
-    const r = await fetch('https://api.resend.com/emails', {
+    const form = new FormData();
+    form.append('from', `EPV Horizons Savants <${fromEmail}>`);
+    form.append('to', to);
+    form.append('subject', subject);
+    form.append('html', html);
+    form.append('text', content.replace(/<[^>]*>/g, ''));
+    const r = await fetch(`https://${baseUrl}/email/3/send`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-      body: JSON.stringify({ from: `EPV Horizons Savants <${fromEmail}>`, to: [to], subject, html, text: content.replace(/<[^>]*>/g, '') }),
+      headers: { 'Authorization': `App ${apiKey}` },
+      body: form,
     });
+    if (!r.ok) console.error(`[Infobip Email ${r.status}]`, await r.text());
     return r.ok;
-  } catch { return false; }
-}
-
-async function sendWhatsAppNotification(to: string, content: string): Promise<boolean> {
-  const metaToken = process.env.WHATSAPP_ACCESS_TOKEN;
-  const metaPhoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-  const clean = to.trim().replace(/\s+/g, '');
-  if (metaToken && metaPhoneId) {
-    try {
-      const r = await fetch(`https://graph.facebook.com/v17.0/${metaPhoneId}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${metaToken}` },
-        body: JSON.stringify({ messaging_product: 'whatsapp', to: clean.replace('+', ''), type: 'text', text: { body: content } }),
-      });
-      if (r.ok) return true;
-    } catch {}
-  }
-  const twilioSid = process.env.TWILIO_ACCOUNT_SID;
-  const twilioAuth = process.env.TWILIO_AUTH_TOKEN;
-  if (twilioSid && twilioAuth) {
-    try {
-      const r = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Basic ${Buffer.from(`${twilioSid}:${twilioAuth}`).toString('base64')}` },
-        body: new URLSearchParams({ To: `whatsapp:${clean}`, From: process.env.TWILIO_WHATSAPP_FROM || 'whatsapp:+14155238886', Body: content }),
-      });
-      if (r.ok) return true;
-    } catch {}
-  }
-  console.log(`[WhatsApp Simulation] To: ${to}`);
-  return false;
+  } catch (e) { console.error('[Infobip Email]', e); return false; }
 }
 
 async function logNotification(type: 'email' | 'whatsapp', destinataire: string, contenu: string, sujet?: string) {
@@ -585,8 +600,8 @@ async function logNotification(type: 'email' | 'whatsapp', destinataire: string,
     'INSERT INTO notifications (id, type, timestamp, destinataire, sujet, contenu) VALUES ($1,$2,NOW(),$3,$4,$5)',
     [id, type, destinataire, sujet ?? null, contenu]
   );
-  if (type === 'email') sendResendEmail(destinataire, sujet || 'Notification EPV', contenu).catch(console.error);
-  else sendWhatsAppNotification(destinataire, contenu).catch(console.error);
+  if (type === 'email') sendInfobipEmail(destinataire, sujet || 'Notification EPV', contenu).catch(console.error);
+  else sendInfobipWhatsApp(destinataire, contenu).catch(console.error);
 }
 
 async function logAction(action: string, module: string, detail: string) {
@@ -977,7 +992,13 @@ app.post('/api/parent/otp/verify', async (req, res) => {
   if (allRows.length === 0) return res.status(404).json({ error: 'Dossier introuvable.' });
 
   const children = allRows.map(r => rowToObj(r) as Prospect);
-  res.json({ success: true, prospect: children[0], children });
+  const token = await signJWT({
+    email: children[0].email,
+    role: 'parent',
+    sub: children[0].email,
+    prospectId: children[0].id,
+  }, '365d');
+  res.json({ success: true, prospect: children[0], children, token });
 });
 
 // ─── Tous les enfants d'un parent (par téléphone) ────────────────────────────
@@ -1358,6 +1379,42 @@ app.get('/api/parrainages', requireAdmin, async (_req, res) => {
   res.json(rowsToObjs(rows));
 });
 
+// Parent — liste de ses filleuls (personnes ayant utilisé son code)
+app.get('/api/parent/mes-filleuls', requireAuth, async (req: any, res) => {
+  const { prospectId } = req.query;
+  if (!prospectId) return res.status(400).json({ error: 'prospectId requis.' });
+  try {
+    const { rows: pRows } = await q('SELECT code_parrainage_personnel FROM prospects WHERE id = $1', [prospectId]);
+    if (pRows.length === 0) return res.status(404).json({ error: 'Prospect introuvable.' });
+    const code = pRows[0].code_parrainage_personnel;
+    if (!code) return res.json([]);
+    const { rows } = await q(`
+      SELECT p.id, p.prenom_parent, p.nom_parent, p.prenom_enfant, p.nom_enfant,
+             p.section_visee, p.statut, p.created_at,
+             par.statut AS parrainage_statut, par.reduction_appliquee
+      FROM prospects p
+      LEFT JOIN parrainages par ON par.prospect_id_filleul = p.id AND UPPER(par.code_parrain) = UPPER($1)
+      WHERE UPPER(p.code_parrainage_utilise) = UPPER($1)
+      ORDER BY p.created_at DESC
+    `, [code]);
+    res.json(rows.map(r => ({
+      id: r.id,
+      prenomParent: r.prenom_parent,
+      nomParent: r.nom_parent,
+      prenomEnfant: r.prenom_enfant,
+      nomEnfant: r.nom_enfant,
+      sectionVisee: r.section_visee,
+      statut: r.statut,
+      createdAt: r.created_at instanceof Date ? r.created_at.toISOString() : r.created_at,
+      parrainageStatut: r.parrainage_statut || 'en_attente',
+      reductionAppliquee: r.reduction_appliquee || 0,
+    })));
+  } catch (e: any) {
+    console.error('[mes-filleuls]', e);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
 // ─── Notifications ────────────────────────────────────────────────────────────
 
 app.get('/api/notifications', requireAdmin, async (_req, res) => {
@@ -1434,6 +1491,82 @@ app.post('/api/messages', requireAdmin, async (req, res) => {
   } catch (e) { console.error(e); res.status(500).json({ error: 'Erreur serveur.' }); }
 });
 
+// Parent — checklist documents (lecture + sauvegarde)
+app.get('/api/parent/checklist', requireAuth, async (req: any, res) => {
+  const { prospectId } = req.query;
+  if (!prospectId) return res.status(400).json({ error: 'prospectId requis.' });
+  try {
+    const cle = `checklist_parent_${prospectId}`;
+    const { rows } = await q('SELECT valeur FROM configuration WHERE cle = $1', [cle]);
+    res.json(rows[0]?.valeur ?? null);
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
+app.patch('/api/parent/checklist', requireAuth, async (req: any, res) => {
+  const { prospectId, checklist } = req.body;
+  if (!prospectId || !Array.isArray(checklist)) return res.status(400).json({ error: 'Données invalides.' });
+  try {
+    const cle = `checklist_parent_${prospectId}`;
+    await q(
+      `INSERT INTO configuration (cle, valeur, description) VALUES ($1, $2, $3)
+       ON CONFLICT (cle) DO UPDATE SET valeur = $2, updated_at = NOW()`,
+      [cle, JSON.stringify(checklist), `Checklist documents parent ${prospectId}`]
+    );
+    res.json({ success: true });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
+// Parent — mettre à jour ses coordonnées
+app.patch('/api/parent/profile', requireAuth, async (req: any, res) => {
+  const { prospectId, telephone, email, commune } = req.body;
+  if (!prospectId) return res.status(400).json({ error: 'prospectId requis.' });
+  try {
+    const allowed: Record<string, any> = {};
+    if (telephone) allowed.telephone = telephone.trim();
+    if (email)     allowed.email     = email.trim().toLowerCase();
+    if (commune)   allowed.commune   = commune.trim();
+    if (Object.keys(allowed).length === 0)
+      return res.status(400).json({ error: 'Aucun champ à modifier.' });
+    const sets = Object.keys(allowed).map((k, i) => `${k} = $${i + 1}`).join(', ');
+    const vals = [...Object.values(allowed), prospectId];
+    const { rows } = await q(
+      `UPDATE prospects SET ${sets}, updated_at = NOW() WHERE id = $${vals.length} RETURNING *`,
+      vals
+    );
+    if (rows.length === 0) return res.status(404).json({ error: 'Prospect introuvable.' });
+    res.json(rowToObj(rows[0]));
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
+// Parent — envoyer un message à l'administration
+app.post('/api/parent/messages', requireAuth, async (req: any, res) => {
+  const { prospectId, contenu } = req.body;
+  if (!contenu?.trim()) return res.status(400).json({ error: 'Message vide.' });
+  if (!prospectId)      return res.status(400).json({ error: 'prospectId requis.' });
+  try {
+    const { rows: pRows } = await q(
+      'SELECT prenom_parent, nom_parent, email, telephone FROM prospects WHERE id = $1', [prospectId]
+    );
+    if (pRows.length === 0) return res.status(404).json({ error: 'Prospect introuvable.' });
+    const p = pRows[0];
+    const de = `${p.prenom_parent} ${p.nom_parent} (Parent)`;
+    const id = uid('msg');
+    await q(
+      'INSERT INTO messages (id,prospect_id,de,date,lu,contenu,created_at,updated_at) VALUES ($1,$2,$3,NOW(),$4,$5,NOW(),NOW())',
+      [id, prospectId, de, false, contenu.trim()]
+    );
+    await logNotification('email', 'direction@horizonssavants.com',
+      `Nouveau message de ${de} :\n\n${contenu.trim()}`,
+      `[Message Parent] ${p.prenom_parent} ${p.nom_parent}`
+    );
+    const { rows } = await q('SELECT * FROM messages WHERE id = $1', [id]);
+    res.status(201).json(rowToObj(rows[0]));
+  } catch (e: any) {
+    console.error('[parent/messages]', e);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
+});
+
 app.patch('/api/messages/:id', requireAuth, async (req, res) => {
   const { id } = req.params;
   const { lu } = req.body;
@@ -1501,6 +1634,77 @@ function crudTable(name: string, idPrefix: string) {
     } catch (e) { console.error(e); res.status(500).json({ error: 'Erreur serveur.' }); }
   });
 }
+
+// ─── Messages — broadcast admin vers tous les parents ────────────────────────
+
+app.post('/api/messages/broadcast', requireAdmin, async (req, res) => {
+  const { de, contenu, section } = req.body;
+  if (!contenu?.trim()) return res.status(400).json({ error: 'Contenu requis.' });
+  const sender = (de || 'Direction EPV Horizons Savants').trim();
+  try {
+    let query = "SELECT id FROM prospects WHERE statut != 'Archive'";
+    const params: any[] = [];
+    if (section && section !== 'ALL') {
+      params.push(section);
+      query += ` AND section_visee = $${params.length}`;
+    }
+    const { rows } = await q(query, params);
+    let sent = 0;
+    for (const p of rows) {
+      await q(
+        'INSERT INTO messages (id,prospect_id,de,date,lu,contenu,created_at,updated_at) VALUES ($1,$2,$3,NOW(),$4,$5,NOW(),NOW())',
+        [uid('msg'), p.id, sender, false, contenu.trim()]
+      );
+      sent++;
+    }
+    await logAction('SEND', 'Messages', `Broadcast "${contenu.trim().slice(0, 60)}" → ${sent} parents`);
+    res.json({ success: true, sent });
+  } catch (e: any) {
+    console.error('[broadcast]', e);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ─── Newsletter — envoi réel via Infobip ─────────────────────────────────────
+
+app.post('/api/newsletters/:id/send', requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { rows: nlRows } = await q('SELECT * FROM newsletters WHERE id = $1', [id]);
+    if (nlRows.length === 0) return res.status(404).json({ error: 'Newsletter introuvable.' });
+    const nl = rowToObj(nlRows[0]);
+
+    let prospectQuery = 'SELECT email, prenom_parent, telephone FROM prospects WHERE email IS NOT NULL';
+    const params: any[] = [];
+    if (nl.cible && nl.cible !== 'ALL') {
+      params.push(nl.cible);
+      prospectQuery += ` AND section_visee = $${params.length}`;
+    }
+    const { rows: recipients } = await q(prospectQuery, params);
+
+    let sent = 0;
+    for (const p of recipients) {
+      const html = `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px">
+        <h2 style="color:#0D2E5C">EPV Horizons Savants</h2>
+        <p>Bonjour ${p.prenom_parent},</p>
+        <div style="line-height:1.7;white-space:pre-line">${nl.contenu}</div>
+        <hr style="margin:24px 0;border:none;border-top:1px solid #e2e8f0">
+        <p style="font-size:12px;color:#94a3b8">EPV Horizons Savants · Bingerville Mtn Kro, Abidjan</p>
+      </div>`;
+      const ok = await sendInfobipEmail(p.email, nl.objet, html);
+      if (ok) sent++;
+    }
+
+    await q(
+      'UPDATE newsletters SET statut = $1, envois = $2, updated_at = NOW() WHERE id = $3',
+      ['envoyée', sent, id]
+    );
+    res.json({ success: true, sent, total: recipients.length });
+  } catch (e: any) {
+    console.error('[newsletter/send]', e);
+    res.status(500).json({ error: e.message });
+  }
+});
 
 // Logs (lecture seule admin)
 app.get('/api/logs', requireAdmin, async (_req, res) => {

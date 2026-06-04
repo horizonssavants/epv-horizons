@@ -206,7 +206,7 @@ export const PreInscriptionForm: React.FC<PreInscriptionFormProps> = ({ onSucces
           Formulaire de Pré-inscription en Ligne
         </h3>
         <p className="text-center text-xs text-brand-muted mt-1">
-          Rentrée scolaire 2026-2027 — Places contingentées par section.
+          Rentrée scolaire 2026/2027 · Places contingentées par section.
         </p>
       </div>
 
@@ -233,42 +233,54 @@ export const PreInscriptionForm: React.FC<PreInscriptionFormProps> = ({ onSucces
                 <Users size={16} className="text-brand-gold" /> Combien d'enfants souhaitez-vous inscrire ?
               </h4>
 
-              <div className="grid grid-cols-4 gap-3">
-                {[1, 2, 3, 4].map(n => (
-                  <button
-                    key={n}
-                    type="button"
-                    onClick={() => handleNbChange(n)}
-                    className="relative flex flex-col items-center justify-center gap-2 py-5 rounded-xl border-2 transition-all duration-200 cursor-pointer group"
+              <div className="space-y-4">
+                {/* Liste déroulante */}
+                <div className="relative">
+                  <select
+                    value={nbEnfants}
+                    onChange={e => handleNbChange(parseInt(e.target.value))}
+                    className="w-full appearance-none px-5 py-4 text-base font-sans font-semibold rounded-xl border-2 focus:outline-none transition-all cursor-pointer"
                     style={{
-                      borderColor: nbEnfants === n ? '#0D2E5C' : '#E5E7EB',
-                      background:  nbEnfants === n ? '#EFF6FF' : 'white',
-                      boxShadow:   nbEnfants === n ? '0 0 0 3px rgba(13,46,92,0.12)' : 'none',
+                      borderColor: '#0D2E5C',
+                      background:  '#EFF6FF',
+                      color:       '#0D2E5C',
+                      boxShadow:   '0 0 0 3px rgba(13,46,92,0.08)',
                     }}
                   >
-                    <div className="flex gap-0.5">
-                      {Array(n).fill(0).map((_, i) => (
-                        <div key={i} className="w-5 h-5 rounded-full flex items-center justify-center"
-                          style={{ background: nbEnfants === n ? '#0D2E5C' : '#E5E7EB' }}>
-                          <User size={10} color={nbEnfants === n ? 'white' : '#9CA3AF'} />
-                        </div>
-                      ))}
-                    </div>
-                    <span className="font-sans font-bold text-lg"
-                          style={{ color: nbEnfants === n ? '#0D2E5C' : '#6B7280' }}>
-                      {n}
-                    </span>
-                    <span className="text-[10px] font-sans uppercase tracking-wide"
-                          style={{ color: nbEnfants === n ? '#0D2E5C' : '#9CA3AF' }}>
-                      {n === 1 ? 'enfant' : 'enfants'}
-                    </span>
-                    {nbEnfants === n && (
-                      <div className="absolute top-2 right-2">
-                        <CheckCircle size={14} className="text-brand-blue-deep" />
-                      </div>
-                    )}
-                  </button>
-                ))}
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
+                      <option key={n} value={n}>
+                        {n} {n === 1 ? 'enfant' : 'enfants'}
+                      </option>
+                    ))}
+                  </select>
+                  {/* Chevron */}
+                  <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                      <path d="M4 6.5 L9 11.5 L14 6.5" stroke="#0D2E5C" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Aperçu visuel du nombre choisi */}
+                <div className="flex items-center justify-center gap-2 py-3 rounded-xl"
+                     style={{ background: 'white', border: '1.5px solid #E5E7EB' }}>
+                  {Array(Math.min(nbEnfants, 8)).fill(0).map((_, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: i * 0.06, duration: 0.25, ease: 'backOut' }}
+                      className="w-8 h-8 rounded-full flex items-center justify-center"
+                      style={{ background: '#0D2E5C' }}
+                    >
+                      <User size={14} color="white" />
+                    </motion.div>
+                  ))}
+                </div>
+
+                <p className="text-center text-sm font-semibold text-brand-blue-deep">
+                  {nbEnfants} {nbEnfants === 1 ? 'enfant sélectionné' : 'enfants sélectionnés'}
+                </p>
               </div>
 
               <div className="p-3.5 bg-blue-50 border border-blue-100 rounded-lg">
@@ -350,7 +362,7 @@ export const PreInscriptionForm: React.FC<PreInscriptionFormProps> = ({ onSucces
                       <div className="p-3.5 bg-brand-gold/15 border-l-4 border-brand-gold text-[11px] font-sans text-brand-dark flex gap-2.5 items-start">
                         <AlertTriangle size={14} className="text-brand-gold shrink-0 mt-0.5" />
                         <div>
-                          <strong className="font-bold text-brand-blue-deep">Droit d'examen — 3 000 FCFA :</strong>
+                          <strong className="font-bold text-brand-blue-deep">Droit d'examen · 3 000 FCFA :</strong>
                           {' '}Fin de cycle primaire (entrée en 6ème). Règlement au secrétariat.
                         </div>
                       </div>
@@ -431,7 +443,7 @@ export const PreInscriptionForm: React.FC<PreInscriptionFormProps> = ({ onSucces
               {nbEnfants > 1 && (
                 <div className="border border-brand-border/40 rounded-lg overflow-hidden">
                   <div className="bg-brand-blue-deep/5 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-brand-blue-deep">
-                    Récapitulatif — {nbEnfants} enfants à inscrire
+                    Récapitulatif · {nbEnfants} enfants à inscrire
                   </div>
                   {children.map((c, i) => (
                     <div key={i} className="flex items-center gap-3 px-3 py-2 border-t border-brand-border/30 text-xs">

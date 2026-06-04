@@ -21,13 +21,13 @@ const CARD_GAP    = 24;               // espace entre cartes en px
 const CARD_STRIDE = CARD_W + CARD_GAP; // 299px par slot
 
 const TESTIMONIALS = [
-  { id: 1, parent: "Mme Carine Kouamé",     role: "Mère d'Ariel — Grande Section",       initials: "CK", color: "from-blue-500 to-blue-700",      quote: "Une école d'excellence d'une qualité rare en Côte d'Ivoire. L'accent mis sur le bilinguisme dès la maternelle est un vrai atout d'avenir.", stars: 5 },
-  { id: 2, parent: "M. Ibrahim Touré",       role: "Père de Maya — CP",                   initials: "IT", color: "from-emerald-500 to-green-700",   quote: "Un encadrement bienveillant qui ne sacrifie pas la rigueur académique. EPV Horizons Savants réunit le meilleur des deux mondes.", stars: 5 },
-  { id: 3, parent: "Dr. Sandrine N'Guessan", role: "Mère de Marc-Aurèle — Petite Section",initials: "SN", color: "from-violet-500 to-purple-700",   quote: "Les effectifs limités à 15 élèves par classe garantissent une attention personnalisée quotidienne. Je suis extrêmement sereine pour la rentrée 2026.", stars: 5 },
-  { id: 4, parent: "M. Kofi Asante",         role: "Père de Léa — CE1",                   initials: "KA", color: "from-amber-500 to-orange-600",    quote: "L'approche bilingue est remarquable. Ma fille parle anglais couramment après un an seulement. Une équipe pédagogique exceptionnelle.", stars: 5 },
-  { id: 5, parent: "Mme Fatoumata Diallo",   role: "Mère de Kévin — CM1",                 initials: "FD", color: "from-rose-500 to-pink-700",       quote: "Le suivi personnalisé et les projets scientifiques ont éveillé chez mon fils une vraie passion pour les mathématiques. Bravo !", stars: 5 },
-  { id: 6, parent: "M. Jean-Claude Bamba",   role: "Père d'Amara — Moyenne Section",      initials: "JB", color: "from-teal-500 to-cyan-700",       quote: "L'environnement sécurisé, les petits effectifs, la pédagogie active... EPV Horizons Savants est exactement l'école que je cherchais.", stars: 5 },
-  { id: 7, parent: "Mme Aya Coulibaly",      role: "Mère de Ryan — CP",                   initials: "AC", color: "from-indigo-500 to-blue-700",     quote: "La méthode Singapour pour les maths a transformé la relation de mon fils avec les chiffres. Des résultats époustouflants dès le premier trimestre.", stars: 5 },
+  { id: 1, parent: "Mme Carine Kouamé",     role: "Mère d'Ariel · Grande Section",       initials: "CK", color: "from-blue-500 to-blue-700",      quote: "Une école d'excellence d'une qualité rare en Côte d'Ivoire. L'accent mis sur le bilinguisme dès la maternelle est un vrai atout d'avenir.", stars: 5 },
+  { id: 2, parent: "M. Ibrahim Touré",       role: "Père de Maya · CP",                   initials: "IT", color: "from-emerald-500 to-green-700",   quote: "Un encadrement bienveillant qui ne sacrifie pas la rigueur académique. EPV Horizons Savants réunit le meilleur des deux mondes.", stars: 5 },
+  { id: 3, parent: "Dr. Sandrine N'Guessan", role: "Mère de Marc-Aurèle · Petite Section",initials: "SN", color: "from-violet-500 to-purple-700",   quote: "Les effectifs limités à 15 élèves par classe garantissent une attention personnalisée quotidienne. Je suis extrêmement sereine pour la rentrée 2026.", stars: 5 },
+  { id: 4, parent: "M. Kofi Asante",         role: "Père de Léa · CE1",                   initials: "KA", color: "from-amber-500 to-orange-600",    quote: "L'approche bilingue est remarquable. Ma fille parle anglais couramment après un an seulement. Une équipe pédagogique exceptionnelle.", stars: 5 },
+  { id: 5, parent: "Mme Fatoumata Diallo",   role: "Mère de Kévin · CM1",                 initials: "FD", color: "from-rose-500 to-pink-700",       quote: "Le suivi personnalisé et les projets scientifiques ont éveillé chez mon fils une vraie passion pour les mathématiques. Bravo !", stars: 5 },
+  { id: 6, parent: "M. Jean-Claude Bamba",   role: "Père d'Amara · Moyenne Section",      initials: "JB", color: "from-teal-500 to-cyan-700",       quote: "L'environnement sécurisé, les petits effectifs, la pédagogie active... EPV Horizons Savants est exactement l'école que je cherchais.", stars: 5 },
+  { id: 7, parent: "Mme Aya Coulibaly",      role: "Mère de Ryan · CP",                   initials: "AC", color: "from-indigo-500 to-blue-700",     quote: "La méthode Singapour pour les maths a transformé la relation de mon fils avec les chiffres. Des résultats époustouflants dès le premier trimestre.", stars: 5 },
 ];
 
 /** Wrapper déclenchant une animation CSS au scroll */
@@ -63,7 +63,7 @@ function Reveal({ children, delay = 0, animation = 'bounceInUp', className = '' 
   );
 }
 
-/** Carte 3D — effet tilt au survol de la souris */
+/** Carte 3D · effet tilt au survol de la souris */
 function TiltCard({ children, className }: { children: React.ReactNode; className?: string }) {
   const rawX = useMotionValue(0);
   const rawY = useMotionValue(0);
@@ -87,7 +87,7 @@ function TiltCard({ children, className }: { children: React.ReactNode; classNam
   );
 }
 
-/** Carte bulle de témoignage — scale réactif à la position dans le track */
+/** Carte bulle de témoignage · scale réactif à la position dans le track */
 function TestimonialCard({ t, idx, trackX, containerW }: {
   t: (typeof TESTIMONIALS)[0];
   idx: number;
@@ -139,7 +139,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
     ? ['Rigueur', 'Bilinguisme', 'Excellence', 'Épanouissement']
     : ['Rigor', 'Bilingualism', 'Excellence', 'Development'];
 
-  /* (pancarte chalk — pas d'état, animation CSS pure) */
+  /* (pancarte chalk · pas d'état, animation CSS pure) */
 
   /* Carousel piliers mobile */
   const pillarCarouselRef = useRef<HTMLDivElement>(null);
@@ -178,7 +178,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
     return () => { clearInterval(interval); clearTimeout(swap); };
   }, []);
 
-  /* Animation rAF du marquee — 50s pour parcourir la moitié du track */
+  /* Animation rAF du marquee · 50s pour parcourir la moitié du track */
   useEffect(() => {
     const total = TESTIMONIALS.length * CARD_STRIDE;
     let x = 0;
@@ -361,7 +361,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               </div>
             </div>
 
-            {/* H1 — typographie fluide clamp() */}
+            {/* H1 · typographie fluide clamp() */}
             <h1
               className="hero-fade-in font-sans font-extrabold text-white tracking-[-0.01em] leading-[1.25]"
               style={{ fontSize: 'clamp(1.3rem, 4.5vw, 2.75rem)', animationDelay: '80ms' }}
@@ -457,7 +457,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           <div className="absolute right-[5%] top-[8%] w-16 h-16 lg:right-[20%] lg:top-[32%] lg:w-60 lg:h-60
                           bg-brand-gold/8 blur-[40px] lg:blur-[90px] rounded-full" />
 
-          {/* Grand cercle — haut droite (mobile: coin haut-droit) */}
+          {/* Grand cercle · haut droite (mobile: coin haut-droit) */}
           <div className="absolute right-[2%] top-[3%]
                           w-24 h-24 sm:w-32 sm:h-32 lg:w-72 lg:h-72 xl:w-80 xl:h-80
                           rounded-full overflow-hidden
@@ -470,7 +470,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                  className="w-full h-full object-cover brightness-[1.05]" />
           </div>
 
-          {/* Cercle moyen — juste en dessous à gauche du grand (mobile) */}
+          {/* Cercle moyen · juste en dessous à gauche du grand (mobile) */}
           <div className="absolute right-[20%] top-[14%]
                           w-16 h-16 sm:w-24 sm:h-24 lg:right-[30%] lg:top-[38%] lg:w-52 lg:h-52 xl:w-56 xl:h-56
                           rounded-full overflow-hidden
@@ -483,7 +483,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                  className="w-full h-full object-cover" />
           </div>
 
-          {/* Petit cercle — sous le grand, coin droit (mobile) */}
+          {/* Petit cercle · sous le grand, coin droit (mobile) */}
           <div className="absolute right-[3%] top-[26%]
                           w-12 h-12 sm:w-16 sm:h-16 lg:right-[4%] lg:top-auto lg:bottom-[8%] lg:w-36 lg:h-36 xl:w-40 xl:h-40
                           rounded-full overflow-hidden
@@ -498,7 +498,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* ══ 2. FLOATING ISLAND — Stats glassmorphism ══ */}
+      {/* ══ 2. FLOATING ISLAND · Stats glassmorphism ══ */}
       <div className="-mt-10 relative z-20 px-4 md:px-8 pb-0">
         <div className="max-w-5xl mx-auto">
           <motion.div
@@ -550,7 +550,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* ══ 3. PILIERS — Staggered Layout + Framer Motion ══ */}
+      {/* ══ 3. PILIERS · Staggered Layout + Framer Motion ══ */}
       <section className="pt-24 pb-40 px-4 md:px-8 relative overflow-hidden"
                style={{ background: 'linear-gradient(160deg,#f4f8ff 0%,#fffbf0 50%,#f0fdf6 100%)' }}>
         <div className="max-w-6xl mx-auto">
@@ -582,8 +582,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 iconColor: 'text-brand-blue-deep',
                 title:     lang === 'fr' ? 'Excellence Académique'   : 'Academic Excellence',
                 desc:      lang === 'fr'
-                  ? "Un enseignement rigoureux basé sur les programmes nationaux renforcés par les meilleures méthodes internationales — approche Singapour pour les maths, écriture renforcée, projets scientifiques autonomes."
-                  : "Rigorous teaching based on national curricula enhanced by the best international methods — Singapore approach for maths, reinforced writing, autonomous science projects.",
+                  ? "Un enseignement rigoureux basé sur les programmes nationaux renforcés par les meilleures méthodes internationales · approche Singapour pour les maths, écriture renforcée, projets scientifiques autonomes."
+                  : "Rigorous teaching based on national curricula enhanced by the best international methods · Singapore approach for maths, reinforced writing, autonomous science projects.",
                 ctaLabel:  lang === 'fr' ? 'EN SAVOIR PLUS' : 'LEARN MORE',
                 ctaColor:  'text-brand-blue-medium hover:text-brand-blue-deep',
                 ctaLine:   'bg-brand-blue-light',
@@ -618,8 +618,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 iconColor: 'text-emerald-700',
                 title:     lang === 'fr' ? 'Épanouissement & Éveil' : 'Growth & Awakening',
                 desc:      lang === 'fr'
-                  ? "Apprentissage par la curiosité et l'expérimentation — éveil sportif, artistique (musique, théâtre, poterie), et initiation à la robotique et à la programmation."
-                  : "Learning through curiosity and experimentation — sport, arts (music, theatre, pottery), and introduction to robotics and coding.",
+                  ? "Apprentissage par la curiosité et l'expérimentation · éveil sportif, artistique (musique, théâtre, poterie), et initiation à la robotique et à la programmation."
+                  : "Learning through curiosity and experimentation · sport, arts (music, theatre, pottery), and introduction to robotics and coding.",
                 ctaLabel:  lang === 'fr' ? 'EXPLORER' : 'EXPLORE',
                 ctaColor:  'text-emerald-600 hover:text-emerald-800',
                 ctaLine:   'bg-emerald-500',
@@ -708,7 +708,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* ══ 4. PROJET PÉDAGOGIQUE — Style Aiglon : dark + collage ══ */}
+      {/* ══ 4. PROJET PÉDAGOGIQUE · Style Aiglon : dark + collage ══ */}
       <section className="relative overflow-hidden" style={{ background: '#0b1d3a' }}>
         <div className="absolute inset-0 pattern-topo pointer-events-none" />
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 items-stretch relative z-10">
@@ -719,7 +719,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               {/* Grande photo */}
               <img
                 src="/img/classe.jpg"
-                alt="EPV — Classe"
+                alt="EPV · Classe"
                 loading="lazy"
                 className="w-full h-[280px] md:h-[340px] object-cover"
               />
@@ -728,7 +728,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                    style={{ borderColor: '#0b1d3a' }}>
                 <img
                   src="/img/co.jpeg"
-                  alt="EPV — Vie scolaire"
+                  alt="EPV · Vie scolaire"
                   loading="lazy"
                   className="w-full h-[170px] object-cover"
                 />
@@ -769,7 +769,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* ══ 5. GALERIE — Bento Grid ══ */}
+      {/* ══ 5. GALERIE · Bento Grid ══ */}
       <section className="py-24 px-4 md:px-8" style={{ background: '#F4F8FF' }}>
         <div className="max-w-6xl mx-auto">
           <Reveal animation="bounceInUp" className="text-center mb-14">
@@ -785,8 +785,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             </h2>
             <p className="font-serif text-sm text-brand-muted mt-5 max-w-xl mx-auto leading-relaxed">
               {lang === 'fr'
-                ? "Un campus vert, entièrement climatisé, surveillé 24h/24 — conçu pour l'épanouissement, la sécurité et l'excellence de chaque enfant."
-                : "A green, fully air-conditioned campus, monitored 24/7 — designed for the well-being, safety and excellence of every child."}
+                ? "Un campus vert, entièrement climatisé, surveillé 24h/24 · conçu pour l'épanouissement, la sécurité et l'excellence de chaque enfant."
+                : "A green, fully air-conditioned campus, monitored 24/7 · designed for the well-being, safety and excellence of every child."}
             </p>
             <div className="h-px w-12 bg-brand-gold/50 mx-auto mt-6" />
           </Reveal>
@@ -794,7 +794,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* ══ 6. TÉMOIGNAGES — Infinite Marquee ══ */}
+      {/* ══ 6. TÉMOIGNAGES · Infinite Marquee ══ */}
       <section className="relative py-20 overflow-hidden" style={{ background: '#0b1d3a' }}>
         <div className="absolute inset-0 pattern-topo pointer-events-none" />
 
@@ -842,7 +842,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* ══ 7. CTA FINAL — Full Width, Interactive Tiles ══ */}
+      {/* ══ 7. CTA FINAL · Full Width, Interactive Tiles ══ */}
       <section className="relative py-24 px-4 md:px-8 overflow-hidden"
                style={{ background: 'linear-gradient(145deg,#06192e 0%,#0D2E5C 45%,#0a2550 100%)' }}>
         <div className="absolute inset-0 pattern-sunburst opacity-8 pointer-events-none" />

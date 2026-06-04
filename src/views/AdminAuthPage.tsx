@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, Eye, EyeOff, ShieldCheck } from 'lucide-react';
 import { signInNeon } from '../lib/auth.ts';
@@ -76,40 +76,19 @@ function ErrorToast({ message, onDismiss }: { message: string; onDismiss: () => 
   );
 }
 
-/* Bouton shimmer doré */
+/* Bouton simple doré */
 function GoldButton({ children, disabled }: { children: React.ReactNode; disabled?: boolean }) {
-  const shimmerRef = useRef<HTMLDivElement>(null);
   return (
-    <motion.button
+    <button
       type="submit"
       disabled={disabled}
-      whileHover={{ scale: 1.01 }}
-      whileTap={{ scale: 0.98 }}
-      onHoverStart={() => {
-        if (shimmerRef.current) {
-          shimmerRef.current.style.animation = 'shimmer 0.7s ease forwards';
-        }
-      }}
-      onHoverEnd={() => {
-        if (shimmerRef.current) {
-          shimmerRef.current.style.animation = 'none';
-        }
-      }}
-      className="relative w-full py-3.5 rounded-xl overflow-hidden text-[#0D2E5C] font-sans font-bold text-sm
-                 uppercase tracking-wide transition-all disabled:opacity-50 cursor-pointer"
-      style={{ background: 'linear-gradient(135deg, #F5A623 0%, #FFD966 50%, #E8960E 100%)' }}
+      className="w-full py-3.5 rounded-xl text-[#0D2E5C] font-sans font-bold text-sm
+                 uppercase tracking-wide transition-all disabled:opacity-50 cursor-pointer
+                 hover:opacity-90 active:scale-[0.99]"
+      style={{ background: '#F5A623' }}
     >
-      {/* Shimmer overlay */}
-      <div
-        ref={shimmerRef}
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.45) 50%, transparent 65%)',
-          backgroundSize: '200% 100%',
-        }}
-      />
-      <span className="relative z-10">{children}</span>
-    </motion.button>
+      {children}
+    </button>
   );
 }
 
@@ -138,18 +117,7 @@ export const AdminAuthPage: React.FC<AdminAuthPageProps> = ({ onSuccess, onBack 
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden select-none"
-      style={{ background: 'linear-gradient(135deg, #0A1929 0%, #0D2E5C 55%, #061526 100%)' }}>
-
-      {/* Grille subtile */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
-        style={{
-          backgroundImage: 'linear-gradient(rgba(74,144,217,1) 1px, transparent 1px), linear-gradient(90deg, rgba(74,144,217,1) 1px, transparent 1px)',
-          backgroundSize: '60px 60px'
-        }}
-      />
-      {/* Lueurs */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-blue-600/10 blur-[150px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-brand-gold/6 blur-[100px] rounded-full pointer-events-none" />
+      style={{ background: 'linear-gradient(160deg, #0A1929 0%, #0D2E5C 100%)' }}>
 
       {/* Bouton retour */}
       <motion.button
@@ -246,12 +214,6 @@ export const AdminAuthPage: React.FC<AdminAuthPageProps> = ({ onSuccess, onBack 
         </p>
       </motion.div>
 
-      <style>{`
-        @keyframes shimmer {
-          0%   { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
-        }
-      `}</style>
     </div>
   );
 };

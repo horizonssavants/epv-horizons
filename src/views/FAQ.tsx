@@ -451,7 +451,7 @@ export const FAQ: React.FC = () => {
                   Vous ne trouvez pas la réponse à vos questions ?
                 </h4>
                 <p className="font-serif text-[13px] text-slate-300 max-w-md leading-relaxed">
-                  Notre équipe d'admissions est disponible pour vous guider — dossier, visite de campus ou entretien d'orientation.
+                  Notre équipe d'admissions est disponible pour vous guider : dossier, visite de campus ou entretien d'orientation.
                 </p>
               </div>
 

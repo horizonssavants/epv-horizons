@@ -150,6 +150,23 @@ const TARIFS_DEFAUT: Record<string, number> = {
   CM1:1880000, CM2:1880000,
 };
 
+// ─── Export CSV client-side ───────────────────────────────────────────────────
+
+function downloadCSV(rows: Record<string, any>[], filename: string) {
+  if (!rows.length) return;
+  const keys = Object.keys(rows[0]);
+  const header = keys.join(';');
+  const body = rows.map(r =>
+    keys.map(k => `"${String(r[k] ?? '').replace(/"/g, '""')}"`).join(';')
+  );
+  const csv = '﻿' + [header, ...body].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
 // Helper fetch générique
 async function apiFetch(path: string) {
   const r = await authFetch(path);
@@ -850,8 +867,16 @@ function AnnuaireTab({ prospects, appointments, onProspectStatus, onToast, onRef
     <PageLayout title="Annuaire des dossiers"
       sub={`${filtered.length} enregistrement${filtered.length > 1 ? 's' : ''} · Année scolaire 2026`}
       actions={
-        <button className="flex items-center gap-1.5 px-3 py-2 rounded-md border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50 cursor-pointer transition-colors">
-          <Download size={13} /> Exporter CSV
+        <button onClick={() => downloadCSV(filtered.map(p => ({
+          'Prénom enfant': p.prenomEnfant, 'Nom enfant': p.nomEnfant,
+          'Date naissance': fmtDate(p.dateNaissance), 'Section': p.sectionVisee,
+          'Prénom parent': p.prenomParent, 'Nom parent': p.nomParent,
+          'Lien': p.lienParente, 'Téléphone': p.telephone, 'Email': p.email,
+          'Commune': p.commune, 'Source': p.source || '', 'Statut': p.statut,
+          'Code parrainage': p.codeParrainagePersonnel, 'Date dossier': fmtDate(p.createdAt),
+        })), `prospects_epv_${new Date().toISOString().slice(0,10)}.csv`)}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-md border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50 cursor-pointer transition-colors">
+          <Download size={13} /> Exporter CSV ({filtered.length})
         </button>
       }
     >
@@ -1323,21 +1348,102 @@ function StatistiquesTab({ prospects }: DataProps) {
 // MESSAGERIE
 // ════════════════════════════════════════════════════════════════════════════
 
-function MessagerieTab({ contacts, notifications, onContactStatus, onToast }: DataProps) {
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const [tab, setTab]           = useState<'contacts'|'notifs'>('contacts');
+const SECTIONS_MSG = ['PS','MS','GS','CP','CE1','CE2','CM1','CM2'];
+const EXPEDITEURS  = ['Direction EPV Horizons Savants','Service Scolarité','Service Infirmerie EPV','Équipe Pédagogique'];
+
+function MessagerieTab({ contacts, notifications, prospects, onContactStatus, onToast }: DataProps) {
+  const [activeId,   setActiveId]   = useState<string | null>(null);
+  const [tab,        setTab]        = useState<'contacts'|'notifs'>('contacts');
+  const [showCompose,setShowCompose] = useState(false);
+  const [msgDe,      setMsgDe]      = useState(EXPEDITEURS[0]);
+  const [msgSection, setMsgSection] = useState('ALL');
+  const [msgContenu, setMsgContenu] = useState('');
+  const [sending,    setSending]    = useState(false);
+
   const unread = contacts.filter(c => c.statut !== 'Traité').length;
+  const nbDest = msgSection === 'ALL'
+    ? prospects.length
+    : prospects.filter(p => p.sectionVisee === msgSection).length;
+
+  const handleBroadcast = async () => {
+    if (!msgContenu.trim()) { onToast('Veuillez rédiger un message.'); return; }
+    setSending(true);
+    try {
+      const r = await apiPost('/api/messages/broadcast', {
+        de: msgDe, contenu: msgContenu.trim(), section: msgSection,
+      });
+      let data: any = {};
+      try { data = await r.json(); } catch {}
+      if (!r.ok) throw new Error(data.error || 'Erreur lors de l\'envoi.');
+      onToast(`Message envoyé à ${data.sent} parent${data.sent > 1 ? 's' : ''}.`);
+      setShowCompose(false);
+      setMsgContenu('');
+    } catch (err: any) {
+      onToast(err.message || 'Erreur lors de l\'envoi.');
+    } finally { setSending(false); }
+  };
 
   return (
     <PageLayout title="Messages & Notifications"
-      sub="Boîte de réception — formulaire de contact site public"
+      sub="Communication avec les familles et journal des notifications"
       actions={
-        <button onClick={() => onToast('Composition disponible dans la version connectée.')}
+        <button onClick={() => setShowCompose(v => !v)}
           className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold hover:bg-slate-700 cursor-pointer transition-colors">
-          <Send size={13} /> Nouveau message
+          {showCompose ? <><X size={13} /> Annuler</> : <><Send size={13} /> Nouveau message</>}
         </button>
       }
     >
+      {/* ── Formulaire broadcast ── */}
+      <AnimatePresence>
+        {showCompose && (
+          <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
+            <Card className="p-5 border-2 border-slate-900">
+              <p className="text-sm font-semibold text-slate-800 mb-4">Envoyer un message groupé aux parents</p>
+              <div className="grid md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Expéditeur</label>
+                  <select value={msgDe} onChange={e => setMsgDe(e.target.value)}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 bg-white">
+                    {EXPEDITEURS.map(e => <option key={e}>{e}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">
+                    Destinataires — <span className="text-slate-600 font-bold">{nbDest} parent{nbDest > 1 ? 's' : ''}</span>
+                  </label>
+                  <select value={msgSection} onChange={e => setMsgSection(e.target.value)}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 bg-white">
+                    <option value="ALL">Tous les parents</option>
+                    {SECTIONS_MSG.map(s => {
+                      const n = prospects.filter(p => p.sectionVisee === s).length;
+                      return <option key={s} value={s}>{s} — {SECTION_LABEL[s]} ({n})</option>;
+                    })}
+                  </select>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Message</label>
+                  <textarea value={msgContenu} onChange={e => setMsgContenu(e.target.value)} rows={5}
+                    placeholder="Rédigez votre message aux familles..."
+                    className="w-full px-3 py-2.5 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 resize-none font-sans" />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={handleBroadcast} disabled={sending || !msgContenu.trim()}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  {sending
+                    ? <><div className="w-3 h-3 rounded-full border-2 border-white/40 border-t-white animate-spin" /> Envoi…</>
+                    : <><Send size={13} /> Envoyer à {nbDest} parent{nbDest > 1 ? 's' : ''}</>}
+                </button>
+                <button onClick={() => { setShowCompose(false); setMsgContenu(''); }}
+                  className="px-4 py-2 rounded-md border border-slate-200 text-slate-600 text-xs font-semibold cursor-pointer hover:bg-slate-50 transition-colors">
+                  Annuler
+                </button>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex gap-1 border-b border-slate-200 mb-5">
         {[
           { id:'contacts', label:`Messages reçus${unread > 0 ? ` (${unread} non traités)` : ''}` },
@@ -1575,11 +1681,192 @@ function QRTab({ onToast }: DataProps) {
 // CONFIGURATION
 // ════════════════════════════════════════════════════════════════════════════
 
-function ConfigurationTab({ onToast, onRefresh, config }: DataProps) {
+// ─── Gestionnaire de documents (URLs) ────────────────────────────────────────
+
+const DOC_CATS = ['Réglementaire','Administratif','Scolaire','Médical'];
+
+function AdminDocuments({ onToast }: { onToast: (m: string) => void }) {
+  const [docs,    setDocs]    = useState<any[]>([]);
+  const [form,    setForm]    = useState<any | null>(null);
+  const [saving,  setSaving]  = useState(false);
+
+  useEffect(() => {
+    apiFetch('/api/documents').then(setDocs).catch(console.error);
+  }, []);
+
+  const handleSave = async () => {
+    if (!form.titre?.trim()) { onToast('Titre requis.'); return; }
+    setSaving(true);
+    try {
+      if (form.id) {
+        await apiPatch(`/api/documents/${form.id}`, form);
+        setDocs(prev => prev.map(d => d.id === form.id ? { ...d, ...form } : d));
+        onToast('Document mis à jour.');
+      } else {
+        const r = await apiPost('/api/documents', { ...form, actif: true });
+        let data: any = {};
+        try { data = await r.json(); } catch {}
+        if (r.ok) setDocs(prev => [...prev, data]);
+        onToast('Document ajouté.');
+      }
+      setForm(null);
+    } catch { onToast('Erreur lors de la sauvegarde.'); }
+    finally { setSaving(false); }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Supprimer ce document ?')) return;
+    await apiDelete(`/api/documents/${id}`);
+    setDocs(prev => prev.filter(d => d.id !== id));
+    onToast('Document supprimé.');
+  };
+
+  const toggleActif = async (id: string) => {
+    const doc = docs.find(d => d.id === id);
+    if (!doc) return;
+    await apiPatch(`/api/documents/${id}`, { actif: !doc.actif });
+    setDocs(prev => prev.map(d => d.id === id ? { ...d, actif: !d.actif } : d));
+  };
+
+  return (
+    <Card>
+      <CardHeader title="Bibliothèque de documents"
+        sub="Documents téléchargeables par les parents dans leur Espace"
+        action={
+          <button onClick={() => setForm({ titre: '', fichier: '', url: '', cat: 'Administratif', ordre: docs.length + 1 })}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-slate-900 text-white text-[11px] font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
+            <Plus size={12} /> Ajouter
+          </button>
+        }
+      />
+
+      <AnimatePresence>
+        {form && (
+          <motion.div initial={{ opacity:0, height:0 }} animate={{ opacity:1, height:'auto' }} exit={{ opacity:0, height:0 }} className="overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100 space-y-3 bg-slate-50">
+              <div className="grid md:grid-cols-2 gap-3">
+                <div className="md:col-span-2">
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Titre</label>
+                  <input value={form.titre} onChange={e => setForm((f: any) => ({...f, titre: e.target.value}))}
+                    placeholder="ex: Règlement intérieur 2025/2026"
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">URL du fichier PDF (lien Google Drive, Dropbox, etc.)</label>
+                  <input value={form.url || ''} onChange={e => setForm((f: any) => ({...f, url: e.target.value}))}
+                    placeholder="https://drive.google.com/file/d/..."
+                    className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Catégorie</label>
+                  <select value={form.cat} onChange={e => setForm((f: any) => ({...f, cat: e.target.value}))}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 bg-white">
+                    {DOC_CATS.map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Ordre d'affichage</label>
+                  <input type="number" value={form.ordre} onChange={e => setForm((f: any) => ({...f, ordre: parseInt(e.target.value)||1}))}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={handleSave} disabled={saving}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  <CheckCircle size={12} /> {saving ? 'Enregistrement…' : 'Enregistrer'}
+                </button>
+                <button onClick={() => setForm(null)}
+                  className="px-3 py-2 rounded-md border border-slate-200 text-slate-600 text-xs font-semibold cursor-pointer hover:bg-slate-50 transition-colors">
+                  Annuler
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead className="border-b border-slate-100 bg-slate-50">
+            <tr>
+              {['#','Titre','Catégorie','URL','Visible','Actions'].map(h => (
+                <th key={h} className="px-4 py-3 text-left font-semibold text-slate-400 text-[10px] uppercase tracking-wide">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-50">
+            {docs.length === 0 && (
+              <tr><td colSpan={6} className="px-5 py-6 text-center text-slate-400 text-xs">Aucun document.</td></tr>
+            )}
+            {[...docs].sort((a,b)=>(a.ordre||0)-(b.ordre||0)).map(d => (
+              <tr key={d.id} className={`hover:bg-slate-50 transition-colors ${!d.actif ? 'opacity-50' : ''}`}>
+                <td className="px-4 py-3 font-mono text-slate-400">{d.ordre || '—'}</td>
+                <td className="px-4 py-3 font-medium text-slate-800 max-w-[200px] truncate">{d.titre}</td>
+                <td className="px-4 py-3">
+                  <span className="text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded">{d.cat}</span>
+                </td>
+                <td className="px-4 py-3">
+                  {d.url ? (
+                    <a href={d.url} target="_blank" rel="noreferrer"
+                      className="text-blue-600 hover:underline text-[10px] font-mono flex items-center gap-1">
+                      <ExternalLink size={11} /> Voir
+                    </a>
+                  ) : <span className="text-slate-300 text-[10px]">Non définie</span>}
+                </td>
+                <td className="px-4 py-3">
+                  <button onClick={() => toggleActif(d.id)}
+                    className="cursor-pointer">
+                    {d.actif
+                      ? <ToggleRight size={18} className="text-emerald-500" />
+                      : <ToggleLeft  size={18} className="text-slate-300" />}
+                  </button>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex gap-1">
+                    <button onClick={() => setForm({ ...d })}
+                      className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors">
+                      <Edit2 size={13} />
+                    </button>
+                    <button onClick={() => handleDelete(d.id)}
+                      className="p-1.5 rounded hover:bg-red-50 text-slate-400 hover:text-red-500 cursor-pointer transition-colors">
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Card>
+  );
+}
+
+const SECTIONS_ORDER = ['PS','MS','GS','CP','CE1','CE2','CM1','CM2'];
+
+function ConfigurationTab({ onToast, onRefresh, config, tarifs }: DataProps) {
   const etab = config.etablissement || {};
-  const tarifsDisplay: any[] = config.tarifs_display || [];
   const adminEmail = config.adminEmail || 'admin@horizonssavants.com';
   const adminNom   = etab.directeur || 'Directeur Académique EPV';
+
+  const [editTarifs, setEditTarifs] = useState(false);
+  const [localTarifs, setLocalTarifs] = useState<Record<string,number>>(tarifs);
+  const [savingT, setSavingT] = useState(false);
+
+  const handleSaveTarifs = async () => {
+    setSavingT(true);
+    try {
+      await authFetch('/api/configuration/tarifs', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ valeur: localTarifs }),
+      });
+      onToast('Tarifs mis à jour.');
+      setEditTarifs(false);
+      onRefresh();
+    } catch { onToast('Erreur lors de la mise à jour.'); }
+    finally { setSavingT(false); }
+  };
 
   return (
     <PageLayout title="Configuration système" sub="Paramètres de l'école, grille tarifaire et compte administrateur">
@@ -1616,11 +1903,9 @@ function ConfigurationTab({ onToast, onRefresh, config }: DataProps) {
               <p className="text-sm font-semibold text-slate-800">{adminNom}</p>
               <p className="text-xs font-mono text-slate-400">{adminEmail}</p>
             </div>
-            <span className="ml-auto text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded">
-              Actif
-            </span>
+            <span className="ml-auto text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded">Actif</span>
           </div>
-          <div className="space-y-2 mb-5">
+          <div className="space-y-2">
             {[
               { l:'Dernière connexion', v: new Date().toLocaleDateString('fr-FR') },
               { l:'Niveau d\'accès',    v: 'Administrateur système' },
@@ -1635,31 +1920,68 @@ function ConfigurationTab({ onToast, onRefresh, config }: DataProps) {
         </Card>
       </div>
 
+      {/* Tarifs éditables */}
       <Card>
-        <CardHeader title="Grille tarifaire 2026/2027" sub="Frais en FCFA · Toutes charges incluses" />
+        <CardHeader title="Tarifs de scolarité par section (FCFA/an)"
+          action={
+            editTarifs ? (
+              <div className="flex gap-2">
+                <button onClick={handleSaveTarifs} disabled={savingT}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-slate-900 text-white text-[11px] font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  <CheckCircle size={12} /> {savingT ? 'Enregistrement…' : 'Enregistrer'}
+                </button>
+                <button onClick={() => { setLocalTarifs(tarifs); setEditTarifs(false); }}
+                  className="px-3 py-1.5 rounded-md border border-slate-200 text-slate-600 text-[11px] font-semibold cursor-pointer hover:bg-slate-50 transition-colors">
+                  Annuler
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => { setLocalTarifs(tarifs); setEditTarifs(true); }}
+                className="flex items-center gap-1 px-3 py-1.5 rounded-md border border-slate-200 text-slate-600 text-[11px] font-semibold cursor-pointer hover:bg-slate-50 transition-colors">
+                <Edit2 size={12} /> Modifier les tarifs
+              </button>
+            )
+          }
+        />
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead className="border-b border-slate-100 bg-slate-50">
               <tr>
-                {['Niveau','Frais d\'inscription','Scolarité annuelle','Fournitures','Total annuel'].map(h => (
+                {['Section','Cycle','Scolarité annuelle (FCFA)','Trimestre (÷3)'].map(h => (
                   <th key={h} className="px-5 py-3 text-left font-semibold text-slate-400 text-[10px] uppercase tracking-wide">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {tarifsDisplay.map((r: any, i: number) => (
-                <tr key={i} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-5 py-4 font-semibold text-slate-800">{r.section}</td>
-                  <td className="px-5 py-4 font-mono text-slate-600">{r.inscription} F</td>
-                  <td className="px-5 py-4 font-mono text-slate-600">{r.scolarite} F</td>
-                  <td className="px-5 py-4 font-mono text-slate-600">{r.fournitures} F</td>
-                  <td className="px-5 py-4 font-mono font-bold text-slate-900">{r.total} F</td>
-                </tr>
-              ))}
+              {SECTIONS_ORDER.map(s => {
+                const val = editTarifs ? (localTarifs[s] || 0) : (tarifs[s] || 0);
+                const cycle = ['PS','MS','GS'].includes(s) ? 'Maternelle' : ['CP','CE1','CE2'].includes(s) ? 'Primaire C1' : 'Primaire C2';
+                return (
+                  <tr key={s} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-5 py-3.5">
+                      <span className="font-bold text-[10px] bg-slate-900 text-white px-2 py-0.5 rounded">{s}</span>
+                    </td>
+                    <td className="px-5 py-3.5 text-slate-500">{cycle}</td>
+                    <td className="px-5 py-3.5">
+                      {editTarifs ? (
+                        <input type="number" value={localTarifs[s] || 0}
+                          onChange={e => setLocalTarifs(t => ({...t, [s]: parseInt(e.target.value) || 0}))}
+                          className="w-36 px-2 py-1.5 text-xs font-mono border border-slate-300 rounded-md focus:outline-none focus:border-slate-500" />
+                      ) : (
+                        <span className="font-mono font-semibold text-slate-800">{val.toLocaleString('fr-FR')} F</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-3.5 font-mono text-slate-500">{Math.round(val / 3).toLocaleString('fr-FR')} F</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </Card>
+
+      {/* ── Bibliothèque documents (URLs) ── */}
+      <AdminDocuments onToast={onToast} />
 
       <Card className="border-red-200 bg-red-50">
         <div className="p-5">
@@ -1756,7 +2078,15 @@ function AssiduiteTab({ prospects, onToast }: DataProps) {
   return (
     <PageLayout title="Suivi de l'assiduité" sub="Pointage quotidien par classe"
       actions={
-        <button className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
+        <button onClick={() => downloadCSV(students.map(s => ({
+          'Élève': `${s.prenomEnfant} ${s.nomEnfant}`,
+          'Section': s.sectionVisee,
+          'Date': selectedDate,
+          'Présence': attendance[s.id] === 'absent' ? 'Absent' : attendance[s.id] === 'retard' ? 'Retard' : 'Présent',
+          'Responsable': `${s.prenomParent} ${s.nomParent}`,
+          'Téléphone': s.telephone,
+        })), `assiduite_${selectedSection}_${selectedDate}.csv`)}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
           <Download size={13} /> Exporter CSV
         </button>
       }
@@ -1845,32 +2175,119 @@ function AssiduiteTab({ prospects, onToast }: DataProps) {
 // 2. ENSEIGNANTS
 // ════════════════════════════════════════════════════════════════════════════
 
+const EMPTY_TEACHER = { prenom:'', nom:'', email:'', tel:'', matieres:'', classes:'', entree: new Date().toISOString().slice(0,10), statut:'actif' };
+
 function EnseignantsTab({ onToast }: DataProps) {
   const [teachers, setTeachers] = useState<any[]>([]);
-  const [search, setSearch] = useState('');
+  const [search,   setSearch]   = useState('');
+  const [form,     setForm]     = useState<any | null>(null);
+  const [saving,   setSaving]   = useState(false);
 
-  useEffect(() => {
-    apiFetch('/api/teachers').then(setTeachers).catch(console.error);
-  }, []);
+  useEffect(() => { apiFetch('/api/teachers').then(setTeachers).catch(console.error); }, []);
 
   const filtered = teachers.filter(t =>
-    !search || [t.nom, t.prenom, ...(t.matieres||[]), ...(t.classes||[])].some((v: string) => v.toLowerCase().includes(search.toLowerCase()))
+    !search || [t.nom, t.prenom, ...(t.matieres||[]), ...(t.classes||[])].some((v: string) => String(v).toLowerCase().includes(search.toLowerCase()))
   );
+
+  const handleSave = async () => {
+    if (!form.prenom?.trim() || !form.nom?.trim()) { onToast('Prénom et nom requis.'); return; }
+    setSaving(true);
+    const payload = {
+      ...form,
+      matieres: typeof form.matieres === 'string' ? form.matieres.split(',').map((s: string) => s.trim()).filter(Boolean) : form.matieres,
+      classes:  typeof form.classes  === 'string' ? form.classes.split(',').map((s: string) => s.trim()).filter(Boolean) : form.classes,
+    };
+    try {
+      if (form.id) {
+        await apiPatch(`/api/teachers/${form.id}`, payload);
+        setTeachers(prev => prev.map(t => t.id === form.id ? { ...t, ...payload } : t));
+        onToast('Enseignant mis à jour.');
+      } else {
+        const r = await apiPost('/api/teachers', payload);
+        let data: any = {};
+        try { data = await r.json(); } catch {}
+        if (r.ok) setTeachers(prev => [data, ...prev]);
+        onToast('Enseignant ajouté.');
+      }
+      setForm(null);
+    } catch { onToast('Erreur lors de la sauvegarde.'); }
+    finally { setSaving(false); }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Supprimer cet enseignant ?')) return;
+    await apiDelete(`/api/teachers/${id}`);
+    setTeachers(prev => prev.filter(t => t.id !== id));
+    onToast('Enseignant supprimé.');
+  };
 
   return (
     <PageLayout title="Enseignants" sub={`${teachers.length} membres du corps enseignant — Année 2025/2026`}
       actions={
-        <button onClick={() => onToast('Formulaire d\'ajout en cours de développement.')}
+        <button onClick={() => setForm({ ...EMPTY_TEACHER })}
           className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
           <Plus size={13} /> Ajouter un enseignant
         </button>
       }
     >
+      <AnimatePresence>
+        {form && (
+          <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
+            <Card className="p-5 border-2 border-slate-900">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm font-semibold text-slate-800">{form.id ? 'Modifier l\'enseignant' : 'Nouvel enseignant'}</p>
+                <button onClick={() => setForm(null)} className="p-1.5 rounded hover:bg-slate-100 cursor-pointer"><X size={15} className="text-slate-400" /></button>
+              </div>
+              <div className="grid md:grid-cols-3 gap-4 mb-4">
+                {[
+                  { key:'prenom', label:'Prénom', ph:'Marie' },
+                  { key:'nom',    label:'Nom',    ph:'Kouassi' },
+                  { key:'email',  label:'Email',  ph:'m.kouassi@epv.ci' },
+                  { key:'tel',    label:'Téléphone', ph:'+225 07 …' },
+                  { key:'matieres', label:'Matières (séparées par virgule)', ph:'Français, Mathématiques' },
+                  { key:'classes',  label:'Classes (séparées par virgule)', ph:'CP, CE1' },
+                ].map(f => (
+                  <div key={f.key} className={f.key === 'matieres' || f.key === 'classes' ? 'md:col-span-1' : ''}>
+                    <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">{f.label}</label>
+                    <input value={typeof form[f.key] === 'object' ? (form[f.key]||[]).join(', ') : form[f.key] || ''} onChange={e => setForm((v: any) => ({...v, [f.key]:e.target.value}))}
+                      placeholder={f.ph}
+                      className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                  </div>
+                ))}
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Date d'entrée</label>
+                  <input type="date" value={form.entree} onChange={e => setForm((v: any) => ({...v, entree:e.target.value}))}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Statut</label>
+                  <select value={form.statut} onChange={e => setForm((v: any) => ({...v, statut:e.target.value}))}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 bg-white">
+                    <option value="actif">Actif</option>
+                    <option value="conge">En congé</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={handleSave} disabled={saving}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  <CheckCircle size={13} /> {saving ? 'Enregistrement…' : 'Enregistrer'}
+                </button>
+                <button onClick={() => setForm(null)}
+                  className="px-4 py-2 rounded-md border border-slate-200 text-slate-600 text-xs font-semibold cursor-pointer hover:bg-slate-50 transition-colors">
+                  Annuler
+                </button>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="grid grid-cols-3 gap-4">
         {[
           { l:'Enseignants actifs',  v:teachers.filter(t=>t.statut==='actif').length,  Icon:CheckCircle },
           { l:'En congé / absent',   v:teachers.filter(t=>t.statut!=='actif').length,  Icon:Clock       },
-          { l:'Classes couvertes',   v:[...new Set(teachers.flatMap((t:any)=>t.classes||[]))].length, Icon:GraduationCap },
+          { l:'Classes couvertes',   v:[...new Set(teachers.flatMap((t:any)=>(t.classes||[])))].length, Icon:GraduationCap },
         ].map(s => <KpiCard key={s.l} label={s.l} value={s.v} Icon={s.Icon} />)}
       </div>
 
@@ -1893,23 +2310,26 @@ function EnseignantsTab({ onToast }: DataProps) {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
+            {filtered.length === 0 && (
+              <tr><td colSpan={7} className="text-center py-8 text-sm text-slate-400">Aucun enseignant enregistré.</td></tr>
+            )}
             {filtered.map(t => (
               <tr key={t.id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-5 py-3.5 font-semibold text-slate-800">{t.prenom} {t.nom}</td>
-                <td className="px-5 py-3.5 text-slate-600 max-w-[160px]">{t.matieres.join(', ')}</td>
+                <td className="px-5 py-3.5 text-slate-600 max-w-[160px]">{(t.matieres||[]).join(', ')}</td>
                 <td className="px-5 py-3.5">
                   <div className="flex flex-wrap gap-1">
-                    {t.classes.slice(0, 4).map(c => (
+                    {(t.classes||[]).slice(0, 4).map((c: string) => (
                       <span key={c} className="text-[9px] font-bold bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">{c}</span>
                     ))}
-                    {t.classes.length > 4 && <span className="text-[9px] text-slate-400">+{t.classes.length - 4}</span>}
+                    {(t.classes||[]).length > 4 && <span className="text-[9px] text-slate-400">+{t.classes.length - 4}</span>}
                   </div>
                 </td>
                 <td className="px-5 py-3.5">
                   <p className="font-mono text-[11px] text-slate-600">{t.tel}</p>
                   <p className="text-[10px] text-slate-400">{t.email}</p>
                 </td>
-                <td className="px-5 py-3.5 text-slate-400">{fmtDate(t.entree, { month:'short', year:'numeric' })}</td>
+                <td className="px-5 py-3.5 text-slate-400">{t.entree ? fmtDate(t.entree, { month:'short', year:'numeric' }) : '—'}</td>
                 <td className="px-5 py-3.5">
                   <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${t.statut === 'actif' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
                     {t.statut === 'actif' ? 'Actif' : 'En congé'}
@@ -1917,13 +2337,13 @@ function EnseignantsTab({ onToast }: DataProps) {
                 </td>
                 <td className="px-5 py-3.5">
                   <div className="flex gap-1">
-                    <button onClick={() => onToast(`Édition de ${t.prenom} ${t.nom}`)}
-                      className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors" title="Modifier">
+                    <button onClick={() => setForm({ ...t, matieres: (t.matieres||[]).join(', '), classes: (t.classes||[]).join(', ') })}
+                      className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors">
                       <Edit2 size={13} />
                     </button>
-                    <button onClick={() => onToast('Action archivée.')}
-                      className="p-1.5 rounded hover:bg-red-50 text-slate-400 hover:text-red-500 cursor-pointer transition-colors" title="Archiver">
-                      <Archive size={13} />
+                    <button onClick={() => handleDelete(t.id)}
+                      className="p-1.5 rounded hover:bg-red-50 text-slate-400 hover:text-red-500 cursor-pointer transition-colors">
+                      <Trash2 size={13} />
                     </button>
                   </div>
                 </td>
@@ -1940,26 +2360,109 @@ function EnseignantsTab({ onToast }: DataProps) {
 // 3. ADMINISTRATION (RH)
 // ════════════════════════════════════════════════════════════════════════════
 
+const POSTES_STAFF = ['Direction','Secrétariat','Comptabilité','Support technique','Maintenance','Garderie','Cantine'];
+const EMPTY_STAFF  = { prenom:'', nom:'', poste:'Secrétariat', tel:'', email:'', entree: new Date().toISOString().slice(0,10), statut:'actif' };
+
 function RhTab({ onToast }: DataProps) {
-  const [staff, setStaff] = useState<any[]>([]);
+  const [staff,  setStaff]  = useState<any[]>([]);
+  const [form,   setForm]   = useState<any | null>(null);
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => { apiFetch('/api/staff').then(setStaff).catch(console.error); }, []);
+
+  const handleSave = async () => {
+    if (!form.prenom?.trim() || !form.nom?.trim()) { onToast('Prénom et nom requis.'); return; }
+    setSaving(true);
+    try {
+      if (form.id) {
+        await apiPatch(`/api/staff/${form.id}`, form);
+        setStaff(prev => prev.map(s => s.id === form.id ? { ...s, ...form } : s));
+        onToast('Membre mis à jour.');
+      } else {
+        const r = await apiPost('/api/staff', form);
+        let data: any = {};
+        try { data = await r.json(); } catch {}
+        if (r.ok) setStaff(prev => [data, ...prev]);
+        onToast('Membre ajouté.');
+      }
+      setForm(null);
+    } catch { onToast('Erreur lors de la sauvegarde.'); }
+    finally { setSaving(false); }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Supprimer ce membre du personnel ?')) return;
+    await apiDelete(`/api/staff/${id}`);
+    setStaff(prev => prev.filter(s => s.id !== id));
+    onToast('Membre supprimé.');
+  };
 
   return (
     <PageLayout title="Personnel administratif" sub={`${staff.length} membres du personnel non-enseignant`}
       actions={
-        <button onClick={() => onToast('Formulaire d\'ajout en cours de développement.')}
+        <button onClick={() => setForm({ ...EMPTY_STAFF })}
           className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
           <Plus size={13} /> Ajouter un membre
         </button>
       }
     >
+      <AnimatePresence>
+        {form && (
+          <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
+            <Card className="p-5 border-2 border-slate-900">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm font-semibold text-slate-800">{form.id ? 'Modifier le membre' : 'Nouveau membre du personnel'}</p>
+                <button onClick={() => setForm(null)} className="p-1.5 rounded hover:bg-slate-100 cursor-pointer"><X size={15} className="text-slate-400" /></button>
+              </div>
+              <div className="grid md:grid-cols-3 gap-4 mb-4">
+                {[
+                  { key:'prenom', label:'Prénom', ph:'Aminata' },
+                  { key:'nom',    label:'Nom',    ph:'Diallo' },
+                  { key:'email',  label:'Email',  ph:'a.diallo@epv.ci' },
+                  { key:'tel',    label:'Téléphone', ph:'+225 05 …' },
+                ].map(f => (
+                  <div key={f.key}>
+                    <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">{f.label}</label>
+                    <input value={form[f.key] || ''} onChange={e => setForm((v: any) => ({...v, [f.key]:e.target.value}))}
+                      placeholder={f.ph}
+                      className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                  </div>
+                ))}
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Poste</label>
+                  <select value={form.poste} onChange={e => setForm((v: any) => ({...v, poste:e.target.value}))}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 bg-white">
+                    {POSTES_STAFF.map(p => <option key={p}>{p}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Date d'entrée</label>
+                  <input type="date" value={form.entree} onChange={e => setForm((v: any) => ({...v, entree:e.target.value}))}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={handleSave} disabled={saving}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  <CheckCircle size={13} /> {saving ? 'Enregistrement…' : 'Enregistrer'}
+                </button>
+                <button onClick={() => setForm(null)}
+                  className="px-4 py-2 rounded-md border border-slate-200 text-slate-600 text-xs font-semibold cursor-pointer hover:bg-slate-50 transition-colors">
+                  Annuler
+                </button>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { l:'Direction',    Icon:Award,    poste:'Direction'    },
           { l:'Secrétariat',  Icon:FileText, poste:'Secrétariat'  },
           { l:'Comptabilité', Icon:Wallet,   poste:'Comptabilité' },
           { l:'Support',      Icon:Wrench,   poste:'Support'      },
-        ].map(s => <KpiCard key={s.l} label={s.l} value={staff.filter((m:any)=>m.poste?.includes(s.poste)||m.service===s.poste).length || 0} Icon={s.Icon} />)}
+        ].map(s => <KpiCard key={s.l} label={s.l} value={staff.filter((m:any)=>m.poste?.includes(s.poste)).length || 0} Icon={s.Icon} />)}
       </div>
 
       <Card>
@@ -1973,21 +2476,30 @@ function RhTab({ onToast }: DataProps) {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
+            {staff.length === 0 && (
+              <tr><td colSpan={7} className="text-center py-8 text-sm text-slate-400">Aucun membre enregistré.</td></tr>
+            )}
             {staff.map(s => (
               <tr key={s.id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-5 py-3.5 font-semibold text-slate-800">{s.poste}</td>
                 <td className="px-5 py-3.5 text-slate-700">{s.prenom} {s.nom}</td>
                 <td className="px-5 py-3.5 font-mono text-[11px] text-slate-600">{s.tel}</td>
                 <td className="px-5 py-3.5 text-slate-500">{s.email}</td>
-                <td className="px-5 py-3.5 text-slate-400">{fmtDate(s.entree)}</td>
+                <td className="px-5 py-3.5 text-slate-400">{s.entree ? fmtDate(s.entree) : '—'}</td>
                 <td className="px-5 py-3.5">
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded border bg-emerald-50 text-emerald-700 border-emerald-200">Actif</span>
                 </td>
                 <td className="px-5 py-3.5">
-                  <button onClick={() => onToast(`Fiche de ${s.prenom} ${s.nom}`)}
-                    className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors">
-                    <Eye size={13} />
-                  </button>
+                  <div className="flex gap-1">
+                    <button onClick={() => setForm({ ...s })}
+                      className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors">
+                      <Edit2 size={13} />
+                    </button>
+                    <button onClick={() => handleDelete(s.id)}
+                      className="p-1.5 rounded hover:bg-red-50 text-slate-400 hover:text-red-500 cursor-pointer transition-colors">
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -2203,11 +2715,37 @@ function FacturationTab({ prospects, tarifs, onToast }: DataProps) {
 // 6. DÉPENSES
 // ════════════════════════════════════════════════════════════════════════════
 
+const DEPENSE_CATS = ['Salaires','Fournitures scolaires','Entretien','Électricité/Eau','Loyer','Assurance','Matériel','Communication','Autre'];
+const EMPTY_DEPENSE = { date: new Date().toISOString().slice(0,10), categorie:'Fournitures scolaires', libelle:'', montant:'', statut:'en_attente' };
+
 function DepensesTab({ onToast }: DataProps) {
   const [depenses, setDepenses] = useState<any[]>([]);
-  const [filter, setFilter] = useState('ALL');
+  const [filter,   setFilter]   = useState('ALL');
+  const [form,     setForm]     = useState<any | null>(null);
+  const [saving,   setSaving]   = useState(false);
 
   useEffect(() => { apiFetch('/api/depenses').then(setDepenses).catch(console.error); }, []);
+
+  const handleSave = async () => {
+    if (!form.libelle?.trim() || !form.montant) { onToast('Libellé et montant requis.'); return; }
+    setSaving(true);
+    try {
+      const r = await apiPost('/api/depenses', { ...form, montant: parseFloat(form.montant) });
+      let data: any = {};
+      try { data = await r.json(); } catch {}
+      if (r.ok) setDepenses(prev => [data, ...prev]);
+      setForm(null);
+      onToast('Dépense enregistrée.');
+    } catch { onToast('Erreur lors de l\'enregistrement.'); }
+    finally { setSaving(false); }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Supprimer cette dépense ?')) return;
+    await apiDelete(`/api/depenses/${id}`);
+    setDepenses(prev => prev.filter(d => d.id !== id));
+    onToast('Dépense supprimée.');
+  };
 
   const cats = [...new Set(depenses.map((d: any) => d.categorie))];
   const filtered = depenses.filter((d: any) => filter === 'ALL' || d.categorie === filter);
@@ -2222,14 +2760,70 @@ function DepensesTab({ onToast }: DataProps) {
   const maxTotal = catTotals[0]?.total || 1;
 
   return (
-    <PageLayout title="Dépenses" sub="Suivi des charges de l'établissement — Mai/Juin 2026"
+    <PageLayout title="Dépenses" sub="Suivi des charges de l'établissement"
       actions={
-        <button onClick={() => onToast('Formulaire de saisie en développement.')}
+        <button onClick={() => setForm({ ...EMPTY_DEPENSE })}
           className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
           <Plus size={13} /> Enregistrer une dépense
         </button>
       }
     >
+      <AnimatePresence>
+        {form && (
+          <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
+            <Card className="p-5 border-2 border-slate-900">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm font-semibold text-slate-800">Nouvelle dépense</p>
+                <button onClick={() => setForm(null)} className="p-1.5 rounded hover:bg-slate-100 cursor-pointer"><X size={15} className="text-slate-400" /></button>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Date</label>
+                  <input type="date" value={form.date} onChange={e => setForm((f: any) => ({...f, date:e.target.value}))}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Catégorie</label>
+                  <select value={form.categorie} onChange={e => setForm((f: any) => ({...f, categorie:e.target.value}))}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 bg-white">
+                    {DEPENSE_CATS.map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Description</label>
+                  <input value={form.libelle} onChange={e => setForm((f: any) => ({...f, libelle:e.target.value}))}
+                    placeholder="ex: Achat de cahiers CP..."
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Montant (FCFA)</label>
+                  <input type="number" value={form.montant} onChange={e => setForm((f: any) => ({...f, montant:e.target.value}))}
+                    placeholder="ex: 150000"
+                    className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Statut</label>
+                  <select value={form.statut} onChange={e => setForm((f: any) => ({...f, statut:e.target.value}))}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 bg-white">
+                    <option value="payée">Payée</option>
+                    <option value="en_attente">En attente</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={handleSave} disabled={saving}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  <CheckCircle size={13} /> {saving ? 'Enregistrement…' : 'Enregistrer'}
+                </button>
+                <button onClick={() => setForm(null)}
+                  className="px-4 py-2 rounded-md border border-slate-200 text-slate-600 text-xs font-semibold cursor-pointer hover:bg-slate-50 transition-colors">
+                  Annuler
+                </button>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 grid grid-cols-2 gap-4">
           <KpiCard label="Total réglé"      value={fmtF(totalPayé)} Icon={CheckCircle} />
@@ -2290,8 +2884,8 @@ function DepensesTab({ onToast }: DataProps) {
                   </span>
                 </td>
                 <td className="px-5 py-3.5 flex gap-1">
-                  <button onClick={() => onToast('Reçu généré.')} className="p-1.5 rounded hover:bg-slate-100 text-slate-400 cursor-pointer transition-colors"><Printer size={13} /></button>
-                  <button onClick={() => onToast('Dépense supprimée.')} className="p-1.5 rounded hover:bg-red-50 text-slate-400 hover:text-red-500 cursor-pointer transition-colors"><Trash2 size={13} /></button>
+                  <button onClick={() => onToast(`Reçu : ${d.libelle}`)} className="p-1.5 rounded hover:bg-slate-100 text-slate-400 cursor-pointer transition-colors"><Printer size={13} /></button>
+                  <button onClick={() => handleDelete(d.id)} className="p-1.5 rounded hover:bg-red-50 text-slate-400 hover:text-red-500 cursor-pointer transition-colors"><Trash2 size={13} /></button>
                 </td>
               </tr>
             ))}
@@ -2317,10 +2911,35 @@ function NewslettersTab({ prospects, onToast }: DataProps) {
 
   useEffect(() => { apiFetch('/api/newsletters').then(setNewsletters).catch(console.error); }, []);
 
-  const handleSend = () => {
+  const [sending, setSending] = useState(false);
+
+  const handleSend = async () => {
     if (!objet.trim() || !contenu.trim()) { onToast('Veuillez renseigner l\'objet et le contenu.'); return; }
-    onToast(`Newsletter envoyée à ${nbDest} destinataire${nbDest>1?'s':''}.`);
-    setView('list'); setObjet(''); setContenu('');
+    setSending(true);
+    try {
+      // 1. Créer le brouillon
+      const r = await apiPost('/api/newsletters', {
+        objet: objet.trim(), contenu: contenu.trim(), cible,
+        statut: 'brouillon', envois: 0, ouvertures: 0,
+        date: new Date().toISOString(),
+      });
+      let nl: any = {};
+      try { nl = await r.json(); } catch {}
+      if (!r.ok || !nl.id) throw new Error('Erreur création newsletter.');
+
+      // 2. Envoyer via Infobip
+      const rs = await authFetch(`/api/newsletters/${nl.id}/send`, { method: 'POST' });
+      let result: any = {};
+      try { result = await rs.json(); } catch {}
+
+      const sent = result.sent ?? 0;
+      nl = { ...nl, statut: 'envoyée', envois: sent };
+      setNewsletters(prev => [nl, ...prev]);
+      onToast(`Newsletter envoyée à ${sent} destinataire${sent > 1 ? 's' : ''}.`);
+      setView('list'); setObjet(''); setContenu('');
+    } catch (e: any) {
+      onToast(e.message || 'Erreur lors de l\'envoi.');
+    } finally { setSending(false); }
   };
 
   return (
@@ -2360,9 +2979,11 @@ function NewslettersTab({ prospects, onToast }: DataProps) {
                   className="w-full px-3 py-2.5 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 resize-none font-sans" />
               </div>
               <div className="flex gap-2 pt-2">
-                <button onClick={handleSend}
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
-                  <Send size={13} /> Envoyer à {nbDest} destinataire{nbDest>1?'s':''}
+                <button onClick={handleSend} disabled={sending}
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  {sending
+                    ? <><div className="w-3 h-3 rounded-full border-2 border-white/40 border-t-white animate-spin" /> Envoi en cours…</>
+                    : <><Send size={13} /> Envoyer à {nbDest} destinataire{nbDest>1?'s':''}</> }
                 </button>
                 <button onClick={() => onToast('Brouillon sauvegardé.')}
                   className="flex items-center gap-1.5 px-4 py-2.5 rounded-md border border-slate-200 text-slate-600 text-xs font-semibold cursor-pointer hover:bg-slate-50 transition-colors">
@@ -2412,8 +3033,14 @@ function NewslettersTab({ prospects, onToast }: DataProps) {
 // 8. BLOG
 // ════════════════════════════════════════════════════════════════════════════
 
+const BLOG_CATS = ['Pédagogie','Vie scolaire','Événements','Conseils parents','Bilingue'];
+const EMPTY_ARTICLE = { titre:'', auteur:'Direction EPV Horizons Savants', cat:'Pédagogie', contenu:'', statut:'brouillon' };
+
 function BlogTab({ onToast }: DataProps) {
   const [articles, setArticles] = useState<any[]>([]);
+  const [form,     setForm]     = useState<any | null>(null);
+  const [saving,   setSaving]   = useState(false);
+
   useEffect(() => { apiFetch('/api/articles').then(setArticles).catch(console.error); }, []);
 
   const toggleStatut = async (id: string) => {
@@ -2425,23 +3052,110 @@ function BlogTab({ onToast }: DataProps) {
     onToast(`Article ${next === 'publié' ? 'publié' : 'dépublié'}.`);
   };
 
+  const handleSave = async () => {
+    if (!form.titre?.trim() || !form.contenu?.trim()) { onToast('Titre et contenu requis.'); return; }
+    setSaving(true);
+    try {
+      if (form.id) {
+        await apiPatch(`/api/articles/${form.id}`, form);
+        setArticles(prev => prev.map(a => a.id === form.id ? { ...a, ...form } : a));
+        onToast('Article mis à jour.');
+      } else {
+        const r = await apiPost('/api/articles', { ...form, vues: 0, date: new Date().toISOString().slice(0,10) });
+        let data: any = {};
+        try { data = await r.json(); } catch {}
+        if (r.ok) setArticles(prev => [data, ...prev]);
+        onToast('Article créé.');
+      }
+      setForm(null);
+    } catch { onToast('Erreur lors de la sauvegarde.'); }
+    finally { setSaving(false); }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Supprimer cet article définitivement ?')) return;
+    await apiDelete(`/api/articles/${id}`);
+    setArticles(prev => prev.filter(a => a.id !== id));
+    onToast('Article supprimé.');
+  };
+
   return (
     <PageLayout title="Blog — CMS" sub="Gestion des articles publiés sur le site public"
       actions={
-        <button onClick={() => onToast('Éditeur d\'articles en cours de développement.')}
+        <button onClick={() => setForm({ ...EMPTY_ARTICLE })}
           className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
           <Plus size={13} /> Nouvel article
         </button>
       }
     >
+      <AnimatePresence>
+        {form && (
+          <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
+            <Card className="p-5 border-2 border-slate-900">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm font-semibold text-slate-800">{form.id ? 'Modifier l\'article' : 'Nouvel article'}</p>
+                <button onClick={() => setForm(null)} className="p-1.5 rounded hover:bg-slate-100 cursor-pointer"><X size={15} className="text-slate-400" /></button>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4 mb-4">
+                <div className="md:col-span-2">
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Titre</label>
+                  <input value={form.titre} onChange={e => setForm((f: any) => ({...f, titre:e.target.value}))}
+                    placeholder="Titre de l'article..."
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Auteur</label>
+                  <input value={form.auteur} onChange={e => setForm((f: any) => ({...f, auteur:e.target.value}))}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Catégorie</label>
+                  <select value={form.cat} onChange={e => setForm((f: any) => ({...f, cat:e.target.value}))}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 bg-white">
+                    {BLOG_CATS.map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Statut</label>
+                  <select value={form.statut} onChange={e => setForm((f: any) => ({...f, statut:e.target.value}))}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 bg-white">
+                    <option value="brouillon">Brouillon</option>
+                    <option value="publié">Publié</option>
+                  </select>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Contenu</label>
+                  <textarea value={form.contenu} onChange={e => setForm((f: any) => ({...f, contenu:e.target.value}))} rows={10}
+                    placeholder="Rédigez le contenu de l'article ici..."
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 resize-y font-sans" />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={handleSave} disabled={saving}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  <CheckCircle size={13} /> {saving ? 'Enregistrement…' : 'Enregistrer'}
+                </button>
+                <button onClick={() => setForm(null)}
+                  className="px-4 py-2 rounded-md border border-slate-200 text-slate-600 text-xs font-semibold cursor-pointer hover:bg-slate-50 transition-colors">
+                  Annuler
+                </button>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="grid grid-cols-3 gap-4">
         <KpiCard label="Articles publiés" value={articles.filter(a=>a.statut==='publié').length}   Icon={Globe}    />
         <KpiCard label="Brouillons"       value={articles.filter(a=>a.statut==='brouillon').length} Icon={FileText} />
-        <KpiCard label="Vues totales"     value={articles.reduce((s,a)=>s+a.vues,0)}               Icon={Eye}      />
+        <KpiCard label="Vues totales"     value={articles.reduce((s,a)=>s+(a.vues||0),0)}          Icon={Eye}      />
       </div>
       <Card>
         <CardHeader title="Articles" />
         <div className="divide-y divide-slate-50">
+          {articles.length === 0 && (
+            <p className="text-xs text-slate-400 text-center py-8">Aucun article. Créez votre premier article ci-dessus.</p>
+          )}
           {articles.map(a => (
             <div key={a.id} className="px-5 py-4 flex items-start gap-4">
               <div className="flex-1 min-w-0">
@@ -2449,7 +3163,7 @@ function BlogTab({ onToast }: DataProps) {
                   <p className="text-sm font-semibold text-slate-800">{a.titre}</p>
                   <span className="text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded">{a.cat}</span>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1">{a.auteur} · {fmtDate(a.date)} · {a.vues} vues</p>
+                <p className="text-[11px] text-slate-400 mt-1">{a.auteur} · {fmtDate(a.date)} · {a.vues||0} vues</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${a.statut==='publié'?'bg-emerald-50 text-emerald-700 border-emerald-200':'bg-slate-50 text-slate-500 border-slate-200'}`}>
@@ -2459,11 +3173,11 @@ function BlogTab({ onToast }: DataProps) {
                   className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors" title={a.statut==='publié'?'Dépublier':'Publier'}>
                   {a.statut==='publié' ? <ToggleRight size={16} className="text-emerald-600" /> : <ToggleLeft size={16} />}
                 </button>
-                <button onClick={() => onToast(`Édition : ${a.titre}`)}
+                <button onClick={() => setForm({ ...a })}
                   className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors">
                   <Edit2 size={13} />
                 </button>
-                <button onClick={() => onToast('Article supprimé.')}
+                <button onClick={() => handleDelete(a.id)}
                   className="p-1.5 rounded hover:bg-red-50 text-slate-400 hover:text-red-500 cursor-pointer transition-colors">
                   <Trash2 size={13} />
                 </button>
@@ -2480,21 +3194,54 @@ function BlogTab({ onToast }: DataProps) {
 // 9. FAQ
 // ════════════════════════════════════════════════════════════════════════════
 
+const FAQ_CATS = ['Admissions','Pédagogie','Finances','Services','Vie scolaire'];
+const EMPTY_FAQ = { question:'', reponse:'', cat:'Admissions', ordre:1, publie:true };
+
 function FaqTab({ onToast }: DataProps) {
-  const [faqs, setFaqs] = useState<any[]>([]);
-  const [openId, setOpenId] = useState<string|null>(null);
+  const [faqs,      setFaqs]      = useState<any[]>([]);
+  const [openId,    setOpenId]    = useState<string|null>(null);
   const [filterCat, setFilterCat] = useState('ALL');
+  const [form,      setForm]      = useState<any | null>(null);
+  const [saving,    setSaving]    = useState(false);
 
   useEffect(() => { apiFetch('/api/faq').then(setFaqs).catch(console.error); }, []);
 
   const cats = [...new Set(faqs.map((f: any) => f.cat))];
 
-  const toggle = async (id: string, key: 'publie') => {
+  const toggle = async (id: string) => {
     const f = faqs.find(x => x.id === id);
     if (!f) return;
-    const next = !f[key];
-    await apiPatch(`/api/faq/${id}`, { [key]: next });
-    setFaqs(prev => prev.map(x => x.id === id ? { ...x, [key]: next } : x));
+    await apiPatch(`/api/faq/${id}`, { publie: !f.publie });
+    setFaqs(prev => prev.map(x => x.id === id ? { ...x, publie: !f.publie } : x));
+    onToast(f.publie ? 'Question dépubliée.' : 'Question publiée.');
+  };
+
+  const handleSave = async () => {
+    if (!form.question?.trim() || !form.reponse?.trim()) { onToast('Question et réponse requises.'); return; }
+    setSaving(true);
+    try {
+      if (form.id) {
+        await apiPatch(`/api/faq/${form.id}`, form);
+        setFaqs(prev => prev.map(f => f.id === form.id ? { ...f, ...form } : f));
+        onToast('Question mise à jour.');
+      } else {
+        const r = await apiPost('/api/faq', form);
+        let data: any = {};
+        try { data = await r.json(); } catch {}
+        if (r.ok) setFaqs(prev => [...prev, data]);
+        onToast('Question créée.');
+      }
+      setForm(null);
+    } catch { onToast('Erreur lors de la sauvegarde.'); }
+    finally { setSaving(false); }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Supprimer cette question ?')) return;
+    await apiDelete(`/api/faq/${id}`);
+    setFaqs(prev => prev.filter(f => f.id !== id));
+    if (openId === id) setOpenId(null);
+    onToast('Question supprimée.');
   };
 
   const filtered = faqs.filter((f: any) => filterCat === 'ALL' || f.cat === filterCat);
@@ -2502,12 +3249,60 @@ function FaqTab({ onToast }: DataProps) {
   return (
     <PageLayout title="FAQ — CMS" sub="Questions fréquentes affichées sur le site public"
       actions={
-        <button onClick={() => onToast('Éditeur de question en cours de développement.')}
+        <button onClick={() => setForm({ ...EMPTY_FAQ, ordre: faqs.length + 1 })}
           className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
           <Plus size={13} /> Nouvelle question
         </button>
       }
     >
+      <AnimatePresence>
+        {form && (
+          <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
+            <Card className="p-5 border-2 border-slate-900">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm font-semibold text-slate-800">{form.id ? 'Modifier la question' : 'Nouvelle question'}</p>
+                <button onClick={() => setForm(null)} className="p-1.5 rounded hover:bg-slate-100 cursor-pointer"><X size={15} className="text-slate-400" /></button>
+              </div>
+              <div className="grid md:grid-cols-3 gap-4 mb-4">
+                <div className="md:col-span-2">
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Question</label>
+                  <input value={form.question} onChange={e => setForm((f: any) => ({...f, question:e.target.value}))}
+                    placeholder="Question fréquemment posée..."
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Catégorie</label>
+                  <select value={form.cat} onChange={e => setForm((f: any) => ({...f, cat:e.target.value}))}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 bg-white">
+                    {FAQ_CATS.map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div className="md:col-span-3">
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Réponse</label>
+                  <textarea value={form.reponse} onChange={e => setForm((f: any) => ({...f, reponse:e.target.value}))} rows={5}
+                    placeholder="Réponse détaillée..."
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 resize-y font-sans" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <label className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide">Publiée</label>
+                  <input type="checkbox" checked={form.publie} onChange={e => setForm((f: any) => ({...f, publie:e.target.checked}))} className="cursor-pointer" />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={handleSave} disabled={saving}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  <CheckCircle size={13} /> {saving ? 'Enregistrement…' : 'Enregistrer'}
+                </button>
+                <button onClick={() => setForm(null)}
+                  className="px-4 py-2 rounded-md border border-slate-200 text-slate-600 text-xs font-semibold cursor-pointer hover:bg-slate-50 transition-colors">
+                  Annuler
+                </button>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="grid grid-cols-3 gap-4">
         <KpiCard label="Questions publiées" value={faqs.filter(f=>f.publie).length}   Icon={CheckCircle} />
         <KpiCard label="Non publiées"        value={faqs.filter(f=>!f.publie).length} Icon={XCircle}     />
@@ -2526,6 +3321,9 @@ function FaqTab({ onToast }: DataProps) {
 
       <Card>
         <div className="divide-y divide-slate-50">
+          {filtered.length === 0 && (
+            <p className="text-xs text-slate-400 text-center py-8">Aucune question. Créez votre première question ci-dessus.</p>
+          )}
           {filtered.map(f => (
             <div key={f.id} className={`${!f.publie ? 'opacity-60' : ''}`}>
               <button onClick={() => setOpenId(openId === f.id ? null : f.id)}
@@ -2544,14 +3342,18 @@ function FaqTab({ onToast }: DataProps) {
                     <div className="px-5 pb-4 space-y-3">
                       <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 border border-slate-100 rounded-md p-3">{f.reponse}</p>
                       <div className="flex gap-2">
-                        <button onClick={() => { toggle(f.id, 'publie'); onToast(f.publie?'Question dépubliée.':'Question publiée.'); }}
+                        <button onClick={() => toggle(f.id)}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-semibold border cursor-pointer transition-colors
                             ${f.publie?'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200':'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'}`}>
                           {f.publie ? <><ToggleRight size={12}/> Dépublier</> : <><ToggleLeft size={12}/> Publier</>}
                         </button>
-                        <button onClick={() => onToast('Édition disponible prochainement.')}
+                        <button onClick={() => { setForm({ ...f }); setOpenId(null); }}
                           className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-semibold border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer transition-colors">
                           <Edit2 size={12} /> Modifier
+                        </button>
+                        <button onClick={() => handleDelete(f.id)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-semibold border border-red-200 text-red-600 hover:bg-red-50 cursor-pointer transition-colors">
+                          <Trash2 size={12} /> Supprimer
                         </button>
                       </div>
                     </div>
@@ -2570,40 +3372,101 @@ function FaqTab({ onToast }: DataProps) {
 // 10. GALERIE
 // ════════════════════════════════════════════════════════════════════════════
 
+const GALERIE_CATS = ['Vie de classe','Événements','Installations','Sports','Arts'];
+
 function GalerieTab({ onToast }: DataProps) {
-  const [galerie, setGalerie] = useState<any[]>([]);
+  const [galerie,   setGalerie]   = useState<any[]>([]);
   const [filterCat, setFilterCat] = useState('ALL');
+  const [showForm,  setShowForm]  = useState(false);
+  const [form,      setForm]      = useState({ titre:'', url:'', cat:'Vie de classe', classe:'', date: new Date().toISOString().slice(0,10) });
+  const [saving,    setSaving]    = useState(false);
 
   useEffect(() => { apiFetch('/api/galerie').then(setGalerie).catch(console.error); }, []);
 
   const cats = [...new Set(galerie.map((g: any) => g.cat))];
   const filtered = galerie.filter((g: any) => filterCat === 'ALL' || g.cat === filterCat);
 
+  const handleAdd = async () => {
+    if (!form.titre.trim() || !form.url.trim()) { onToast('Titre et URL requis.'); return; }
+    setSaving(true);
+    try {
+      const r = await apiPost('/api/galerie', form);
+      let data: any = {};
+      try { data = await r.json(); } catch {}
+      if (r.ok) setGalerie(prev => [data, ...prev]);
+      setShowForm(false);
+      setForm({ titre:'', url:'', cat:'Vie de classe', classe:'', date: new Date().toISOString().slice(0,10) });
+      onToast('Photo ajoutée à la galerie.');
+    } catch { onToast('Erreur lors de l\'ajout.'); }
+    finally { setSaving(false); }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Supprimer cette photo ?')) return;
+    await apiDelete(`/api/galerie/${id}`);
+    setGalerie(prev => prev.filter(g => g.id !== id));
+    onToast('Photo supprimée.');
+  };
+
   return (
     <PageLayout title="Galerie — CMS" sub="Médiathèque photographique de l'établissement"
       actions={
-        <button onClick={() => onToast('Téléversement en cours de développement.')}
+        <button onClick={() => setShowForm(v => !v)}
           className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
-          <Upload size={13} /> Téléverser des photos
+          {showForm ? <><X size={13} /> Annuler</> : <><Plus size={13} /> Ajouter une photo</>}
         </button>
       }
     >
+      <AnimatePresence>
+        {showForm && (
+          <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
+            <Card className="p-5 border-2 border-slate-900">
+              <p className="text-sm font-semibold text-slate-800 mb-4">Ajouter une photo par URL</p>
+              <div className="grid md:grid-cols-2 gap-4 mb-4">
+                <div className="md:col-span-2">
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">URL de l'image</label>
+                  <input value={form.url} onChange={e => setForm(f => ({...f, url:e.target.value}))}
+                    placeholder="https://example.com/photo.jpg"
+                    className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Titre</label>
+                  <input value={form.titre} onChange={e => setForm(f => ({...f, titre:e.target.value}))}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Catégorie</label>
+                  <select value={form.cat} onChange={e => setForm(f => ({...f, cat:e.target.value}))}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 bg-white">
+                    {GALERIE_CATS.map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Classe / Niveau</label>
+                  <input value={form.classe} onChange={e => setForm(f => ({...f, classe:e.target.value}))}
+                    placeholder="ex: CP, GS…"
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Date</label>
+                  <input type="date" value={form.date} onChange={e => setForm(f => ({...f, date:e.target.value}))}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                </div>
+              </div>
+              <button onClick={handleAdd} disabled={saving}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                <CheckCircle size={13} /> {saving ? 'Ajout…' : 'Ajouter à la galerie'}
+              </button>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="grid grid-cols-3 gap-4">
         <KpiCard label="Total photos"  value={galerie.length} Icon={Image}   />
-        <KpiCard label="Catégories"    value={cats.length}         Icon={Layers}  />
-        <KpiCard label="Médias indexés"   value={galerie.length}    Icon={Download}/>
+        <KpiCard label="Catégories"    value={cats.length}    Icon={Layers}  />
+        <KpiCard label="Médias indexés" value={galerie.length} Icon={Download}/>
       </div>
-
-      {/* Upload zone */}
-      <Card className="border-2 border-dashed border-slate-200 p-8 text-center">
-        <Upload size={24} className="mx-auto mb-2 text-slate-300" />
-        <p className="text-sm font-semibold text-slate-500">Glissez vos photos ici</p>
-        <p className="text-xs text-slate-400 mt-1">JPG, PNG, WebP — Max 10 Mo par fichier</p>
-        <button onClick={() => onToast('Sélection de fichier en développement.')}
-          className="mt-3 px-3 py-1.5 rounded-md border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50 cursor-pointer transition-colors">
-          Parcourir les fichiers
-        </button>
-      </Card>
 
       <div className="flex gap-2 flex-wrap">
         {[['ALL','Toutes'], ...cats.map(c=>[c,c])].map(([v,l]) => (
@@ -2615,21 +3478,36 @@ function GalerieTab({ onToast }: DataProps) {
         ))}
       </div>
 
+      {filtered.length === 0 && (
+        <Card className="p-8 text-center">
+          <Image size={24} className="mx-auto mb-2 text-slate-300" />
+          <p className="text-sm text-slate-400">Aucune photo. Ajoutez votre première photo ci-dessus.</p>
+        </Card>
+      )}
+
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
         {filtered.map(g => (
           <div key={g.id} className="group relative bg-slate-100 border border-slate-200 rounded-lg overflow-hidden aspect-video">
-            <div className="w-full h-full flex flex-col items-center justify-center p-3">
-              <Image size={24} className="text-slate-300 mb-1.5" />
-              <p className="text-[10px] font-semibold text-slate-600 text-center line-clamp-2">{g.titre}</p>
-              <p className="text-[9px] text-slate-400 mt-0.5">{g.date} · {g.classe}</p>
-              <span className="text-[9px] font-semibold bg-white border border-slate-200 text-slate-500 px-1.5 py-0.5 rounded mt-1">{g.cat}</span>
+            {g.url ? (
+              <img src={g.url} alt={g.titre} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center p-3">
+                <Image size={24} className="text-slate-300 mb-1.5" />
+                <p className="text-[10px] font-semibold text-slate-600 text-center line-clamp-2">{g.titre}</p>
+              </div>
+            )}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+              <p className="text-[9px] text-white font-semibold truncate">{g.titre}</p>
+              <span className="text-[8px] text-white/60">{g.cat}</span>
             </div>
             <div className="absolute inset-0 bg-slate-900/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-              <button onClick={() => onToast(`Aperçu : ${g.titre}`)}
-                className="p-1.5 rounded bg-white/20 text-white hover:bg-white/30 cursor-pointer transition-colors">
-                <Eye size={13} />
-              </button>
-              <button onClick={() => onToast('Photo supprimée.')}
+              {g.url && (
+                <a href={g.url} target="_blank" rel="noreferrer"
+                  className="p-1.5 rounded bg-white/20 text-white hover:bg-white/30 cursor-pointer transition-colors">
+                  <Eye size={13} />
+                </a>
+              )}
+              <button onClick={() => handleDelete(g.id)}
                 className="p-1.5 rounded bg-white/20 text-white hover:bg-red-500/80 cursor-pointer transition-colors">
                 <Trash2 size={13} />
               </button>

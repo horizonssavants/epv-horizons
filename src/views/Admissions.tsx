@@ -184,7 +184,7 @@ export const Admissions: React.FC = () => {
     <div className="bg-gradient-to-br from-[#F4F8FF] to-white select-none">
 
       {/* ══════════════════════════════════════════════════════
-          HERO — fond navy avec badge animé
+          HERO · fond navy avec badge animé
       ══════════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden bg-[#0b1d3a] py-24 px-4 md:px-8">
         {/* Dot-grid overlay */}
@@ -201,7 +201,7 @@ export const Admissions: React.FC = () => {
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-gold/40 bg-brand-gold/10 text-brand-gold text-xs font-bold uppercase tracking-widest"
           >
             <span className="w-2 h-2 rounded-full bg-brand-gold animate-ping" />
-            {fr ? 'Inscriptions Ouvertes — Rentrée Septembre 2026' : 'Enrollments Open — September 2026'}
+            {fr ? 'Inscriptions Ouvertes · Rentrée Septembre 2026' : 'Enrollments Open · September 2026'}
           </motion.div>
 
           <motion.h1
@@ -254,7 +254,7 @@ export const Admissions: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-16 space-y-24">
 
         {/* ══════════════════════════════════════════════════════
-            1. PROCESSUS EN 4 ÉTAPES — Stepper premium
+            1. PROCESSUS EN 4 ÉTAPES · Stepper premium
         ══════════════════════════════════════════════════════ */}
         <motion.section
           variants={fadeUp}
@@ -279,7 +279,7 @@ export const Admissions: React.FC = () => {
         </motion.section>
 
         {/* ══════════════════════════════════════════════════════
-            2. TARIFS — Bento Cards (pas de table HTML)
+            2. TARIFS · Bento Cards (pas de table HTML)
         ══════════════════════════════════════════════════════ */}
         <motion.section
           variants={fadeUp}
@@ -293,7 +293,7 @@ export const Admissions: React.FC = () => {
               Investissement annuel
             </span>
             <h2 className="font-sans font-extrabold text-2xl md:text-4xl text-brand-blue-deep mt-2 tracking-tight">
-              Grille Tarifaire — Rentrée 2026
+              Grille Tarifaire · Rentrée 2026
             </h2>
             <p className="font-serif text-sm text-brand-muted mt-2 max-w-xl mx-auto">
               Un investissement réfléchi pour une éducation d'excellence bilingue individualisée en Côte d'Ivoire.
@@ -324,7 +324,7 @@ export const Admissions: React.FC = () => {
 
                 {/* Price lines */}
                 <div className="flex-1 p-6 space-y-4">
-                  {/* Total — mis en avant */}
+                  {/* Total · mis en avant */}
                   <div className="text-center py-3 rounded-2xl bg-gradient-to-br from-[#F4F8FF] to-white border border-brand-border/50">
                     <span className="text-[10px] text-brand-muted uppercase tracking-widest font-sans block">Budget global estimé</span>
                     <span className="font-mono font-extrabold text-2xl text-brand-blue-deep block mt-0.5">
@@ -371,7 +371,7 @@ export const Admissions: React.FC = () => {
         </motion.section>
 
         {/* ══════════════════════════════════════════════════════
-            3. DOCUMENTS REQUIS — pills + ✓ stylés
+            3. DOCUMENTS REQUIS · pills + ✓ stylés
         ══════════════════════════════════════════════════════ */}
         <motion.section
           variants={fadeUp}
@@ -436,9 +436,9 @@ export const Admissions: React.FC = () => {
             <div className="p-6 md:p-8">
               <div className="flex justify-between items-center mb-5">
                 <h4 className="font-sans font-bold text-sm text-brand-blue-deep uppercase tracking-wider">
-                  {selectedDocTab === "maternelle" && "Pièces Exigées — Maternelle"}
-                  {selectedDocTab === "primaire" && "Pièces Exigées — Primaire (CP à CM1)"}
-                  {selectedDocTab === "cm2" && "Pièces Exigées — Classe de CM2"}
+                  {selectedDocTab === "maternelle" && "Pièces Exigées · Maternelle"}
+                  {selectedDocTab === "primaire" && "Pièces Exigées · Primaire (CP à CM1)"}
+                  {selectedDocTab === "cm2" && "Pièces Exigées · Classe de CM2"}
                 </h4>
                 <span className="text-[10px] font-mono text-brand-gold font-bold bg-brand-gold/10 px-2 py-0.5 rounded-full">
                   Rentrée Sep 2026
@@ -530,7 +530,7 @@ export const Admissions: React.FC = () => {
             </p>
           </div>
 
-          {/* Countdown clock — grand format, fond navy avec glow */}
+          {/* Countdown clock · grand format, fond navy avec glow */}
           <div className="relative max-w-3xl mx-auto mb-12 rounded-3xl overflow-hidden bg-[#0b1d3a] shadow-[0_20px_60px_rgba(11,29,58,0.40)] border border-white/5">
             {/* Dot grid */}
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(rgba(245,166,35,0.12)_1px,transparent_1px)] [background-size:16px_16px]" />
@@ -678,7 +678,7 @@ export const Admissions: React.FC = () => {
         </motion.section>
 
         {/* ══════════════════════════════════════════════════════
-            5. FORMULAIRE PRÉ-INSCRIPTION — Card premium
+            5. FORMULAIRE PRÉ-INSCRIPTION · Card premium
         ══════════════════════════════════════════════════════ */}
         <motion.section
           variants={fadeUp}
@@ -833,7 +833,7 @@ export const Admissions: React.FC = () => {
         </motion.section>
 
         {/* ══════════════════════════════════════════════════════
-            6. RENDEZ-VOUS DIRECT — sans pré-inscription
+            6. RENDEZ-VOUS DIRECT · sans pré-inscription
         ══════════════════════════════════════════════════════ */}
         <motion.section
           variants={fadeUp}
@@ -861,7 +861,7 @@ export const Admissions: React.FC = () => {
         </motion.section>
 
         {/* ══════════════════════════════════════════════════════
-            7. FAQ — overline + uppercase + design premium
+            7. FAQ · overline + uppercase + design premium
         ══════════════════════════════════════════════════════ */}
         <motion.section
           variants={fadeUp}

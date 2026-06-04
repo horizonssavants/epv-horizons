@@ -21,7 +21,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'drawer.nav':      'Navigation',
     'drawer.lang':     'Langue',
     'drawer.cta':      'Espace Parent →',
-    'nav.subtitle':    "École d'Excellence — Abidjan",
+    'nav.subtitle':    "École d'Excellence · Abidjan",
 
     // ── Mobile Bottom Nav ────────────────────────────────────────
     'bnav.home':       'Accueil',
@@ -34,7 +34,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'footer.address':  'Bingerville Mtn Kro, Abidjan',
     'footer.phone':    '07 78 98 14 56 / 05 85 41 51 51',
     'footer.email':    'contact@horizonssavants.com',
-    'footer.hours':    'Lun–Ven : 7h30–17h00',
+    'footer.hours':    'Lun à Ven : 7h30 à 17h00',
     'footer.nav':      'Navigation',
     'footer.programs': 'Programmes',
     'footer.mat':      'Maternelle (PS, MS, GS)',
@@ -50,7 +50,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'hero.h1b':        "l'avenir d'excellence",
     'hero.h1c':        'de vos enfants',
     'hero.vision':     'Notre vision :',
-    'hero.desc':       "École maternelle & primaire d'excellence à Abidjan — rigueur internationale, bilinguisme précoce et encadrement bienveillant.",
+    'hero.desc':       "École maternelle & primaire d'excellence à Abidjan · rigueur internationale, bilinguisme précoce et encadrement bienveillant.",
     'hero.btn.preinsc':'Pré-inscription',
     'hero.btn.rdv':    'Prendre RDV',
     'hero.btn.prog':   'Nos Programmes',
@@ -70,20 +70,20 @@ export const translations: Record<Lang, Record<string, string>> = {
     'home.cta.btn':     'Réserver ma Pré-inscription',
 
     // ── Admissions ───────────────────────────────────────────────
-    'adm.hero.sup':    'Candidatures 2026–2027',
+    'adm.hero.sup':    'Candidatures 2026/2027',
     'adm.hero.title':  'Pré-Inscriptions Ouvertes',
     'adm.hero.sub':    "Rejoignez l'école d'excellence de Bingerville.",
     'adm.hero.btn1':   'Commencer ma pré-inscription',
     'adm.hero.btn2':   'Télécharger le dossier',
     'adm.process':     'Le Parcours d\'Admission',
     'adm.form.title':  'Commencer ma Pré-inscription',
-    'adm.form.sub':    'Rentrée scolaire 2026-2027 — Places contingentées par section.',
+    'adm.form.sub':    'Rentrée scolaire 2026/2027 · Places contingentées par section.',
     'adm.success.h2':  'Pré-inscription Enregistrée avec Succès !',
 
     // ── Programmes ───────────────────────────────────────────────
     'prog.hero.sup':   'Curriculum d\'Excellence',
     'prog.hero.title': 'Nos Programmes Académiques',
-    'prog.hero.sub':   'Maternelle & Primaire — Approche bilingue et méthodes internationales.',
+    'prog.hero.sub':   'Maternelle & Primaire · Approche bilingue et méthodes internationales.',
     'prog.mat.title':  'Programme Maternelle',
     'prog.prim.title': 'Programme Primaire',
 
@@ -134,7 +134,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'drawer.nav':      'Navigation',
     'drawer.lang':     'Language',
     'drawer.cta':      'Parent Space →',
-    'nav.subtitle':    'School of Excellence — Abidjan',
+    'nav.subtitle':    'School of Excellence · Abidjan',
 
     // ── Mobile Bottom Nav ────────────────────────────────────────
     'bnav.home':       'Home',
@@ -147,7 +147,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'footer.address':  'Bingerville Mtn Kro, Abidjan',
     'footer.phone':    '07 78 98 14 56 / 05 85 41 51 51',
     'footer.email':    'contact@horizonssavants.com',
-    'footer.hours':    'Mon–Fri: 7:30am–5:00pm',
+    'footer.hours':    'Mon to Fri: 7:30am to 5:00pm',
     'footer.nav':      'Navigation',
     'footer.programs': 'Programs',
     'footer.mat':      'Kindergarten (PS, MS, GS)',
@@ -163,7 +163,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'hero.h1b':        'the future of excellence',
     'hero.h1c':        'for your children',
     'hero.vision':     'Our vision:',
-    'hero.desc':       'Excellence kindergarten & primary school in Abidjan — international standards, early bilingualism and caring guidance.',
+    'hero.desc':       'Excellence kindergarten & primary school in Abidjan · international standards, early bilingualism and caring guidance.',
     'hero.btn.preinsc':'Pre-enrollment',
     'hero.btn.rdv':    'Book Appointment',
     'hero.btn.prog':   'Our Programs',
@@ -183,20 +183,20 @@ export const translations: Record<Lang, Record<string, string>> = {
     'home.cta.btn':     'Reserve my Pre-enrollment',
 
     // ── Admissions ───────────────────────────────────────────────
-    'adm.hero.sup':    'Applications 2026–2027',
+    'adm.hero.sup':    'Applications 2026/2027',
     'adm.hero.title':  'Enrollments Are Open',
     'adm.hero.sub':    'Join the school of excellence in Bingerville.',
     'adm.hero.btn1':   'Start my enrollment',
     'adm.hero.btn2':   'Download the application',
     'adm.process':     'The Admission Process',
     'adm.form.title':  'Start my Pre-enrollment',
-    'adm.form.sub':    'School Year 2026-2027 — Limited places per class.',
+    'adm.form.sub':    'School Year 2026/2027 · Limited places per class.',
     'adm.success.h2':  'Pre-enrollment Successfully Registered!',
 
     // ── Programmes ───────────────────────────────────────────────
     'prog.hero.sup':   'Excellence Curriculum',
     'prog.hero.title': 'Our Academic Programs',
-    'prog.hero.sub':   'Kindergarten & Primary — Bilingual approach and international methods.',
+    'prog.hero.sub':   'Kindergarten & Primary · Bilingual approach and international methods.',
     'prog.mat.title':  'Kindergarten Program',
     'prog.prim.title': 'Primary Program',
 

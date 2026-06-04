@@ -164,7 +164,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ mode, onSuccess, onBack }) =
           {isAdmin ? (
             <AdminLoginForm onSuccess={onSuccess} />
           ) : (
-            /* LoginForm parent existant — enveloppé sans card (naked) */
+            /* LoginForm parent existant · enveloppé sans card (naked) */
             <div className="[&_input]:bg-white/6 [&_input]:border-white/12 [&_input]:text-white
                             [&_input:focus]:border-brand-gold/60 [&_input]:placeholder:text-white/25
                             [&_label]:text-white/50 [&_button[type=submit]]:mt-2">
@@ -175,7 +175,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ mode, onSuccess, onBack }) =
 
         {/* Footer discret */}
         <p className="text-center text-[9px] text-white/20 font-sans uppercase tracking-widest mt-6">
-          EPV Horizons Savants — Abidjan © {new Date().getFullYear()}
+          EPV Horizons Savants · Abidjan © {new Date().getFullYear()}
         </p>
       </motion.div>
     </div>

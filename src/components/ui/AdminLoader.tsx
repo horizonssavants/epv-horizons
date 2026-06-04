@@ -70,7 +70,7 @@ export const AdminLoader: React.FC<AdminLoaderProps> = ({ onComplete }) => {
 
       <div className="relative z-10 flex flex-col items-center gap-7">
 
-        {/* Tracé SVG toque — palette bleue */}
+        {/* Tracé SVG toque · palette bleue */}
         <svg viewBox="0 0 120 96" fill="none" className="w-28 h-28" aria-hidden="true">
           <motion.path d="M60 16 L102 38 L60 50 L18 38 Z"
             stroke="#4A90D9" strokeWidth="2.5" strokeLinejoin="round" fill="rgba(74,144,217,0.06)"
@@ -103,7 +103,7 @@ export const AdminLoader: React.FC<AdminLoaderProps> = ({ onComplete }) => {
             Portail Administrateur
           </p>
           <p className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#4A90D9]/60">
-            EPV Horizons Savants — v2.0
+            EPV Horizons Savants · v2.0
           </p>
         </motion.div>
 

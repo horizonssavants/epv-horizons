@@ -30,7 +30,7 @@ export const ProgrammesPrimaire: React.FC = () => {
           </span>
 
           <h1 className="font-sans font-extrabold text-3xl md:text-5xl text-brand-blue-deep tracking-tight leading-tight">
-            {fr ? "Programme Primaire d'Élite d'Abidjan — EPV Horizons Savants" : 'Elite Primary Program in Abidjan — EPV Horizons Savants'}
+            {fr ? "Programme Primaire d'Élite d'Abidjan · EPV Horizons Savants" : 'Elite Primary Program in Abidjan · EPV Horizons Savants'}
           </h1>
           <p className="font-serif text-sm md:text-base text-brand-muted leading-relaxed max-w-4xl">
             Découvrez comment notre enseignement élémentaire d'excellence d'Abidjan prépare intellectuellement et méthodologiquement les plus doués des élèves de Côte d'Ivoire à l'accès aux plus prestigieux collèges mondiaux.
@@ -48,7 +48,7 @@ export const ProgrammesPrimaire: React.FC = () => {
               « L'école primaire ne doit pas seulement transférer des faits mémorisés de façon mécanique, elle doit aiguiser la curiosité analytique, installer l'éloquence orale publique et donner le goût de l'abstraction mathématique. C'est l'essence de notre programme d'excellence académique à Abidjan. »
             </p>
             <div className="font-sans text-xs uppercase tracking-wider text-brand-gold font-bold">
-              — Conseil de l'Élite Académique, EPV Horizons Savants
+              · Conseil de l'Élite Académique, EPV Horizons Savants
             </div>
           </div>
         </Card>

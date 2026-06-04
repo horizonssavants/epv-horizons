@@ -10,9 +10,9 @@ import { Navbar }           from './components/layout/Navbar.tsx';
 import { Footer }           from './components/layout/Footer.tsx';
 import { WhatsAppButton }   from './components/ui/WhatsAppButton.tsx';
 import { MobileBottomNav }  from './components/ui/MobileBottomNav.tsx';
-import { PublicLoader }     from './components/ui/PublicLoader.tsx';
-import { AdminLoader }      from './components/ui/AdminLoader.tsx';
-import { ParentLoader }     from './components/ui/ParentLoader.tsx';
+import { PublicLoader }          from './components/ui/PublicLoader.tsx';
+import { ParentWelcomeLoader }   from './components/ui/ParentWelcomeLoader.tsx';
+import { AdminWelcomeLoader }    from './components/ui/AdminWelcomeLoader.tsx';
 import { AdminAuthPage } from './views/AdminAuthPage.tsx';
 import { ParentAuthPage } from './views/ParentAuthPage.tsx';
 
@@ -204,10 +204,18 @@ export default function App() {
           <PublicLoader key="public-loader" onComplete={handleLoaderComplete} />
         )}
         {!showGlobalLoader && protectedPhase === 'loading' && currentHash === '#/admin' && (
-          <AdminLoader key="admin-loader" onComplete={handleLoaderComplete} />
+          <AdminWelcomeLoader
+            key="admin-welcome-loader"
+            onComplete={handleLoaderComplete}
+            name={protectedSession?.name || protectedSession?.email?.split('@')[0] || 'Administrateur'}
+          />
         )}
         {!showGlobalLoader && protectedPhase === 'loading' && currentHash === '#/espace-parent' && (
-          <ParentLoader key="parent-loader" onComplete={handleLoaderComplete} />
+          <ParentWelcomeLoader
+            key="parent-welcome-loader"
+            onComplete={handleLoaderComplete}
+            name={protectedSession?.prenomParent || protectedSession?.name || ''}
+          />
         )}
       </AnimatePresence>
     </>

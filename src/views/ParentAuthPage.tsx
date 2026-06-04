@@ -187,13 +187,18 @@ export const ParentAuthPage: React.FC<ParentAuthPageProps> = ({ onSuccess, onBac
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ telephone: telephone.trim() }),
       });
-      const data = await r.json();
-      if (!r.ok) throw new Error(data.error);
+      let data: any = {};
+      try { data = await r.json(); } catch { /* réponse non-JSON */ }
+      if (!r.ok) throw new Error(data.error || `Erreur serveur (${r.status}). Veuillez réessayer.`);
       setParentName(data.name || '');
       setStep('otp');
       setOtp(Array(6).fill(''));
     } catch (err: any) {
-      setError(err.message || 'Erreur lors de l\'envoi du code.');
+      if (err instanceof TypeError) {
+        setError('Impossible de contacter le serveur. Vérifiez votre connexion.');
+      } else {
+        setError(err.message || 'Erreur lors de l\'envoi du code.');
+      }
     } finally {
       setLoading(false);
     }
@@ -211,15 +216,20 @@ export const ParentAuthPage: React.FC<ParentAuthPageProps> = ({ onSuccess, onBac
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ telephone: telephone.trim(), otp: code }),
       });
-      const data = await r.json();
-      if (!r.ok) throw new Error(data.error);
-      // Session permanente jusqu'à déconnexion manuelle
+      let data: any = {};
+      try { data = await r.json(); } catch { /* réponse non-JSON */ }
+      if (!r.ok) throw new Error(data.error || `Erreur serveur (${r.status}). Veuillez réessayer.`);
+      if (data.token) sessionStorage.setItem('neon_auth_token', data.token);
       const kids = data.children || [data.prospect];
       localStorage.setItem('parent_session',  JSON.stringify(data.prospect));
       localStorage.setItem('parent_children', JSON.stringify(kids));
       onSuccess(data.prospect);
     } catch (err: any) {
-      setError(err.message || 'Code invalide.');
+      if (err instanceof TypeError) {
+        setError('Impossible de contacter le serveur. Vérifiez votre connexion.');
+      } else {
+        setError(err.message || 'Code invalide.');
+      }
       setOtp(Array(6).fill(''));
     } finally {
       setLoading(false);
@@ -445,7 +455,7 @@ export const ParentAuthPage: React.FC<ParentAuthPageProps> = ({ onSuccess, onBac
           </div>
 
           <p className="text-center text-[9px] text-[#0D2E5C]/25 font-sans uppercase tracking-widest mt-5">
-            EPV Horizons Savants — Abidjan © {new Date().getFullYear()}
+            EPV Horizons Savants · Abidjan © {new Date().getFullYear()}
           </p>
         </motion.div>
       </div>

@@ -88,7 +88,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, onNavigate, id }) =
                   EPV Horizons Savants
                 </span>
                 <span className="text-[9px] font-sans tracking-widest text-brand-gold-light font-medium block uppercase">
-                  {lang === 'fr' ? "École d'Excellence — Abidjan" : 'School of Excellence — Abidjan'}
+                  {lang === 'fr' ? "École d'Excellence · Abidjan" : 'School of Excellence · Abidjan'}
                 </span>
               </div>
             </div>
@@ -184,7 +184,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, onNavigate, id }) =
                   <div>
                     <p className="font-sans font-bold text-sm text-brand-blue-deep leading-tight">EPV Horizons Savants</p>
                     <p className="text-[9px] font-sans text-brand-gold uppercase tracking-widest">
-                      {lang === 'fr' ? 'Excellence — Abidjan' : 'Excellence — Abidjan'}
+                      {'Excellence · Abidjan'}
                     </p>
                   </div>
                 </div>

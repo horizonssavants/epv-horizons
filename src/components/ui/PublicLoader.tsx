@@ -490,7 +490,7 @@ export const PublicLoader: React.FC<PublicLoaderProps> = ({ onComplete }) => {
             letterSpacing: '0.32em',
             marginTop: 2,
           }}>
-            École d'Excellence — Abidjan
+            École d'Excellence · Abidjan
           </p>
         </div>
 

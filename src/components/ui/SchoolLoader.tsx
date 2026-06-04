@@ -114,7 +114,7 @@ export const SchoolLoader: React.FC<SchoolLoaderProps> = ({ onComplete }) => {
             EPV Horizons Savants
           </p>
           <p className="text-[10px] font-sans uppercase tracking-[0.4em] text-brand-gold">
-            École d'Excellence — Abidjan
+            École d'Excellence · Abidjan
           </p>
         </motion.div>
 

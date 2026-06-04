@@ -100,10 +100,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, id }) => {
                 <Clock size={15} className="text-brand-gold shrink-0 mt-0.5" />
                 <span>
                   {fr
-                    ? 'L-V : 07:30 – 12:30 / 13:30 – 17:30'
-                    : 'Mon-Fri: 07:30–12:30 / 13:30–17:30'}
+                    ? 'Lu à Ve : 07h30 à 12h30 / 13h30 à 17h30'
+                    : 'Mon to Fri: 07:30 to 12:30 / 13:30 to 17:30'}
                   <br />
-                  {fr ? 'Mer : 08:00 – 12:30' : 'Wed: 08:00–12:30'}
+                  {fr ? 'Mer : 08h00 à 12h30' : 'Wed: 08:00 to 12:30'}
                 </span>
               </p>
               <p className="text-[11px] text-brand-gold font-serif italic text-white/90">
@@ -125,7 +125,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, id }) => {
         {/* Legal */}
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs select-none">
           <p className="text-brand-border/50 text-center md:text-left leading-normal font-sans text-[11px]">
-            &copy; {currentYear} EPV Horizons Savants — {fr ? "École d'Excellence Abidjan. Tous droits réservés." : "School of Excellence Abidjan. All rights reserved."}
+            &copy; {currentYear} EPV Horizons Savants · {fr ? "École d'Excellence Abidjan. Tous droits réservés." : "School of Excellence Abidjan. All rights reserved."}
           </p>
           <div className="flex flex-wrap justify-center gap-6 text-brand-border/60 text-[11px] font-sans">
             <span className="flex items-center gap-1">

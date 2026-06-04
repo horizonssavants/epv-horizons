@@ -213,9 +213,9 @@ export const Programmes: React.FC = () => {
 
                 <div className="p-7 flex flex-col flex-1 space-y-5">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-brand-green">2 à 6 ans — Option Bilingue Immersive</span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-brand-green">2 à 6 ans · Option Bilingue Immersive</span>
                     <h2 className="font-sans font-extrabold text-xl text-brand-blue-deep leading-tight mt-1">
-                      Le Cycle Maternelle — Horizons Éveil
+                      Le Cycle Maternelle · Horizons Éveil
                     </h2>
                     <p className="text-xs text-brand-muted leading-relaxed font-serif mt-3">
                       La maternelle est la fondation essentielle du devenir d'excellence de l'enfant. Notre approche s'articule autour de l'estime de soi, du respect collectif, et d'un apprentissage progressif par le mouvement tactile. Tout est pensé pour éveiller la créativité.
@@ -270,9 +270,9 @@ export const Programmes: React.FC = () => {
 
                 <div className="p-7 flex flex-col flex-1 space-y-5">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-brand-blue-medium">6 à 11 ans — Excellence Littéraire & STEM</span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-brand-blue-medium">6 à 11 ans · Excellence Littéraire & STEM</span>
                     <h2 className="font-sans font-extrabold text-xl text-brand-blue-deep leading-tight mt-1">
-                      Le Cycle Primaire — Horizons Académique
+                      Le Cycle Primaire · Horizons Académique
                     </h2>
                     <p className="text-xs text-brand-muted leading-relaxed font-serif mt-3">
                       Le cycle élémentaire scelle le passeport académique. Nous offrons les bases nationales officielles bonifiées par un enrichissement international rigoureux : résolution analytique, écriture, bilinguisme total, et projets pratiques.
@@ -361,7 +361,7 @@ export const Programmes: React.FC = () => {
               Calendrier <span className="bg-brand-gold text-brand-blue-deep px-2">Académique</span>
             </h2>
             <p className="text-[11px] text-brand-muted mt-3 font-serif">
-              Année Scolaire 2026/2027 — Conforme au Ministère de l'Éducation de Côte d'Ivoire
+              Année Scolaire 2026/2027 · Conforme au Ministère de l'Éducation de Côte d'Ivoire
             </p>
           </div>
 
@@ -373,7 +373,7 @@ export const Programmes: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-sans font-extrabold text-lg text-brand-blue-deep">Grand Calendrier Académique</h3>
-                  <span className="text-[11px] font-semibold text-brand-muted">Rentrée 2026/2027 — Provisoire</span>
+                  <span className="text-[11px] font-semibold text-brand-muted">Rentrée 2026/2027 · Provisoire</span>
                 </div>
               </div>
 

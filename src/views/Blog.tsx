@@ -231,8 +231,25 @@ export const Blog: React.FC = () => {
     }
   ];
 
+  const [shareCopied, setShareCopied] = React.useState(false);
+
   const handleShare = () => {
-    alert("Partage d'article : lien d'orientation d'excellence copié dans votre presse-papiers.");
+    const url = window.location.href;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => {
+        setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 2500);
+      }).catch(() => {
+        const el = document.createElement('input');
+        el.value = url;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 2500);
+      });
+    }
   };
 
   /* ─── Derived data ──────────────────────────────────────────── */
@@ -500,7 +517,7 @@ export const Blog: React.FC = () => {
               })}
             </motion.div>
 
-            {/* ── BOTTOM ROW — remaining articles ── */}
+            {/* ── BOTTOM ROW · remaining articles ── */}
             {rest.slice(2).map((article) => {
               const { bg, text } = tagColor(article.tag);
               return (
@@ -571,7 +588,7 @@ export const Blog: React.FC = () => {
             onClose={() => setActiveArticle(null)}
             title={activeArticle.title}
           >
-            {/* Modal inner — scrollable body */}
+            {/* Modal inner · scrollable body */}
             <div className="flex flex-col gap-5 max-h-[72vh] overflow-y-auto pr-1 no-scrollbar">
 
               {/* Hero image */}
@@ -612,7 +629,7 @@ export const Blog: React.FC = () => {
               {/* Footer */}
               <div className="shrink-0 border-t border-brand-border/40 pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <span className="text-[10px] text-brand-muted italic font-serif leading-relaxed">
-                  EPV Horizons Savants d'Abidjan — Éveil culturel &amp; bilingue
+                  EPV Horizons Savants d'Abidjan · Éveil culturel &amp; bilingue
                 </span>
                 <div className="flex gap-2 shrink-0">
                   <Button
@@ -621,7 +638,7 @@ export const Blog: React.FC = () => {
                     onClick={handleShare}
                   >
                     <Share2 size={11} />
-                    Partager
+                    {shareCopied ? 'Lien copié !' : 'Partager'}
                   </Button>
                   <Button
                     variant="primary"

@@ -117,7 +117,7 @@ function KpiCard({ label, value, sub, Icon, accent = false }: {
 
 function SubTabNav<T extends string>({
   tabs, active, onChange
-}: { tabs: { id: T; label: string }[]; active: T; onChange: (t: T) => void }) {
+}: { tabs: { id: T; label: string }[]; active: T; onChange: React.Dispatch<React.SetStateAction<T>> | ((t: T) => void) }) {
   return (
     <div className="flex gap-1 border-b border-slate-200 mb-6">
       {tabs.map(t => (
@@ -504,9 +504,43 @@ function ParcoursTab({ session, devoirs, setDevoirs, notes, absences, bilinguism
                   </table>
                 </div>
                 <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between">
-                  <p className="text-xs text-slate-400">Bulletin officiel disponible en fin de trimestre</p>
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-slate-900 text-white text-[10px] font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
-                    <Download size={11} /> Télécharger PDF
+                  <p className="text-xs text-slate-400">Bulletin officiel — Année scolaire 2025/2026</p>
+                  <button onClick={() => {
+                    const w = window.open('', '_blank', 'width=800,height=900');
+                    if (!w) return;
+                    const avgT1 = avg(notes, 't1');
+                    const avgT2 = avg(notes, 't2');
+                    w.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+                    <title>Bulletin — ${session.prenomEnfant} ${session.nomEnfant}</title>
+                    <style>body{font-family:Georgia,serif;padding:40px;max-width:720px;margin:0 auto;color:#0D2E5C}
+                    h1{font-size:22px;border-bottom:3px solid #0D2E5C;padding-bottom:8px}
+                    h2{font-size:14px;color:#1A4F8B;margin-top:24px}
+                    table{width:100%;border-collapse:collapse;margin-top:12px}
+                    th,td{border:1px solid #ddd;padding:8px 12px;text-align:left;font-size:13px}
+                    th{background:#0D2E5C;color:white;font-weight:bold}
+                    tr:nth-child(even){background:#f8faff}
+                    .avg{font-size:18px;font-weight:bold;text-align:center;padding:12px;background:#EFF6FF;border-radius:8px;margin:16px 0}
+                    .footer{margin-top:40px;font-size:11px;color:#94a3b8;text-align:center;border-top:1px solid #e2e8f0;padding-top:16px}
+                    @media print{button{display:none}}</style></head><body>
+                    <h1>Bulletin de Notes — EPV Horizons Savants</h1>
+                    <p><strong>Élève :</strong> ${session.prenomEnfant} ${session.nomEnfant} &nbsp;|&nbsp;
+                    <strong>Classe :</strong> ${SECTION_LABEL[session.sectionVisee] || session.sectionVisee} &nbsp;|&nbsp;
+                    <strong>Année :</strong> 2025/2026</p>
+                    <p><strong>Responsable :</strong> ${session.prenomParent} ${session.nomParent}</p>
+                    <div class="avg">Moyenne générale T1 : ${avgT1}/20 &nbsp;&nbsp; T2 : ${avgT2}/20</div>
+                    <h2>Détail par matière</h2>
+                    <table><tr><th>Matière</th><th>Coef.</th><th>T1 /20</th><th>T2 /20</th><th>Évolution</th></tr>
+                    ${notes.map(n => `<tr><td>${n.matiere}</td><td style="text-align:center">${n.coef}</td>
+                    <td style="text-align:center">${n.t1}</td><td style="text-align:center">${n.t2 ?? '—'}</td>
+                    <td style="text-align:center;color:${(n.t2||n.t1)>=n.t1?'green':'red'}">${n.t2?(n.t2-n.t1>0?'+':''+(n.t2-n.t1).toFixed(1)):''}</td></tr>`).join('')}
+                    </table>
+                    <div class="footer">EPV Horizons Savants · Bingerville Mtn Kro, Abidjan · Imprimé le ${new Date().toLocaleDateString('fr-FR')}</div>
+                    <br><button onclick="window.print()" style="padding:10px 20px;background:#0D2E5C;color:white;border:none;border-radius:6px;cursor:pointer;font-size:14px">Imprimer</button>
+                    </body></html>`);
+                    w.document.close();
+                  }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-slate-900 text-white text-[10px] font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
+                    <Download size={11} /> Télécharger / Imprimer
                   </button>
                 </div>
               </Card>
@@ -831,13 +865,25 @@ function FinancesTab({ session, appointments, paiements, reduction, tarifs, onRd
   const [documents, setDocuments] = useState<any[]>([]);
 
   const [checklist, setChecklist] = useState<{doc:string;done:boolean}[]>([]);
+
+  // Charge depuis API (DB) → fallback localStorage → fallback configuration
   useEffect(() => {
-    const saved = localStorage.getItem(`checklist_${session.id}`);
-    if (saved) { setChecklist(JSON.parse(saved)); return; }
-    fetch('/api/configuration').then(r => r.json()).then(cfg => {
-      const docs = (cfg.checklist?.[session.sectionVisee.toUpperCase()] || []) as string[];
-      setChecklist(docs.map(doc => ({ doc, done: false })));
-    }).catch(() => {});
+    apiFetch(`/api/parent/checklist?prospectId=${session.id}`)
+      .then(r => r.ok ? r.json() : null)
+      .then((data: any) => {
+        if (Array.isArray(data)) { setChecklist(data); return; }
+        // Fallback localStorage
+        const saved = localStorage.getItem(`checklist_${session.id}`);
+        if (saved) { setChecklist(JSON.parse(saved)); return; }
+        // Fallback configuration
+        fetch('/api/configuration').then(r => r.json()).then(cfg => {
+          const docs = (cfg.checklist?.[session.sectionVisee.toUpperCase()] || []) as string[];
+          setChecklist(docs.map(doc => ({ doc, done: false })));
+        }).catch(() => {});
+      }).catch(() => {
+        const saved = localStorage.getItem(`checklist_${session.id}`);
+        if (saved) setChecklist(JSON.parse(saved));
+      });
   }, [session.id, session.sectionVisee]);
 
   useEffect(() => {
@@ -847,6 +893,12 @@ function FinancesTab({ session, appointments, paiements, reduction, tarifs, onRd
   const toggleItem = (i: number) => {
     const upd = checklist.map((c, j) => j === i ? { ...c, done: !c.done } : c);
     setChecklist(upd);
+    // Sauvegarde en DB + localStorage en parallèle
+    apiFetch('/api/parent/checklist', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prospectId: session.id, checklist: upd }),
+    }).catch(console.error);
     localStorage.setItem(`checklist_${session.id}`, JSON.stringify(upd));
   };
 
@@ -1091,10 +1143,16 @@ function FinancesTab({ session, appointments, paiements, reduction, tarifs, onRd
                       <div key={doc.id} className="flex items-center gap-4 px-5 py-3.5">
                         <FileText size={15} className="text-slate-300 shrink-0" />
                         <p className="flex-1 text-xs font-medium text-slate-700">{doc.titre}</p>
-                        <button onClick={() => onToast(`Téléchargement : ${doc.fichier}`)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-200 text-slate-600 text-[10px] font-semibold hover:bg-slate-50 cursor-pointer transition-colors">
-                          <Download size={11} /> PDF
-                        </button>
+                        {doc.url ? (
+                          <a href={doc.url} target="_blank" rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-200 text-slate-600 text-[10px] font-semibold hover:bg-slate-50 transition-colors">
+                            <Download size={11} /> PDF
+                          </a>
+                        ) : (
+                          <span className="text-[10px] text-slate-300 px-3 py-1.5 border border-slate-100 rounded-md">
+                            Bientôt disponible
+                          </span>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -1117,20 +1175,39 @@ function MessageTab({ session, messages, setMessages, onToast }: {
   session: Prospect; messages: any[]; setMessages: React.Dispatch<React.SetStateAction<any[]>>;
   onToast: (m: string) => void;
 }) {
-  const [sel, setSel]   = useState<any | null>(null);
-  const [reply, setReply] = useState('');
+  const [sel,     setSel]     = useState<any | null>(null);
+  const [reply,   setReply]   = useState('');
+  const [sending, setSending] = useState(false);
 
   const open = (m: any) => {
     setSel(m);
-    // Marquer lu en base
-    apiFetch(`/api/messages/${m.id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ lu:true }) }).catch(console.error);
-    setMessages(prev => prev.map(x => x.id === m.id ? { ...x, lu: true } : x));
+    if (!m.lu) {
+      apiFetch(`/api/messages/${m.id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ lu:true }) }).catch(console.error);
+      setMessages(prev => prev.map(x => x.id === m.id ? { ...x, lu: true } : x));
+    }
   };
 
-  const send = () => {
-    if (!reply.trim()) return;
-    onToast('Message transmis à l\'équipe pédagogique.');
-    setReply('');
+  const send = async () => {
+    if (!reply.trim() || sending) return;
+    setSending(true);
+    try {
+      const r = await apiFetch('/api/parent/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prospectId: session.id, contenu: reply.trim() }),
+      });
+      let data: any = {};
+      try { data = await r.json(); } catch {}
+      if (!r.ok) throw new Error(data.error || 'Erreur lors de l\'envoi.');
+      setMessages(prev => [...prev, data]);
+      setSel(data);
+      setReply('');
+      onToast('Message envoyé à l\'équipe pédagogique.');
+    } catch (err: any) {
+      onToast(err.message || 'Erreur lors de l\'envoi.');
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -1176,13 +1253,12 @@ function MessageTab({ session, messages, setMessages, onToast }: {
                   placeholder="Rédigez votre réponse..."
                   rows={3}
                   className="w-full text-xs font-sans border border-slate-200 rounded-md px-3 py-2.5 resize-none text-slate-700 placeholder:text-slate-300 focus:outline-none focus:border-[#0D2E5C] transition-colors" />
-                <div className="flex justify-between items-center">
-                  <button className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-600 cursor-pointer">
-                    <Paperclip size={13} /> Joindre un fichier
-                  </button>
-                  <button onClick={send}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold hover:bg-[#1A4F8B] cursor-pointer transition-colors">
-                    <Send size={12} /> Envoyer
+                <div className="flex justify-end items-center">
+                  <button onClick={send} disabled={sending || !reply.trim()}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold hover:bg-[#1A4F8B] cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    {sending
+                      ? <><div className="w-3 h-3 rounded-full border-2 border-white/40 border-t-white animate-spin" /> Envoi…</>
+                      : <><Send size={12} /> Envoyer</>}
                   </button>
                 </div>
               </div>
@@ -1206,8 +1282,26 @@ function MessageTab({ session, messages, setMessages, onToast }: {
 // PARRAINAGE
 // ════════════════════════════════════════════════════════════════════════════
 
+const STATUT_PARRAINAGE_LABEL: Record<string, { label: string; cls: string }> = {
+  valide:     { label: 'Réduction validée',  cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  en_attente: { label: 'En attente',          cls: 'bg-amber-50 text-amber-700 border-amber-200'       },
+  refuse:     { label: 'Refusé',              cls: 'bg-red-50 text-red-600 border-red-200'             },
+};
+
 function ParrainageTab({ session, reduction, onToast }: { session: Prospect; reduction: number; onToast: (m: string) => void }) {
-  const [copied, setCopied] = useState(false);
+  const [copied,   setCopied]   = useState(false);
+  const [filleuls, setFilleuls] = useState<any[]>([]);
+
+  useEffect(() => {
+    apiFetch(`/api/parent/mes-filleuls?prospectId=${session.id}`)
+      .then(r => r.ok ? r.json() : [])
+      .then(d => setFilleuls(Array.isArray(d) ? d : []))
+      .catch(() => {});
+  }, [session.id]);
+
+  const validCount = filleuls.filter(f => f.parrainageStatut === 'valide').length;
+  const reductionReelle = Math.min(validCount * 10, 40);
+
   const copy = () => {
     navigator.clipboard.writeText(session.codeParrainagePersonnel);
     setCopied(true);
@@ -1220,9 +1314,9 @@ function ParrainageTab({ session, reduction, onToast }: { session: Prospect; red
     <SectionPage title="Programme de parrainage" sub="Bénéficiez d'une réduction de 10% par famille parrainée inscrite">
 
       <div className="grid lg:grid-cols-3 gap-4">
-        <KpiCard label="Filleuls inscrits"  value={Math.round(reduction / 10)} sub={reduction === 0 ? "Aucune famille référencée" : `${Math.round(reduction/10)} famille(s) parrainée(s)`} Icon={Users} />
-        <KpiCard label="Réduction cumulée"  value={`${reduction} %`} sub={reduction > 0 ? "Appliquée sur votre scolarité" : "Parrainez pour bénéficier d'une réduction"} Icon={TrendingUp} />
-        <KpiCard label="Réduction maximale" value="40 %" sub="Cumulable jusqu'à 4 familles parrainées" Icon={Award} accent />
+        <KpiCard label="Familles parrainées"  value={filleuls.length} sub={filleuls.length === 0 ? 'Aucune famille référencée' : `${validCount} inscription(s) confirmée(s)`} Icon={Users} />
+        <KpiCard label="Réduction cumulée"    value={`${reductionReelle} %`} sub={reductionReelle > 0 ? 'Appliquée sur votre scolarité' : 'Parrainez pour bénéficier d\'une réduction'} Icon={TrendingUp} />
+        <KpiCard label="Réduction maximale"   value="40 %" sub="Cumulable jusqu'à 4 familles parrainées" Icon={Award} accent />
       </div>
 
       <Card className="p-6">
@@ -1240,6 +1334,51 @@ function ParrainageTab({ session, reduction, onToast }: { session: Prospect; red
         <p className="text-xs text-slate-400 mt-3 leading-relaxed max-w-lg">
           Communiquez ce code à vos proches lors de leur pré-inscription sur le site d'EPV Horizons Savants. Toute famille dont l'inscription est confirmée vous fait bénéficier d'une réduction de 10% sur vos frais de scolarité.
         </p>
+      </Card>
+
+      {/* Liste réelle des filleuls */}
+      <Card>
+        <CardHeader
+          title={`Mes filleuls (${filleuls.length})`}
+          sub="Familles ayant utilisé votre code lors de leur pré-inscription"
+        />
+        {filleuls.length === 0 ? (
+          <div className="px-5 py-8 text-center">
+            <Users size={24} className="mx-auto mb-2 text-slate-200" />
+            <p className="text-sm text-slate-400">Aucune famille n'a encore utilisé votre code.</p>
+            <p className="text-xs text-slate-400 mt-1">Partagez votre code ci-dessus pour commencer à parrainer.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50">
+                  {['Famille', 'Enfant', 'Classe', 'Dossier', 'Réduction'].map(h => (
+                    <th key={h} className="text-left px-5 py-3 font-semibold text-slate-400 text-[10px] uppercase tracking-wide">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {filleuls.map((f: any) => {
+                  const ps = STATUT_PARRAINAGE_LABEL[f.parrainageStatut] ?? STATUT_PARRAINAGE_LABEL.en_attente;
+                  return (
+                    <tr key={f.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-5 py-3.5 font-medium text-slate-800">{f.prenomParent} {f.nomParent}</td>
+                      <td className="px-5 py-3.5 text-slate-600">{f.prenomEnfant} {f.nomEnfant}</td>
+                      <td className="px-5 py-3.5 text-slate-500">{SECTION_LABEL[f.sectionVisee] || f.sectionVisee}</td>
+                      <td className="px-5 py-3.5">
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded border bg-slate-50 text-slate-600 border-slate-200">{f.statut}</span>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${ps.cls}`}>{ps.label}</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </Card>
 
       <Card>
@@ -1279,14 +1418,67 @@ function ParrainageTab({ session, reduction, onToast }: { session: Prospect; red
 // PROFIL
 // ════════════════════════════════════════════════════════════════════════════
 
-function ProfilTab({ session, sante }: { session: Prospect; sante: any | null }) {
+function ProfilTab({ session, sante, onSessionUpdate }: {
+  session: Prospect; sante: any | null; onSessionUpdate: (s: Prospect) => void;
+}) {
   type Sub = 'infos' | 'enfant' | 'securite' | 'preferences';
   const [sub, setSub] = useState<Sub>('infos');
 
-  const [pwd,    setPwd]    = useState({ old: '', new: '', confirm: '' });
-  const [show,   setShow]   = useState({ old: false, new: false, confirm: false });
+  // ── Infos personnelles ──
+  const [editing,  setEditing]  = useState(false);
+  const [form,     setForm]     = useState({ telephone: session.telephone, email: session.email, commune: session.commune });
+  const [saving,   setSaving]   = useState(false);
+  const [infoMsg,  setInfoMsg]  = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
+
+  const handleSaveProfil = async () => {
+    setSaving(true); setInfoMsg(null);
+    try {
+      const r = await apiFetch('/api/parent/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prospectId: session.id, ...form }),
+      });
+      let data: any = {};
+      try { data = await r.json(); } catch {}
+      if (!r.ok) throw new Error(data.error || 'Erreur lors de la sauvegarde.');
+      onSessionUpdate({ ...session, ...data });
+      setEditing(false);
+      setInfoMsg({ type: 'ok', text: 'Coordonnées mises à jour.' });
+    } catch (err: any) {
+      setInfoMsg({ type: 'err', text: err.message });
+    } finally { setSaving(false); }
+  };
+
+  // ── Sécurité / Mot de passe ──
+  const [pwd,      setPwd]      = useState({ old: '', new: '', confirm: '' });
+  const [show,     setShow]     = useState({ old: false, new: false, confirm: false });
+  const [pwdLoad,  setPwdLoad]  = useState(false);
+  const [pwdMsg,   setPwdMsg]   = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
+
+  const handleChangePwd = async () => {
+    setPwdMsg(null);
+    if (!pwd.old || !pwd.new || !pwd.confirm) { setPwdMsg({ type:'err', text:'Tous les champs sont requis.' }); return; }
+    if (pwd.new !== pwd.confirm) { setPwdMsg({ type:'err', text:'Les mots de passe ne correspondent pas.' }); return; }
+    if (pwd.new.length < 6) { setPwdMsg({ type:'err', text:'Le mot de passe doit contenir au moins 6 caractères.' }); return; }
+    setPwdLoad(true);
+    try {
+      const r = await apiFetch('/api/users/me/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ oldPassword: pwd.old, newPassword: pwd.new }),
+      });
+      let data: any = {};
+      try { data = await r.json(); } catch {}
+      if (!r.ok) throw new Error(data.error || 'Erreur lors du changement.');
+      setPwd({ old:'', new:'', confirm:'' });
+      setPwdMsg({ type:'ok', text:'Mot de passe mis à jour avec succès.' });
+    } catch (err: any) {
+      setPwdMsg({ type:'err', text: err.message });
+    } finally { setPwdLoad(false); }
+  };
+
+  // ── Préférences ──
   const [notifs, setNotifs] = useState({ email: true, sms: true, urgence: true, bulletin: true });
-  const [twofa,  setTwofa]  = useState(false);
 
   const Toggle = ({ val, onToggle }: { val: boolean; onToggle: () => void }) => (
     <button onClick={onToggle}
@@ -1295,15 +1487,10 @@ function ProfilTab({ session, sante }: { session: Prospect; sante: any | null })
     </button>
   );
 
-  const FieldRow = ({ label, value, editable = false }: { label: string; value: string; editable?: boolean }) => (
-    <div className="flex items-center justify-between py-3 border-b border-slate-50">
-      <div>
-        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{label}</p>
-        <p className="text-sm font-medium text-slate-800 mt-0.5">{value}</p>
-      </div>
-      {editable && (
-        <button className="text-[11px] font-semibold text-[#0D2E5C] hover:underline cursor-pointer px-2">Modifier</button>
-      )}
+  const FieldDisplay = ({ label, value }: { label: string; value: string }) => (
+    <div className="flex items-start justify-between py-3 border-b border-slate-50 gap-4">
+      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide shrink-0">{label}</p>
+      <p className="text-sm font-medium text-slate-800 text-right">{value}</p>
     </div>
   );
 
@@ -1336,19 +1523,58 @@ function ProfilTab({ session, sante }: { session: Prospect; sante: any | null })
                     <Badge status={session.statut} />
                   </div>
                 </div>
-                <FieldRow label="Prénom"    value={session.prenomParent} editable />
-                <FieldRow label="Nom"       value={session.nomParent}    editable />
-                <FieldRow label="Email"     value={session.email}        editable />
-                <FieldRow label="Téléphone" value={session.telephone}    editable />
-                <FieldRow label="Commune"   value={`${session.commune}, Abidjan, Côte d'Ivoire`} editable />
-                <FieldRow label="Lien de parenté" value={session.lienParente} />
-                <FieldRow label="Code parrainage personnel" value={session.codeParrainagePersonnel} />
-                <div className="flex items-center justify-between pt-4">
-                  <p className="text-[10px] text-slate-400">Compte créé le {fmtDate(session.createdAt)}</p>
-                  <button className="flex items-center gap-2 px-4 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors">
-                    Enregistrer les modifications
-                  </button>
-                </div>
+
+                {infoMsg && (
+                  <div className={`mb-4 px-4 py-2.5 rounded-lg text-xs font-semibold ${infoMsg.type === 'ok' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'}`}>
+                    {infoMsg.text}
+                  </div>
+                )}
+
+                <FieldDisplay label="Prénom"    value={session.prenomParent} />
+                <FieldDisplay label="Nom"       value={session.nomParent} />
+                <FieldDisplay label="Lien de parenté" value={session.lienParente} />
+                <FieldDisplay label="Code parrainage" value={session.codeParrainagePersonnel} />
+
+                {editing ? (
+                  <div className="mt-4 space-y-3">
+                    {[
+                      { key: 'telephone', label: 'Téléphone', type: 'tel'   },
+                      { key: 'email',     label: 'Email',     type: 'email' },
+                      { key: 'commune',   label: 'Commune',   type: 'text'  },
+                    ].map(f => (
+                      <div key={f.key}>
+                        <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">{f.label}</label>
+                        <input type={f.type}
+                          value={(form as any)[f.key]}
+                          onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
+                          className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#0D2E5C] transition-colors" />
+                      </div>
+                    ))}
+                    <div className="flex gap-2 pt-2">
+                      <button onClick={handleSaveProfil} disabled={saving}
+                        className="flex items-center gap-2 px-4 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors disabled:opacity-50">
+                        {saving ? <><div className="w-3 h-3 rounded-full border-2 border-white/40 border-t-white animate-spin" /> Enregistrement…</> : 'Enregistrer'}
+                      </button>
+                      <button onClick={() => { setEditing(false); setForm({ telephone: session.telephone, email: session.email, commune: session.commune }); }}
+                        className="px-4 py-2 rounded-md border border-slate-200 text-slate-600 text-xs font-semibold cursor-pointer hover:bg-slate-50 transition-colors">
+                        Annuler
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <FieldDisplay label="Téléphone" value={session.telephone} />
+                    <FieldDisplay label="Email"     value={session.email} />
+                    <FieldDisplay label="Commune"   value={`${session.commune}, Abidjan`} />
+                    <div className="flex items-center justify-between pt-4">
+                      <p className="text-[10px] text-slate-400">Compte créé le {fmtDate(session.createdAt)}</p>
+                      <button onClick={() => { setEditing(true); setInfoMsg(null); }}
+                        className="flex items-center gap-2 px-4 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors">
+                        Modifier mes coordonnées
+                      </button>
+                    </div>
+                  </>
+                )}
               </Card>
             </div>
           )}
@@ -1357,23 +1583,23 @@ function ProfilTab({ session, sante }: { session: Prospect; sante: any | null })
             <div className="space-y-4">
               <Card className="p-6">
                 <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-4">Identité de l'enfant</p>
-                <FieldRow label="Nom complet"        value={`${session.prenomEnfant} ${session.nomEnfant}`} />
-                <FieldRow label="Date de naissance"  value={fmtDate(session.dateNaissance)} />
-                <FieldRow label="Classe visée"       value={SECTION_LABEL[session.sectionVisee] || session.sectionVisee} />
-                <FieldRow label="Rentrée"            value="Septembre 2026" />
+                <FieldDisplay label="Nom complet"       value={`${session.prenomEnfant} ${session.nomEnfant}`} />
+                <FieldDisplay label="Date de naissance" value={fmtDate(session.dateNaissance)} />
+                <FieldDisplay label="Classe visée"      value={SECTION_LABEL[session.sectionVisee] || session.sectionVisee} />
+                <FieldDisplay label="Rentrée"           value="Septembre 2026" />
               </Card>
               <Card className="p-6">
                 <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-4">Données de santé</p>
-                <FieldRow label="Groupe sanguin"     value={sante?.groupeSanguin || '—'} editable />
-                <FieldRow label="Allergies connues"  value={sante?.allergies || '—'} editable />
-                <FieldRow label="Vaccinations"       value={sante?.vaccinations || '—'} editable />
-                <FieldRow label="Médecin traitant"   value={sante?.medecin || '—'} editable />
+                <FieldDisplay label="Groupe sanguin"    value={sante?.groupeSanguin || '—'} />
+                <FieldDisplay label="Allergies connues" value={sante?.allergies     || '—'} />
+                <FieldDisplay label="Vaccinations"      value={sante?.vaccinations  || '—'} />
+                <FieldDisplay label="Médecin traitant"  value={sante?.medecin       || '—'} />
               </Card>
               <Card className="p-6">
                 <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-4">Contacts d'urgence</p>
-                <FieldRow label="Contact principal"   value={`${session.prenomParent} ${session.nomParent} — ${session.telephone}`} editable />
-                <FieldRow label="Contact secondaire"  value="Non renseigné" editable />
-                <FieldRow label="Email de contact"    value={session.email} editable />
+                <FieldDisplay label="Contact principal"  value={`${session.prenomParent} ${session.nomParent} — ${session.telephone}`} />
+                <FieldDisplay label="Contact secondaire" value="Non renseigné" />
+                <FieldDisplay label="Email de contact"   value={session.email} />
               </Card>
             </div>
           )}
@@ -1388,11 +1614,18 @@ function ProfilTab({ session, sante }: { session: Prospect; sante: any | null })
                     <p className="text-xs text-slate-400 mt-0.5">Sécurisez votre accès avec un nouveau mot de passe fort</p>
                   </div>
                 </div>
+
+                {pwdMsg && (
+                  <div className={`mb-4 px-4 py-2.5 rounded-lg text-xs font-semibold ${pwdMsg.type === 'ok' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'}`}>
+                    {pwdMsg.text}
+                  </div>
+                )}
+
                 <div className="space-y-4 max-w-sm">
                   {([
-                    { key: 'old',     label: 'Mot de passe actuel' },
-                    { key: 'new',     label: 'Nouveau mot de passe' },
-                    { key: 'confirm', label: 'Confirmer le nouveau mot de passe' },
+                    { key: 'old',     label: 'Mot de passe actuel (ou numéro de téléphone)' },
+                    { key: 'new',     label: 'Nouveau mot de passe (min. 6 caractères)'     },
+                    { key: 'confirm', label: 'Confirmer le nouveau mot de passe'            },
                   ] as const).map(f => (
                     <div key={f.key} className="space-y-1.5">
                       <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">{f.label}</label>
@@ -1410,35 +1643,20 @@ function ProfilTab({ session, sante }: { session: Prospect; sante: any | null })
                       </div>
                     </div>
                   ))}
-                  <button className="flex items-center gap-2 px-4 py-2.5 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors mt-2">
-                    <Shield size={13} /> Mettre à jour le mot de passe
+                  <button onClick={handleChangePwd} disabled={pwdLoad}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors mt-2 disabled:opacity-50">
+                    {pwdLoad
+                      ? <><div className="w-3 h-3 rounded-full border-2 border-white/40 border-t-white animate-spin" /> Changement…</>
+                      : <><Shield size={13} /> Mettre à jour le mot de passe</>}
                   </button>
                 </div>
-              </Card>
-
-              <Card className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <Smartphone size={15} className="text-slate-400" />
-                    <div>
-                      <p className="text-sm font-semibold text-slate-800">Double authentification (2FA)</p>
-                      <p className="text-xs text-slate-400 mt-0.5">Renforcez la sécurité de votre compte avec une vérification par SMS</p>
-                    </div>
-                  </div>
-                  <Toggle val={twofa} onToggle={() => setTwofa(!twofa)} />
-                </div>
-                {twofa && (
-                  <div className="mt-4 p-3 rounded-md bg-slate-50 border border-slate-100">
-                    <p className="text-xs text-slate-500">Un code de vérification vous sera envoyé au <strong className="text-slate-700">{session.telephone}</strong> lors de chaque connexion.</p>
-                  </div>
-                )}
               </Card>
 
               <Card className="p-5">
                 <div className="flex items-center gap-2.5">
                   <Info size={14} className="text-slate-400 shrink-0" />
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Dernière connexion : aujourd'hui à {new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}. Si vous ne reconnaissez pas cette activité, changez immédiatement votre mot de passe et contactez l'administration.
+                    Dernière connexion : aujourd'hui à {new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}. Si vous ne reconnaissez pas cette activité, changez immédiatement votre mot de passe.
                   </p>
                 </div>
               </Card>
@@ -1592,12 +1810,12 @@ export const EspaceParent: React.FC = () => {
         setPaiements(Array.isArray(data) ? data.filter((p: any) => p.statut === 'validé') : []);
       }).catch(() => {});
 
-    // Réduction parrainage — chercher les parrainages validés
-    apiFetch('/api/parrainages')
+    // Réduction parrainage — calculée depuis les filleuls du parent
+    apiFetch(`/api/parent/mes-filleuls?prospectId=${pid}`)
       .then(r => r.ok ? r.json() : [])
       .then((data: any[]) => {
         if (!Array.isArray(data)) return;
-        const validCount = data.filter((p: any) => p.prospectIdParrain === pid && p.statut === 'valide').length;
+        const validCount = data.filter((f: any) => f.parrainageStatut === 'valide').length;
         setReduction(Math.min(validCount * 10, 40));
       }).catch(() => {});
 
@@ -1797,7 +2015,7 @@ export const EspaceParent: React.FC = () => {
               {tab === 'finances'   && <FinancesTab  session={session} appointments={appointments} paiements={paiements} reduction={reduction} tarifs={tarifs} onRdvBooked={handleRdvBooked} onToast={setToast} />}
               {tab === 'messagerie' && <MessageTab   session={session} messages={messages} setMessages={setMessages} onToast={setToast} />}
               {tab === 'parrainage' && <ParrainageTab session={session} reduction={reduction} onToast={setToast} />}
-              {(tab as string) === 'profil' && <ProfilTab session={session} sante={sante} />}
+              {(tab as string) === 'profil' && <ProfilTab session={session} sante={sante} onSessionUpdate={s => { setSession(s); localStorage.setItem('parent_session', JSON.stringify(s)); }} />}
             </motion.div>
           </AnimatePresence>
         </main>

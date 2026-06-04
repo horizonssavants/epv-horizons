@@ -55,15 +55,15 @@ const whyContactReasons = [
 ];
 
 const scheduleRows = [
-  { label: 'Lundi – Mardi – Jeudi – Vendredi', value: '07h45 – 12h20 · 13h30 – 16h00' },
-  { label: 'Pause récréative', value: '10h15 – 10h30' },
-  { label: 'Mercredi', value: '08h00 – 12h30' },
-  { label: 'Samedi – Dimanche', value: 'Fermé' },
+  { label: 'Lundi · Mardi · Jeudi · Vendredi', value: '07h45 à 12h20 · 13h30 à 16h00' },
+  { label: 'Pause récréative', value: '10h15 à 10h30' },
+  { label: 'Mercredi', value: '08h00 à 12h30' },
+  { label: 'Samedi · Dimanche', value: 'Fermé' },
 ];
 
 const secretariatRows = [
-  { label: 'Lundi – Vendredi', value: '07h30 – 12h30 · 13h30 – 17h30' },
-  { label: 'Mercredi', value: '08h00 – 12h30' },
+  { label: 'Lundi à Vendredi', value: '07h30 à 12h30 · 13h30 à 17h30' },
+  { label: 'Mercredi', value: '08h00 à 12h30' },
 ];
 
 /* ─── Component ──────────────────────────────────────────────── */
