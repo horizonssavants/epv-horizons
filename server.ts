@@ -1820,6 +1820,17 @@ async function startServer() {
   });
 }
 
+// ─── Gestionnaire d'erreurs global — retourne toujours du JSON ───────────────
+// Express 4 ne catch pas les async handlers automatiquement → ce handler
+// intercepte toute erreur non catchée et renvoie JSON au lieu de HTML 500.
+app.use((err: any, _req: any, res: any, _next: any) => {
+  console.error('[global-error]', err);
+  res.status(err.status || 500).json({
+    error: err.message || 'Erreur serveur interne.',
+    stack: process.env.NODE_ENV !== 'production' ? err.stack : undefined,
+  });
+});
+
 // Export pour Vercel serverless
 export { app, initDB };
 
