@@ -8,7 +8,8 @@ import { motion, MotionValue, useMotionValue, useSpring, useTransform } from 'mo
 import { StatCounter } from '../components/ui/StatCounter.tsx';
 import { PhotoGallery } from '../components/ui/PhotoGallery.tsx';
 import { Button } from '../components/ui/Button.tsx';
-import { ShieldAlert, BookOpen, Quote, ChevronRight, UserCheck, GraduationCap, Award, Compass, ArrowRight, Star, Globe, Calendar } from 'lucide-react';
+import { ShieldAlert, BookOpen, Quote, ChevronRight, UserCheck, GraduationCap, Award, ArrowRight, Star, Calendar } from 'lucide-react';
+import { Translate, Plant } from '@phosphor-icons/react';
 import { useLang } from '../lib/LanguageContext.tsx';
 import { t } from '../lib/i18n.ts';
 
@@ -221,8 +222,42 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
     }, 350);
   };
 
+  const bannerItems = lang === 'fr' ? [
+    'Inscriptions Ouvertes',
+    'Rentrée Septembre 2026',
+    'EPV Horizons Savants',
+    'Bingerville · Abidjan',
+    'Maternelle & Primaire',
+    '15 élèves max / classe',
+    'Programme Bilingue FR/EN',
+  ] : [
+    'Enrollments Open',
+    'September 2026 School Year',
+    'EPV Horizons Savants',
+    'Bingerville · Abidjan',
+    'Kindergarten & Primary',
+    '15 students max / class',
+    'Bilingual Program FR/EN',
+  ];
+
   return (
     <div className="relative animate-fade-in">
+
+      {/* ══════ BANDEROLE SCROLL ══════════════════════════════ */}
+      <div className="bg-white overflow-hidden py-2 select-none border-b border-brand-border/30">
+        <div
+          className="flex whitespace-nowrap"
+          style={{ animation: 'marqueeScroll 24s linear infinite' }}
+        >
+          {[...bannerItems, ...bannerItems].map((item, i) => (
+            <span key={i} className="inline-flex items-center gap-3 text-brand-blue-deep font-sans font-bold text-[11px] uppercase tracking-[0.2em] pr-8">
+              {item}
+              <span className="w-1 h-1 rounded-full bg-brand-blue-deep shrink-0" />
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* 1. HERO SECTION */}
       <section className="relative overflow-hidden min-h-[92vh] flex flex-col lg:flex-row">
         {/* Image de fond plein écran */}
@@ -522,8 +557,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                   bg: 'from-yellow-100 to-amber-50',
                   value: 100, suffix: '%',
                   title: lang === 'fr' ? 'Profs certifiés' : 'Certified' },
-                { icon: <Globe size={11} className="text-emerald-700 md:hidden" />,
-                  iconLg: <Globe size={14} className="text-emerald-700 hidden md:block" />,
+                { icon: <Translate size={11} className="text-emerald-700 md:hidden" />,
+                  iconLg: <Translate size={14} className="text-emerald-700 hidden md:block" />,
                   bg: 'from-green-100 to-emerald-50',
                   value: 100, suffix: lang === 'fr' ? '% bilingue' : '% bilingual',
                   title: lang === 'fr' ? 'Bilingue' : 'Bilingual' },
@@ -560,7 +595,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             </span>
             <h2 className="font-sans font-black text-brand-blue-deep uppercase tracking-[0.08em] leading-tight" style={{fontSize:"clamp(1.6rem,4vw,3rem)"}}>
               {lang === 'fr' ? 'Nos Trois' : 'Our Three'}{' '}
-              <span className="bg-brand-gold text-brand-blue-deep px-2 inline-block leading-tight">
+              <span className="text-brand-gold">
                 {lang === 'fr' ? 'Piliers' : 'Pillars'}
               </span><br className="hidden md:block" />
               {lang === 'fr' ? 'Fondateurs' : 'Founding'}
@@ -596,7 +631,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 border:    'border-yellow-100',
                 shadow:    'shadow-[0_2px_10px_rgba(245,166,35,0.08)] hover:shadow-[0_8px_28px_rgba(245,166,35,0.18)]',
                 iconBg:    'from-yellow-100 to-amber-50',
-                Icon:      Globe,
+                Icon:      Translate,
                 iconColor: 'text-amber-600',
                 title:     lang === 'fr' ? 'Richesse Bilingue Précoce' : 'Early Bilingual Richness',
                 desc:      lang === 'fr'
@@ -614,7 +649,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 border:    'border-emerald-100',
                 shadow:    'shadow-[0_2px_10px_rgba(45,140,60,0.07)] hover:shadow-[0_8px_28px_rgba(45,140,60,0.15)]',
                 iconBg:    'from-green-100 to-emerald-50',
-                Icon:      Compass,
+                Icon:      Plant,
                 iconColor: 'text-emerald-700',
                 title:     lang === 'fr' ? 'Épanouissement & Éveil' : 'Growth & Awakening',
                 desc:      lang === 'fr'
@@ -778,7 +813,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             </span>
             <h2 className="font-sans font-black text-brand-blue-deep uppercase tracking-[0.08em] leading-tight" style={{fontSize:"clamp(1.6rem,4vw,3rem)"}}>
               {lang === 'fr' ? 'Notre' : 'Our'}{' '}
-              <span className="bg-brand-gold text-brand-blue-deep px-2 inline-block leading-tight">
+              <span className="text-brand-gold">
                 {lang === 'fr' ? 'Équipement' : 'Academic'}
               </span><br className="hidden md:block" />
               {lang === 'fr' ? 'Pédagogique' : 'Facilities'}
@@ -806,7 +841,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           <h2 className="font-sans font-black text-white uppercase tracking-[0.08em] leading-tight" style={{fontSize:"clamp(1.6rem,4vw,2.75rem)"}}>
             {lang === 'fr' ? 'Ce que disent' : 'What'}<br />
             {lang === 'fr' ? 'les' : ''}{' '}
-            <span className="bg-brand-gold text-brand-blue-deep px-2 inline-block leading-tight">
+            <span className="text-brand-gold">
               {lang === 'fr' ? 'Familles' : 'Families Say'}
             </span>
           </h2>
@@ -854,7 +889,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           <Reveal animation="bounceInUp" className="text-center mb-14">
             <h2 className="font-sans font-black text-white uppercase tracking-[0.06em] leading-tight" style={{fontSize:"clamp(1.6rem,4vw,2.75rem)"}}>
               {lang === 'fr' ? 'Offrez' : 'Give Your Child'}{' '}
-              <span className="bg-brand-gold text-brand-blue-deep px-2 inline-block leading-tight">
+              <span className="text-brand-gold">
                 {lang === 'fr' ? "L'Excellence" : 'Excellence'}
               </span>
               {lang === 'fr' ? ' À Votre Enfant' : ''}
@@ -925,15 +960,10 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           </div>
 
           {/* Boutons principaux */}
-          <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="mt-12 flex justify-center">
             <Button variant="cta" className="px-8 py-3.5 font-bold" onClick={handleCTA}>
               <GraduationCap size={16} /> {lang === 'fr' ? 'Réserver ma Pré-inscription' : 'Reserve my Pre-enrollment'}
             </Button>
-            <a href="https://wa.me/2250778981456" target="_blank" rel="noopener"
-               className="flex items-center gap-2 px-7 py-3.5 rounded-xl border border-green-400/60
-                          bg-green-500/10 hover:bg-green-500/22 text-white font-bold text-sm transition-all">
-              {lang === 'fr' ? 'Contacter par WhatsApp' : 'Contact via WhatsApp'}
-            </a>
           </div>
         </div>
       </section>

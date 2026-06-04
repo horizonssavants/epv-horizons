@@ -13,6 +13,16 @@
       "dest": "/api/index.ts"
     },
     {
+      "src": "/admin",
+      "headers": { "Location": "/#/admin" },
+      "status": 301
+    },
+    {
+      "src": "/espace-parent",
+      "headers": { "Location": "/#/espace-parent" },
+      "status": 301
+    },
+    {
       "src": "/img/(.*)",
       "dest": "/img/$1"
     },

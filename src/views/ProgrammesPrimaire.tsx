@@ -6,7 +6,7 @@
 import React from 'react';
 import { Card } from '../components/ui/Card.tsx';
 import { Button } from '../components/ui/Button.tsx';
-import { BookOpen, GraduationCap, Clock, ShieldCheck, HelpCircle, ArrowRight, Sparkles, Database } from 'lucide-react';
+import { BookOpen, ArrowRight } from 'lucide-react';
 import { useLang } from '../lib/LanguageContext.tsx';
 
 export const ProgrammesPrimaire: React.FC = () => {
@@ -21,19 +21,16 @@ export const ProgrammesPrimaire: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2 text-xs font-sans text-brand-muted uppercase font-bold tracking-wider">
             <a href="#/programmes" className="hover:text-brand-blue-deep transition-colors">{fr ? 'Nos Programmes' : 'Our Programs'}</a>
             <span>/</span>
-            <span className="text-brand-blue-medium">{fr ? "Cycle Primaire d'Excellence" : 'Excellence Primary Cycle'}</span>
+            <span className="text-brand-blue-medium">{fr ? 'Cycle Primaire' : 'Primary Cycle'}</span>
           </div>
-
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-brand-blue-medium/10 border border-brand-blue-medium/20 text-brand-blue-medium text-[10px] font-bold uppercase tracking-wider">
-            <Sparkles size={12} className="text-brand-gold" />
-            {fr ? 'Méthodes Scientifiques Actives & Éloquence Scolaire (CP au CM2)' : 'Active Scientific Methods & Academic Eloquence (CP to CM2)'}
-          </span>
 
           <h1 className="font-sans font-extrabold text-3xl md:text-5xl text-brand-blue-deep tracking-tight leading-tight">
             {fr ? "Programme Primaire d'Élite d'Abidjan · EPV Horizons Savants" : 'Elite Primary Program in Abidjan · EPV Horizons Savants'}
           </h1>
           <p className="font-serif text-sm md:text-base text-brand-muted leading-relaxed max-w-4xl">
-            Découvrez comment notre enseignement élémentaire d'excellence d'Abidjan prépare intellectuellement et méthodologiquement les plus doués des élèves de Côte d'Ivoire à l'accès aux plus prestigieux collèges mondiaux.
+            {fr
+              ? "Découvrez comment notre enseignement élémentaire d'excellence d'Abidjan prépare intellectuellement et méthodologiquement les plus doués des élèves de Côte d'Ivoire à l'accès aux plus prestigieux collèges mondiaux."
+              : "Discover how our elite primary education in Abidjan intellectually and methodologically prepares Côte d'Ivoire's most gifted students for access to the world's most prestigious secondary schools."}
           </p>
           <div className="h-1 w-20 bg-brand-blue-medium rounded-full" />
         </div>
@@ -45,10 +42,12 @@ export const ProgrammesPrimaire: React.FC = () => {
           </div>
           <div className="relative z-10 space-y-4 max-w-2xl font-serif">
             <p className="text-sm md:text-md italic leading-relaxed">
-              « L'école primaire ne doit pas seulement transférer des faits mémorisés de façon mécanique, elle doit aiguiser la curiosité analytique, installer l'éloquence orale publique et donner le goût de l'abstraction mathématique. C'est l'essence de notre programme d'excellence académique à Abidjan. »
+              {fr
+                ? '« L\'école primaire ne doit pas seulement transférer des faits mémorisés de façon mécanique, elle doit aiguiser la curiosité analytique, installer l\'éloquence orale publique et donner le goût de l\'abstraction mathématique. C\'est l\'essence de notre programme d\'excellence académique à Abidjan. »'
+                : '"Primary school must not simply transfer mechanically memorized facts — it must sharpen analytical curiosity, build public oral eloquence and cultivate a taste for mathematical abstraction. This is the essence of our academic excellence program in Abidjan."'}
             </p>
             <div className="font-sans text-xs uppercase tracking-wider text-brand-gold font-bold">
-              · Conseil de l'Élite Académique, EPV Horizons Savants
+              {fr ? '· Conseil de l\'Élite Académique, EPV Horizons Savants' : '· Academic Excellence Council, EPV Horizons Savants'}
             </div>
           </div>
         </Card>
@@ -58,72 +57,74 @@ export const ProgrammesPrimaire: React.FC = () => {
           
           <section className="space-y-3">
             <h2 className="font-sans font-bold text-lg md:text-xl text-brand-blue-deep">
-              La Redéfinition de l'Excellence du Premier Cycle Primaire en Côte d'Ivoire
+              {fr ? "La Redéfinition de l'Excellence du Premier Cycle Primaire en Côte d'Ivoire" : "Redefining Primary Excellence in Côte d'Ivoire"}
             </h2>
             <p>
-              EPV Horizons Savants à Abidjan applique les exigences académiques strictes agréées par le Ministère de l'Éducation Nationale de Côte d'Ivoire. Nous croyons ferment que ce socle doit être bonifié et enrichi de méthodes actives d'autres pôles d'excellence mondiaux : Singapour pour les raisonnements de mathématiques et la Finlande pour l'accompagnement comportemental bienveillant des élèves.
+              {fr
+                ? "EPV Horizons Savants à Abidjan applique les exigences académiques strictes agréées par le Ministère de l'Éducation Nationale de Côte d'Ivoire, enrichies de méthodes actives mondiales : Singapour pour les mathématiques et la Finlande pour l'accompagnement comportemental bienveillant."
+                : "EPV Horizons Savants in Abidjan applies the strict academic requirements approved by Côte d'Ivoire's Ministry of National Education, enriched with world-class active methods: Singapore for mathematics and Finland for caring behavioral support."}
             </p>
             <p>
-              Sous la conduite d'un corps professoral d'élite trié sur le volet et soumis à une formation pédagogique continue intense, notre enseignement primaire garantit des classes limitées à <strong>vides de pollution de surcharge (20 élèves maximum)</strong>. Cette densité d’élite permet d'allouer à chaque enfant le temps d'assimilation requis, éradiquant l'échec et stimulant le dépassement de soi.
+              {fr
+                ? <>Sous la conduite d'un corps professoral d'élite, notre enseignement primaire garantit des classes limitées à <strong>20 élèves maximum</strong>. Cette densité d'élite permet d'allouer à chaque enfant le temps d'assimilation requis, éradiquant l'échec et stimulant le dépassement de soi.</>
+                : <>Under the guidance of a handpicked elite faculty, our primary teaching guarantees classes limited to <strong>20 students maximum</strong>. This elite ratio allows each child the time needed for assimilation, eradicating failure and stimulating self-improvement.</>}
             </p>
           </section>
 
           <section className="space-y-3">
             <h3 className="font-sans font-bold text-xs uppercase tracking-wider text-brand-blue-medium">
-              1. Mathématiques d'Élite : La Méthode Concrète, Immagée, Abstraite de Singapour
+              {fr ? "1. Mathématiques d'Élite : La Méthode Concrète, Imagée, Abstraite de Singapour" : '1. Elite Mathematics: The Singapore Concrete-Pictorial-Abstract Method'}
             </h3>
             <p>
-              Les mathématiques sont souvent sources d'anxiété scolaire en l'absence de base saine. Chez EPV Horizons Savants, nous avons brisé ce cycle en instaurant la <strong>Méthode de Singapour</strong> du CP au CM2. 
+              {fr
+                ? <>Les mathématiques sont souvent sources d'anxiété scolaire. Chez EPV Horizons Savants, nous avons brisé ce cycle en instaurant la <strong>Méthode de Singapour</strong> du CP au CM2.</>
+                : <>Mathematics is often a source of academic anxiety. At EPV Horizons Savants, we have broken this cycle by implementing the <strong>Singapore Method</strong> from Grade 1 to Grade 5.</>}
             </p>
             <p>
-              Cette approche en trois étapes commence toujours par le <strong>Concret</strong> (manipulations d'objets, cubes de liaison d'Abidjan), se poursuit par l'<strong>Imagé</strong> (modélisation de barres graphiques représentant la situation), et s'achève naturellement par l'<strong>Abstrait</strong> (les notations algébriques). En installant solidement ces modélisations heuristiques, nos élèves abordent sereinement le calcul rapide complexe et la résolution logique de problèmes quotidiens.
+              {fr
+                ? <>Cette approche en trois étapes commence par le <strong>Concret</strong> (manipulations d'objets), se poursuit par l'<strong>Imagé</strong> (modélisation graphique), et s'achève par l'<strong>Abstrait</strong> (notations algébriques). Nos élèves abordent ainsi sereinement le calcul complexe et la résolution de problèmes.</>
+                : <>This three-step approach always starts with the <strong>Concrete</strong> (object manipulations), continues with the <strong>Pictorial</strong> (bar model representations), and concludes with the <strong>Abstract</strong> (algebraic notation). Our students thus calmly approach complex calculations and problem solving.</>}
             </p>
           </section>
 
           {/* Grids with classes details */}
           <section className="space-y-4 pt-2">
             <h2 className="font-sans font-bold text-md md:text-lg text-brand-blue-deep border-b border-brand-border/60 pb-1.5">
-              Notre Parcours Pédagogique par Cycles du CP au CM2
+              {fr ? 'Notre Parcours Pédagogique par Cycles du CP au CM2' : 'Our Pedagogical Journey by Cycles from Grade 1 to Grade 5'}
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-sans text-xs">
-              
+
               <div className="bg-brand-pale p-5 rounded-xl border border-brand-border/60 space-y-3">
                 <div className="flex gap-2 items-center">
-                  <div className="w-8 h-8 rounded bg-brand-blue-medium/10 text-brand-blue-deep flex items-center justify-center font-bold text-xs shrink-0">CP</div>
-                  <h4 className="font-bold text-xs text-brand-blue-deep font-sans">CPI / CP (6-7 ans)</h4>
+                  <span className="font-extrabold text-sm text-brand-blue-medium shrink-0">CP</span>
+                  <h4 className="font-bold text-xs text-brand-blue-deep font-sans">{fr ? 'CPI / CP (6-7 ans)' : 'Grade 1 — CP (6-7 years)'}</h4>
                 </div>
                 <div className="text-[11px] text-brand-muted leading-relaxed font-serif space-y-2">
-                  <p>
-                    Le cycle de lecture phonique active et d'acquisition de l'écriture cursive impeccable en Français et en Anglais.
-                  </p>
-                  <p><strong>Piliers :</strong> Enseignement de la méthode d'apprentissage phonique bilingue, mathématiques actives Singapour (sommes et restes jusqu'à 100), et projets de découverte de la nature dans notre potager écologique d'Abidjan.</p>
+                  <p>{fr ? "Le cycle de lecture phonique active et d'acquisition de l'écriture cursive impeccable en Français et en Anglais." : "The cycle of active phonics reading and impeccable cursive writing acquisition in French and English."}</p>
+                  <p><strong>{fr ? 'Piliers :' : 'Pillars:'}</strong> {fr ? 'Méthode phonique bilingue, mathématiques Singapour (sommes jusqu\'à 100), projets nature dans notre potager écologique.' : 'Bilingual phonics method, Singapore math (sums up to 100), nature discovery projects in our ecological garden.'}</p>
                 </div>
               </div>
 
               <div className="bg-brand-pale p-5 rounded-xl border border-brand-border/60 space-y-3">
                 <div className="flex gap-2 items-center">
-                  <div className="w-8 h-8 rounded bg-brand-gold/15 text-brand-blue-deep flex items-center justify-center font-bold text-xs shrink-0">CE</div>
-                  <h4 className="font-bold text-xs text-brand-blue-deep font-sans">CE1 & CE2 (7-9 ans)</h4>
+                  <span className="font-extrabold text-sm text-brand-gold shrink-0">CE</span>
+                  <h4 className="font-bold text-xs text-brand-blue-deep font-sans">{fr ? 'CE1 & CE2 (7-9 ans)' : 'Grades 2 & 3 — CE (7-9 years)'}</h4>
                 </div>
                 <div className="text-[11px] text-brand-muted leading-relaxed font-serif space-y-2">
-                  <p>
-                    La phase de consolidation orthographique, de grammaire et de structuration du raisonnement scientifique et d'éloquence.
-                  </p>
-                  <p><strong>Piliers :</strong> Dictées programmées, initiation à la géométrie de précision, activités de théâtre d'expression orale pour vaincre la timidité linguistique bilingue d'Abidjan, et robotique éducative Lego Education.</p>
+                  <p>{fr ? "La phase de consolidation orthographique, de grammaire et de structuration du raisonnement scientifique et d'éloquence." : "The phase of spelling consolidation, grammar and structuring of scientific reasoning and eloquence."}</p>
+                  <p><strong>{fr ? 'Piliers :' : 'Pillars:'}</strong> {fr ? 'Dictées programmées, géométrie de précision, théâtre d\'expression orale, robotique éducative Lego Education.' : 'Scheduled dictations, precision geometry, oral expression theater, Lego Education robotics.'}</p>
                 </div>
               </div>
 
               <div className="bg-brand-pale p-5 rounded-xl border border-brand-border/60 space-y-3">
                 <div className="flex gap-2 items-center">
-                  <div className="w-8 h-8 rounded bg-brand-blue-deep/10 text-brand-blue-deep flex items-center justify-center font-bold text-xs shrink-0">CM</div>
-                  <h4 className="font-bold text-xs text-brand-blue-deep font-sans">CM1 & CM2 (9-11 ans)</h4>
+                  <span className="font-extrabold text-sm text-brand-blue-deep shrink-0">CM</span>
+                  <h4 className="font-bold text-xs text-brand-blue-deep font-sans">{fr ? 'CM1 & CM2 (9-11 ans)' : 'Grades 4 & 5 — CM (9-11 years)'}</h4>
                 </div>
                 <div className="text-[11px] text-brand-muted leading-relaxed font-serif space-y-2">
-                  <p>
-                    Le cycle d'élargissement critique, de bilinguisme soutenu écrit et de préparation aux concours prestigieux d'admission d'Abidjan.
-                  </p>
-                  <p><strong>Piliers :</strong> Analyse grammaticale avancée, mathématiques d'équations, codage Scratch, géopolitique régionale de Côte d'Ivoire et de l'Afrique, et ateliers hebdomadaires de leadership social de groupe.</p>
+                  <p>{fr ? "Le cycle d'élargissement critique, de bilinguisme soutenu et de préparation aux concours prestigieux d'admission." : "The cycle of critical expansion, sustained bilingualism and preparation for prestigious entrance exams."}</p>
+                  <p><strong>{fr ? 'Piliers :' : 'Pillars:'}</strong> {fr ? 'Analyse grammaticale avancée, mathématiques d\'équations, codage Scratch, géopolitique africaine, leadership social.' : 'Advanced grammar analysis, equation mathematics, Scratch coding, African geopolitics, social leadership workshops.'}</p>
                 </div>
               </div>
 
@@ -132,37 +133,41 @@ export const ProgrammesPrimaire: React.FC = () => {
 
           <section className="space-y-3 pt-2">
             <h3 className="font-sans font-bold text-xs uppercase tracking-wider text-brand-blue-medium">
-              2. Bilinguisme Académique Réfléchi et Littérature
+              {fr ? '2. Bilinguisme Académique Réfléchi et Littérature' : '2. Thoughtful Academic Bilingualism & Literature'}
             </h3>
             <p>
-              Au cycle primaire, le bilinguisme dépasse les rituels d'expression orale pour devenir académique solide. Nos cours de sciences de découvertes du monde, de technologie computationnelle STEM et d’histoire-géographie sont alternativement d'usage en Français et en Anglais. Les élèves lisent régulièrement des ouvrages de référence dans les deux langues, développent des esprits d'analyse de contes critiques et rédigent des dissertations de haut niveau. 
+              {fr
+                ? "Au cycle primaire, le bilinguisme dépasse les rituels d'expression orale pour devenir académique solide. Nos cours de sciences, STEM et d'histoire-géographie sont alternativement en Français et en Anglais. Les élèves lisent régulièrement des ouvrages de référence dans les deux langues et rédigent des dissertations de haut niveau."
+                : "In the primary cycle, bilingualism goes beyond oral expression rituals to become solid academic bilingualism. Our science, STEM and geography-history classes alternate between French and English. Students regularly read reference works in both languages and write high-level essays."}
             </p>
           </section>
 
           <section className="space-y-3">
             <h3 className="font-sans font-bold text-xs uppercase tracking-wider text-brand-gold font-bold">
-              3. STEM et Technologie Computationnelle Lego Education
+              {fr ? '3. STEM et Technologie Computationnelle Lego Education' : '3. STEM & Lego Education Computational Technology'}
             </h3>
             <p>
-              EPV Horizons Savants d'Abidjan prépare ses élèves à exceller dans un univers de plus en plus numérique. Notre atelier robotique et de programmation avancée par blocs Scratch permet d’appréhender la logique mathématique appliquée. Les enfants construisent eux-mêmes leurs capteurs motorisés Lego Education, testent les boucles et les variables mécaniques et apprennent à travailler en dynamique de groupe de projet, liant la science théorique à la matérialité concrète.
+              {fr
+                ? "EPV Horizons Savants d'Abidjan prépare ses élèves à exceller dans un univers numérique. Notre atelier robotique et de programmation Scratch permet d'appréhender la logique mathématique appliquée. Les enfants construisent leurs capteurs Lego Education, testent les boucles et variables mécaniques et apprennent à travailler en groupe de projet."
+                : "EPV Horizons Savants in Abidjan prepares its students to excel in an increasingly digital world. Our Scratch programming and robotics workshop develops applied mathematical logic. Children build their own Lego Education motorized sensors, test mechanical loops and variables, and learn collaborative project work."}
             </p>
           </section>
 
         </div>
 
         {/* Highlights summary banner */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 font-sans text-brand-blue-deep text-center select-none">
-          <div className="p-4 rounded-xl bg-brand-pale border border-brand-border/40">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 font-sans text-center select-none border-t border-brand-border/40">
+          <div className="pt-4">
             <strong className="block text-2xl font-extrabold text-brand-blue-medium">20 max</strong>
-            <span className="text-[10px] text-brand-muted uppercase font-bold tracking-normal block mt-1">Élèves par Classe de Primaire</span>
+            <span className="text-[10px] text-brand-muted uppercase font-bold tracking-normal block mt-1">{fr ? 'Élèves par classe' : 'Students per class'}</span>
           </div>
-          <div className="p-4 rounded-xl bg-brand-pale border border-brand-border/40">
+          <div className="pt-4">
             <strong className="block text-2xl font-extrabold text-brand-gold">100%</strong>
-            <span className="text-[10px] text-brand-muted uppercase font-bold tracking-normal block mt-1">Taux de Maîtrise Méthode Singapour</span>
+            <span className="text-[10px] text-brand-muted uppercase font-bold tracking-normal block mt-1">{fr ? 'Méthode Singapour' : 'Singapore Method'}</span>
           </div>
-          <div className="p-4 rounded-xl bg-brand-pale border border-brand-border/40">
-            <strong className="block text-2xl font-extrabold text-brand-green">10 d'éloquence</strong>
-            <span className="text-[10px] text-brand-muted uppercase font-bold tracking-normal block mt-1">Clubs de Communication et Leadership</span>
+          <div className="pt-4">
+            <strong className="block text-2xl font-extrabold text-brand-green">10</strong>
+            <span className="text-[10px] text-brand-muted uppercase font-bold tracking-normal block mt-1">{fr ? 'Clubs parascolaires' : 'Extracurricular clubs'}</span>
           </div>
         </div>
 
@@ -170,15 +175,17 @@ export const ProgrammesPrimaire: React.FC = () => {
         <Card className="bg-brand-gold-light/15 border border-brand-gold-light/45 p-6 md:p-8 rounded-2xl flex flex-col md:flex-row gap-6 items-center justify-between">
           <div className="space-y-2 text-center md:text-left max-w-xl">
             <h3 className="font-sans font-extrabold text-lg md:text-xl text-brand-blue-deep leading-tight">
-              Prendre rendez-vous avec le Conseil Pédagogique d'Abidjan
+              {fr ? "Prendre rendez-vous avec le Conseil Pédagogique d'Abidjan" : 'Book an Appointment with the Academic Council in Abidjan'}
             </h3>
             <p className="text-xs text-brand-muted font-serif leading-relaxed">
-              Le passage du test d'évaluation gratuit est nécessaire pour valider l'excellence et le plan d'accueil individualisé de l'élève en CP, CE1, CE2, CM1 ou CM2. Planifiez votre entretien physique.
+              {fr
+                ? "Le passage du test d'évaluation gratuit est nécessaire pour valider l'excellence et le plan d'accueil individualisé de l'élève en CP, CE1, CE2, CM1 ou CM2. Planifiez votre entretien physique."
+                : "The free evaluation test is necessary to validate excellence and create an individualized reception plan for each student in Grades 1 through 5. Schedule your in-person interview."}
             </p>
           </div>
           <a href="#/admissions" className="shrink-0">
             <Button variant="cta" className="font-bold gap-2 px-6">
-              S'inscrire aux Évaluations <ArrowRight size={14} />
+              {fr ? "S'inscrire aux Évaluations" : 'Register for Evaluations'} <ArrowRight size={14} />
             </Button>
           </a>
         </Card>

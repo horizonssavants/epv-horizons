@@ -328,7 +328,7 @@ export const FAQ: React.FC = () => {
                 <div className="flex items-center gap-3">
                   {/* Badge pill */}
                   <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold font-sans uppercase tracking-wide bg-white border border-brand-border shadow-sm ${meta.color}`}
+                    className={`inline-flex items-center gap-1.5 text-[11px] font-bold font-sans uppercase tracking-wide ${meta.color}`}
                   >
                     {meta.icon}
                     {cat}
@@ -415,13 +415,13 @@ export const FAQ: React.FC = () => {
               className="py-14 text-center bg-white rounded-2xl shadow-[0_2px_20px_rgba(13,46,92,0.07)] border border-brand-border/50"
             >
               <p className="font-serif text-sm text-brand-muted">
-                Aucune réponse ne correspond à votre recherche actuelle.
+                {fr ? 'Aucune réponse ne correspond à votre recherche actuelle.' : 'No answers match your current search.'}
               </p>
               <button
                 onClick={() => setSearchQuery("")}
                 className="mt-4 text-xs font-bold font-sans text-brand-blue-medium hover:text-brand-gold transition-colors"
               >
-                Réinitialiser la recherche
+                {fr ? 'Réinitialiser la recherche' : 'Reset search'}
               </button>
             </motion.div>
           )}
@@ -445,13 +445,15 @@ export const FAQ: React.FC = () => {
               {/* Left text block */}
               <div className="space-y-2 text-center md:text-left">
                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-gold font-sans">
-                  Besoin d'un conseil personnalisé ?
+                  {fr ? "Besoin d'un conseil personnalisé ?" : 'Need personalized guidance?'}
                 </p>
                 <h4 className="font-sans font-extrabold text-lg md:text-xl text-white leading-snug">
-                  Vous ne trouvez pas la réponse à vos questions ?
+                  {fr ? 'Vous ne trouvez pas la réponse à vos questions ?' : "Can't find the answer to your question?"}
                 </h4>
                 <p className="font-serif text-[13px] text-slate-300 max-w-md leading-relaxed">
-                  Notre équipe d'admissions est disponible pour vous guider : dossier, visite de campus ou entretien d'orientation.
+                  {fr
+                    ? "Notre équipe d'admissions est disponible pour vous guider : dossier, visite de campus ou entretien d'orientation."
+                    : 'Our admissions team is available to guide you: application, campus visit, or orientation interview.'}
                 </p>
               </div>
 
@@ -461,14 +463,14 @@ export const FAQ: React.FC = () => {
                   href="#/contact"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-brand-gold hover:bg-brand-gold-light text-brand-blue-deep font-sans font-bold text-xs uppercase tracking-wide rounded-xl shadow-md transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap"
                 >
-                  Formulaire de Contact
+                  {fr ? 'Formulaire de Contact' : 'Contact Form'}
                   <ArrowRight size={14} />
                 </a>
                 <a
                   href="#/preinscription"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-sans font-semibold text-xs uppercase tracking-wide rounded-xl border border-white/20 transition-all duration-200 whitespace-nowrap"
                 >
-                  Pré-inscription en ligne
+                  {fr ? 'Pré-inscription en ligne' : 'Online Pre-enrollment'}
                 </a>
               </div>
             </div>

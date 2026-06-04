@@ -8,6 +8,7 @@ import { Card } from '../ui/Card.tsx';
 import { Button } from '../ui/Button.tsx';
 import { CalendarPicker } from '../ui/CalendarPicker.tsx';
 import { Calendar, User, Phone, Mail, FileText, CheckCircle } from 'lucide-react';
+import { useLang } from '../../lib/LanguageContext.tsx';
 
 interface AppointmentFormProps {
   onSuccess: (appointment: any) => void;
@@ -20,6 +21,8 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
   initialProspect,
   id
 }) => {
+  const { lang } = useLang();
+  const fr = lang === 'fr';
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,12 +44,12 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
     setError(null);
 
     if (!selectedDateTime) {
-      setError("Veuillez sélectionner un créneau horaire d'excellence disponible sur le calendrier.");
+      setError(fr ? "Veuillez sélectionner un créneau horaire disponible sur le calendrier." : "Please select an available time slot on the calendar.");
       return;
     }
 
     if (!prenomParent.trim() || !nomParent.trim() || !telephone.trim() || !email.trim()) {
-      setError("Veuillez remplir vos coordonnées de contact obligatoires.");
+      setError(fr ? "Veuillez remplir vos coordonnées de contact obligatoires." : "Please fill in all required contact details.");
       return;
     }
 
@@ -88,10 +91,12 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
       <div className="border-b border-brand-border/40 pb-4 mb-6">
         <h3 className="font-sans font-bold text-lg text-brand-blue-deep flex items-center gap-2">
           <Calendar className="text-brand-gold" size={20} />
-          Planifier un Rendez-vous d'Excellence
+          {fr ? "Planifier un Rendez-vous d'Excellence" : 'Book an Excellence Appointment'}
         </h3>
         <p className="text-xs text-brand-muted mt-1 leading-normal leading-relaxed">
-          Planifiez votre visite physique, entretien pédagogique d'admission ou l'évaluation d'apprentissage de votre enfant en Côte d'Ivoire.
+          {fr
+            ? "Planifiez votre visite physique, entretien pédagogique d'admission ou l'évaluation d'apprentissage de votre enfant."
+            : "Schedule your in-person visit, academic admission interview, or your child's learning assessment."}
         </p>
       </div>
 
@@ -105,7 +110,7 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
         {/* Step 1: Calendar Selection */}
         <div>
           <label className="block text-xs font-bold text-brand-blue-deep uppercase tracking-wider mb-3">
-            Étape 1 : Choisir la Date et l'Heure *
+            {fr ? "Étape 1 : Choisir la Date et l'Heure *" : 'Step 1: Choose Date & Time *'}
           </label>
           <CalendarPicker
             selectedDateTime={selectedDateTime}
@@ -116,25 +121,25 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
         {/* Step 2: Informational entries */}
         <div className="border-t border-brand-border/40 pt-5 space-y-4">
           <label className="block text-xs font-bold text-brand-blue-deep uppercase tracking-wider">
-            Étape 2 : Vos Coordonnées Académiques
+            {fr ? 'Étape 2 : Vos Coordonnées Académiques' : 'Step 2: Your Contact Details'}
           </label>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-brand-blue-medium mb-1.5">Objet du rendez-vous *</label>
+              <label className="block text-xs font-semibold text-brand-blue-medium mb-1.5">{fr ? 'Objet du rendez-vous *' : 'Appointment purpose *'}</label>
               <select
                 value={typeRdv}
                 onChange={(e) => setTypeRdv(e.target.value as any)}
                 className="w-full px-3.5 py-2.5 border border-brand-border focus:border-brand-blue-medium bg-white focus:outline-none text-xs text-brand-dark"
               >
-                <option value="Visite des locaux">Visite guidée des locaux scolaires</option>
-                <option value="Entretien pédagogique">Entretien pédagogique direction</option>
-                <option value="Évaluation enfant">Évaluation de l'enfant (test d'excellence gratuit)</option>
-                <option value="Question administrative">Clarification d'ordre administrative</option>
+                <option value="Visite des locaux">{fr ? 'Visite guidée des locaux scolaires' : 'Guided school tour'}</option>
+                <option value="Entretien pédagogique">{fr ? 'Entretien pédagogique direction' : 'Pedagogical interview with management'}</option>
+                <option value="Évaluation enfant">{fr ? "Évaluation de l'enfant (test d'excellence gratuit)" : 'Child assessment (free excellence test)'}</option>
+                <option value="Question administrative">{fr ? "Clarification d'ordre administrative" : 'Administrative inquiry'}</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-brand-blue-medium mb-1.5">Adresse e-mail de contact *</label>
+              <label className="block text-xs font-semibold text-brand-blue-medium mb-1.5">{fr ? 'Adresse e-mail de contact *' : 'Contact email *'}</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3.5 text-brand-muted" size={13} />
                 <input
@@ -152,31 +157,31 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-brand-blue-medium mb-1.5">Votre Prénom *</label>
+              <label className="block text-xs font-semibold text-brand-blue-medium mb-1.5">{fr ? 'Votre Prénom *' : 'First Name *'}</label>
               <input
                 type="text"
                 required
                 value={prenomParent}
                 disabled={!!initialProspect}
                 onChange={(e) => setPrenomParent(e.target.value)}
-                placeholder="Parent"
+                placeholder={fr ? 'Prénom' : 'First name'}
                 className="w-full px-3.5 py-2.5 border border-brand-border focus:border-brand-blue-medium disabled:bg-brand-pale focus:outline-none text-xs text-brand-dark"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-brand-blue-medium mb-1.5">Votre Nom *</label>
+              <label className="block text-xs font-semibold text-brand-blue-medium mb-1.5">{fr ? 'Votre Nom *' : 'Last Name *'}</label>
               <input
                 type="text"
                 required
                 value={nomParent}
                 disabled={!!initialProspect}
                 onChange={(e) => setNomParent(e.target.value)}
-                placeholder="Nom"
+                placeholder={fr ? 'Nom de famille' : 'Last name'}
                 className="w-full px-3.5 py-2.5 border border-brand-border focus:border-brand-blue-medium disabled:bg-brand-pale focus:outline-none text-xs text-brand-dark"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-brand-blue-medium mb-1.5">Téléphone d'urgence *</label>
+              <label className="block text-xs font-semibold text-brand-blue-medium mb-1.5">{fr ? "Téléphone d'urgence *" : 'Emergency Phone *'}</label>
               <div className="relative">
                 <Phone className="absolute left-3 top-3.5 text-brand-muted" size={13} />
                 <input
@@ -191,42 +196,42 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-brand-blue-medium mb-1.5">Section de l'enfant (optionnel)</label>
+              <label className="block text-xs font-semibold text-brand-blue-medium mb-1.5">{fr ? "Section de l'enfant (optionnel)" : "Child's class (optional)"}</label>
               <select
                 value={sectionEnfant}
                 onChange={(e) => setSectionEnfant(e.target.value)}
                 className="w-full px-3.5 py-2.5 border border-brand-border focus:border-brand-blue-medium bg-white focus:outline-none text-xs text-brand-dark"
               >
-                <option value="PS">Petite Section</option>
-                <option value="MS">Moyenne Section</option>
-                <option value="GS">Grande Section</option>
-                <option value="CP">Classe de CP</option>
-                <option value="CE1">Classe de CE1</option>
-                <option value="CE2">Classe de CE2</option>
-                <option value="CM1">Classe de CM1</option>
-                <option value="CM2">Classe de CM2</option>
+                <option value="PS">{fr ? 'Petite Section' : 'Nursery (PS)'}</option>
+                <option value="MS">{fr ? 'Moyenne Section' : 'Middle Kindergarten (MS)'}</option>
+                <option value="GS">{fr ? 'Grande Section' : 'Senior Kindergarten (GS)'}</option>
+                <option value="CP">{fr ? 'Classe de CP' : 'Grade 1 (CP)'}</option>
+                <option value="CE1">{fr ? 'Classe de CE1' : 'Grade 2 (CE1)'}</option>
+                <option value="CE2">{fr ? 'Classe de CE2' : 'Grade 3 (CE2)'}</option>
+                <option value="CM1">{fr ? 'Classe de CM1' : 'Grade 4 (CM1)'}</option>
+                <option value="CM2">{fr ? 'Classe de CM2' : 'Grade 5 (CM2)'}</option>
               </select>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-brand-blue-medium mb-1.5">Prénom de l'enfant (optionnel)</label>
+              <label className="block text-xs font-semibold text-brand-blue-medium mb-1.5">{fr ? "Prénom de l'enfant (optionnel)" : "Child's first name (optional)"}</label>
               <input
                 type="text"
                 value={prenomEnfant}
                 onChange={(e) => setPrenomEnfant(e.target.value)}
-                placeholder="Saisissez son prénom"
+                placeholder={fr ? 'Saisissez son prénom' : "Enter child's first name"}
                 className="w-full px-3.5 py-2.5 border border-brand-border focus:border-brand-blue-medium focus:outline-none text-xs text-brand-dark"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-brand-blue-medium mb-1.5">Demandes particulières / Commentaires</label>
+              <label className="block text-xs font-semibold text-brand-blue-medium mb-1.5">{fr ? 'Demandes particulières / Commentaires' : 'Special requests / Comments'}</label>
               <input
                 type="text"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="ex: Difficultés d'apprentissage, carnet scolaire précédent dispo."
+                placeholder={fr ? "ex: Difficultés d'apprentissage, carnet scolaire précédent dispo." : "e.g., Learning difficulties, previous report card available."}
                 className="w-full px-3.5 py-2.5 border border-brand-border focus:border-brand-blue-medium focus:outline-none text-xs text-brand-dark"
               />
             </div>
@@ -236,7 +241,7 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
         <div className="border-t border-brand-border/40 pt-4 flex justify-end shrink-0">
           <Button type="submit" variant="cta" className="px-8 py-3.5 text-sm font-bold shadow-md" disabled={loading}>
             <CheckCircle size={16} className="mr-1" />
-            {loading ? "Confirmation du créneau..." : "Planifier mon Entretien d'Excellence"}
+            {loading ? (fr ? "Confirmation du créneau..." : "Booking...") : (fr ? "Planifier mon Entretien d'Excellence" : 'Book my Excellence Appointment')}
           </Button>
         </div>
       </form>

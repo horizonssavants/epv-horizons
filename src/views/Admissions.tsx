@@ -16,8 +16,9 @@ import { useLang } from '../lib/LanguageContext.tsx';
 import {
   CheckCircle, ShieldAlert, FileText, Gift, Calendar, Phone,
   Award, HelpCircle, Download, AlertCircle, Sparkles, Clock,
-  ChevronRight, Star, Lock, Mail, Copy
+  ChevronRight, Lock, Mail
 } from 'lucide-react';
+import { Baby, Books, Student } from '@phosphor-icons/react';
 
 /* ─── Animation variants ─────────────────────────────────────────── */
 const fadeUp = {
@@ -92,41 +93,38 @@ export const Admissions: React.FC = () => {
 
   const tuitionFees = [
     {
-      section: "Maternelle",
-      subtitle: "Petite Section • Moyenne Section • Grande Section",
+      section: fr ? "Maternelle" : "Kindergarten",
+      subtitle: fr ? "Petite Section • Moyenne Section • Grande Section" : "Nursery • Middle Class • Senior Class",
       droitIns: "150 000",
       scolarite: "1 200 000",
       fournitures: "120 000",
       total: "1 470 000",
-      badgeColor: "bg-violet-100 text-violet-700 border-violet-200",
       accent: "from-violet-500 to-purple-600",
-      icon: "🌱",
+      icon: <Baby size={32} weight="fill" className="text-white" />,
     },
     {
-      section: "Primaire Cycle 1",
+      section: fr ? "Primaire Cycle 1" : "Primary Cycle 1",
       subtitle: "CPI/CP • CE1 • CE2",
       droitIns: "150 000",
       scolarite: "1 500 000",
       fournitures: "150 000",
       total: "1 800 000",
-      badgeColor: "bg-blue-100 text-brand-blue-deep border-blue-200",
       accent: "from-brand-blue-medium to-brand-blue-deep",
-      icon: "📚",
+      icon: <Books size={32} weight="fill" className="text-white" />,
     },
     {
-      section: "Primaire Cycle 2",
+      section: fr ? "Primaire Cycle 2" : "Primary Cycle 2",
       subtitle: "CM1 • CM2",
       droitIns: "150 000",
       scolarite: "1 700 000",
       fournitures: "180 000",
       total: "2 030 000",
-      badgeColor: "bg-amber-100 text-amber-700 border-amber-200",
       accent: "from-brand-gold to-amber-500",
-      icon: "🎓",
+      icon: <Student size={32} weight="fill" className="text-white" />,
     },
   ];
 
-  const faqList = [
+  const faqList = fr ? [
     {
       title: "Quels sont les documents obligatoires pour l'inscription définitive ?",
       content: "Pour que l'inscription physique soit validée, vous devez fournir au secrétariat : l'extrait d'acte de naissance original de l'enfant, une copie de son carnet de vaccination à jour, 4 photos d'identité couleur récentes de l'enfant, les bulletins scolaires de l'année précédente (pour l'accès au primaire), et une pièce d'identité du parent/tuteur légal.",
@@ -167,6 +165,47 @@ export const Admissions: React.FC = () => {
       title: "Quels sont les effectifs admis par classe ?",
       content: "Afin de privilégier l'excellence pédagogique, nous bloquons strictement les effectifs à 15 élèves maximum en classe de Maternelle (PS, MS, GS) et 20 élèves maximum en classe de Primaire (CP au CM2). Les inscriptions cessent automatiquement dès que les capacités limites d'Abidjan sont atteintes.",
     },
+  ] : [
+    {
+      title: "What documents are required for final enrollment?",
+      content: "For physical enrollment to be validated, you must provide at the secretariat: the child's original birth certificate, an up-to-date vaccination record, 4 recent color passport photos of the child, previous year's report cards (for primary school entry), and a valid ID of the parent/legal guardian.",
+    },
+    {
+      title: "What official curriculum do you follow?",
+      content: "EPV Horizons Savants rigorously follows the official curriculum of Côte d'Ivoire's National Ministry of Education, guaranteeing access to all state exams and equivalences. However, we significantly enrich it with early immersive bilingualism, advanced English writing, Singapore active math methods, and dedicated robotics/computing workshops.",
+    },
+    {
+      title: "How can tuition fees be paid?",
+      content: "For convenience, EPV Horizons Savants tuition is payable in 3 quarterly installments: a first payment at physical enrollment confirmation in August, a second in December, and the final installment in March. Transactions are currently processed by certified bank cheque or physical bank transfer — no direct online payment is processed.",
+    },
+    {
+      title: "What does the child evaluation test involve?",
+      content: "The evaluation test is free and caring. For kindergarten, it observes motor skills, spontaneous language, and collective socialization. For primary school, it assesses phonics reading level, French writing, and basic mathematical logic. The test is not eliminatory; it simply allows our team to tailor individualized monitoring.",
+    },
+    {
+      title: "How does the 10% referral discount work?",
+      content: "Each parent receives a unique code at pre-enrollment (e.g. EPV-AKA01). When you share this code with friends or family and they enter it in their form, you are linked. Once your referral's enrollment is physically confirmed and fees paid, you receive an immediate 10% discount on your child's tuition. The benefit is cumulative up to 4 referrals (40% total discount)!",
+    },
+    {
+      title: "Is school transport and canteen provided?",
+      content: "Yes, a healthy and balanced canteen cooked on-site is offered to parents individually (billed separately). We also operate a secure, air-conditioned school transport service covering priority areas of Abidjan: Cocody, Riviera Palmeraie, M'Pouto, Bingerville, Marcory and Plateau.",
+    },
+    {
+      title: "Is your school campus in Abidjan under surveillance?",
+      content: "Security is our absolute priority. Our educational complex is fully enclosed with 24/7 security guard access control and comprehensive CCTV surveillance of outdoor areas. Student entry and exit are subject to mandatory sign-in/sign-out.",
+    },
+    {
+      title: "Do you offer after-school care or extracurricular activities?",
+      content: "Yes, a supervised and animated after-school club is open every evening until 18:00 to support working parents. During this time, multiple extracurricular clubs (painting, chess, English eloquence, writing club, judo) are open to children.",
+    },
+    {
+      title: "Can my child enroll if they are a foreign national?",
+      content: "Absolutely. Our school is open to all excellence-minded children, whether Ivorian or international residents. Our equivalences facilitate future integration into any global school system (French-speaking or English-speaking).",
+    },
+    {
+      title: "What are the class sizes?",
+      content: "To prioritize pedagogical excellence, we strictly cap class sizes at 15 students maximum in Kindergarten classes (PS, MS, GS) and 20 students maximum in Primary classes (Grade 1 to Grade 5). Enrollment automatically closes once maximum capacity is reached.",
+    },
   ];
 
   const handleFormSuccess = (code: string, prospect: any) => {
@@ -198,7 +237,7 @@ export const Admissions: React.FC = () => {
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-gold/40 bg-brand-gold/10 text-brand-gold text-xs font-bold uppercase tracking-widest"
+            className="inline-flex items-center gap-2 text-brand-gold text-xs font-bold uppercase tracking-widest"
           >
             <span className="w-2 h-2 rounded-full bg-brand-gold animate-ping" />
             {fr ? 'Inscriptions Ouvertes · Rentrée Septembre 2026' : 'Enrollments Open · September 2026'}
@@ -264,10 +303,7 @@ export const Admissions: React.FC = () => {
           transition={{ duration: 0.6 }}
         >
           <div className="text-center mb-10">
-            <span className="text-xs font-bold uppercase tracking-widest text-brand-gold font-sans">
-              {fr ? "Votre passeport pour l'excellence" : 'Your passport to excellence'}
-            </span>
-            <h2 className="font-sans font-extrabold text-2xl md:text-4xl text-brand-blue-deep mt-2 tracking-tight">
+            <h2 className="font-sans font-extrabold text-2xl md:text-4xl text-brand-blue-deep tracking-tight">
               {fr ? "Processus d'Inscription en 4 Étapes" : '4-Step Enrollment Process'}
             </h2>
             <div className="h-1 w-16 bg-brand-gold mx-auto mt-4 rounded-full" />
@@ -289,14 +325,13 @@ export const Admissions: React.FC = () => {
           transition={{ duration: 0.6 }}
         >
           <div className="text-center mb-10">
-            <span className="text-xs font-bold uppercase tracking-widest text-brand-gold font-sans">
-              Investissement annuel
-            </span>
-            <h2 className="font-sans font-extrabold text-2xl md:text-4xl text-brand-blue-deep mt-2 tracking-tight">
-              Grille Tarifaire · Rentrée 2026
+            <h2 className="font-sans font-extrabold text-2xl md:text-4xl text-brand-blue-deep tracking-tight">
+              {fr ? 'Grille Tarifaire · Rentrée 2026' : 'Tuition Schedule · September 2026'}
             </h2>
             <p className="font-serif text-sm text-brand-muted mt-2 max-w-xl mx-auto">
-              Un investissement réfléchi pour une éducation d'excellence bilingue individualisée en Côte d'Ivoire.
+              {fr
+                ? "Un investissement réfléchi pour une éducation d'excellence bilingue individualisée en Côte d'Ivoire."
+                : "A thoughtful investment in individualized bilingual excellence education in Côte d'Ivoire."}
             </p>
             <div className="h-1 w-16 bg-brand-gold mx-auto mt-4 rounded-full" />
           </div>
@@ -317,7 +352,7 @@ export const Admissions: React.FC = () => {
               >
                 {/* Card accent header */}
                 <div className={`bg-gradient-to-r ${fee.accent} p-5 text-white`}>
-                  <span className="text-3xl block mb-2">{fee.icon}</span>
+                  <span className="block mb-2">{fee.icon}</span>
                   <h3 className="font-sans font-extrabold text-lg leading-tight">{fee.section}</h3>
                   <p className="text-xs text-white/75 mt-0.5 font-serif">{fee.subtitle}</p>
                 </div>
@@ -326,7 +361,7 @@ export const Admissions: React.FC = () => {
                 <div className="flex-1 p-6 space-y-4">
                   {/* Total · mis en avant */}
                   <div className="text-center py-3 rounded-2xl bg-gradient-to-br from-[#F4F8FF] to-white border border-brand-border/50">
-                    <span className="text-[10px] text-brand-muted uppercase tracking-widest font-sans block">Budget global estimé</span>
+                    <span className="text-[10px] text-brand-muted uppercase tracking-widest font-sans block">{fr ? 'Budget global estimé' : 'Estimated total budget'}</span>
                     <span className="font-mono font-extrabold text-2xl text-brand-blue-deep block mt-0.5">
                       {fee.total} <span className="text-xs font-sans font-semibold text-brand-muted">FCFA</span>
                     </span>
@@ -334,9 +369,9 @@ export const Admissions: React.FC = () => {
 
                   <div className="space-y-2.5 text-sm">
                     {[
-                      { label: "Droit d'inscription unique", val: fee.droitIns },
-                      { label: "Scolarité annuelle", val: fee.scolarite },
-                      { label: "Trousseau & fournitures", val: fee.fournitures },
+                      { label: fr ? "Droit d'inscription unique" : "One-time enrollment fee", val: fee.droitIns },
+                      { label: fr ? "Scolarité annuelle" : "Annual tuition", val: fee.scolarite },
+                      { label: fr ? "Trousseau & fournitures" : "Kit & supplies", val: fee.fournitures },
                     ].map((line) => (
                       <div key={line.label} className="flex justify-between items-center border-b border-brand-border/40 pb-2.5">
                         <span className="font-serif text-brand-muted text-xs">{line.label}</span>
@@ -346,7 +381,7 @@ export const Admissions: React.FC = () => {
                   </div>
 
                   <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wide ${fee.badgeColor}`}>
-                    <Award size={10} /> Places limitées
+                    <Award size={10} /> {fr ? 'Places limitées' : 'Limited spots'}
                   </div>
                 </div>
               </motion.div>
@@ -364,8 +399,13 @@ export const Admissions: React.FC = () => {
           >
             <ShieldAlert size={18} className="text-brand-gold shrink-0 mt-0.5" />
             <p className="font-serif text-xs text-brand-dark/90 leading-relaxed">
-              <strong>Remarque :</strong> Les droits d'inscription comprennent l'assurance scolaire obligatoire, l'accès permanent aux plateformes numériques et l'infirmerie d'Abidjan.
-              Une réduction de <strong>10% cumulable</strong> est appliquée sur la scolarité pour chaque enfant d'un parrainage confirmé.
+              {fr ? (
+                <><strong>Remarque :</strong> Les droits d'inscription comprennent l'assurance scolaire obligatoire, l'accès permanent aux plateformes numériques et l'infirmerie d'Abidjan.
+                Une réduction de <strong>10% cumulable</strong> est appliquée sur la scolarité pour chaque enfant d'un parrainage confirmé.</>
+              ) : (
+                <><strong>Note:</strong> Enrollment fees include mandatory school insurance, permanent access to digital platforms, and the Abidjan campus infirmary.
+                A <strong>cumulative 10% discount</strong> is applied to tuition for each child enrolled through a confirmed referral.</>
+              )}
             </p>
           </motion.div>
         </motion.section>
@@ -383,14 +423,13 @@ export const Admissions: React.FC = () => {
           className="scroll-mt-20"
         >
           <div className="text-center mb-10">
-            <span className="text-xs font-bold uppercase tracking-widest text-brand-gold font-sans">
-              Dossier administratif réglementaire
-            </span>
-            <h2 className="font-sans font-extrabold text-2xl md:text-4xl text-brand-blue-deep mt-2 tracking-tight">
-              Pièces à Fournir pour l'Inscription
+            <h2 className="font-sans font-extrabold text-2xl md:text-4xl text-brand-blue-deep tracking-tight">
+              {fr ? "Pièces à Fournir pour l'Inscription" : 'Documents Required for Enrollment'}
             </h2>
             <p className="font-serif text-sm text-brand-muted mt-2 max-w-xl mx-auto">
-              Sélectionnez la section scolaire de votre enfant pour consulter la liste officielle.
+              {fr
+                ? "Sélectionnez la section scolaire de votre enfant pour consulter la liste officielle."
+                : "Select your child's school level to view the official required document list."}
             </p>
             <div className="h-1 w-16 bg-brand-gold mx-auto mt-4 rounded-full" />
           </div>
@@ -400,9 +439,9 @@ export const Admissions: React.FC = () => {
             <div className="p-6 border-b border-brand-border/40 flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
               <div className="flex flex-wrap gap-2">
                 {[
-                  { id: "maternelle", label: "Maternelle", sub: "PS · MS · GS" },
-                  { id: "primaire", label: "Primaire", sub: "CP → CM1" },
-                  { id: "cm2", label: "CM2", sub: "Fin de cycle" },
+                  { id: "maternelle", label: fr ? "Maternelle" : "Kindergarten", sub: "PS · MS · GS" },
+                  { id: "primaire", label: fr ? "Primaire" : "Primary", sub: "CP → CM1" },
+                  { id: "cm2", label: "CM2", sub: fr ? "Fin de cycle" : "End of cycle" },
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -436,11 +475,11 @@ export const Admissions: React.FC = () => {
             <div className="p-6 md:p-8">
               <div className="flex justify-between items-center mb-5">
                 <h4 className="font-sans font-bold text-sm text-brand-blue-deep uppercase tracking-wider">
-                  {selectedDocTab === "maternelle" && "Pièces Exigées · Maternelle"}
-                  {selectedDocTab === "primaire" && "Pièces Exigées · Primaire (CP à CM1)"}
-                  {selectedDocTab === "cm2" && "Pièces Exigées · Classe de CM2"}
+                  {selectedDocTab === "maternelle" && (fr ? "Pièces Exigées · Maternelle" : "Required Documents · Kindergarten")}
+                  {selectedDocTab === "primaire" && (fr ? "Pièces Exigées · Primaire (CP à CM1)" : "Required Documents · Primary (Grade 1 to Grade 4)")}
+                  {selectedDocTab === "cm2" && (fr ? "Pièces Exigées · Classe de CM2" : "Required Documents · Grade 5 (CM2)")}
                 </h4>
-                <span className="text-[10px] font-mono text-brand-gold font-bold bg-brand-gold/10 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-mono text-brand-gold font-bold">
                   Rentrée Sep 2026
                 </span>
               </div>
@@ -454,11 +493,15 @@ export const Admissions: React.FC = () => {
               >
                 {selectedDocTab === "maternelle" && (
                   <>
-                    {[
+                    {(fr ? [
                       "01 Extrait de Naissance original",
                       "01 Certificat de Vaccination ou Carnet de Vaccination à jour",
                       "08 Photos d'identité de même tirage",
-                    ].map((doc, i) => (
+                    ] : [
+                      "01 Original Birth Certificate",
+                      "01 Vaccination Certificate or up-to-date Vaccination Record",
+                      "08 Passport-size photos (identical print)",
+                    ]).map((doc, i) => (
                       <DocItem key={i} index={i + 1} text={doc} />
                     ))}
                   </>
@@ -466,11 +509,15 @@ export const Admissions: React.FC = () => {
 
                 {selectedDocTab === "primaire" && (
                   <>
-                    {[
+                    {(fr ? [
                       "01 Extrait de Naissance original",
                       "04 Photos d'identité de même tirage",
                       "Relevé de notes de la classe précédente",
-                    ].map((doc, i) => (
+                    ] : [
+                      "01 Original Birth Certificate",
+                      "04 Passport-size photos (identical print)",
+                      "Previous year's school report card",
+                    ]).map((doc, i) => (
                       <DocItem key={i} index={i + 1} text={doc} />
                     ))}
                   </>
@@ -478,20 +525,26 @@ export const Admissions: React.FC = () => {
 
                 {selectedDocTab === "cm2" && (
                   <>
-                    {[
+                    {(fr ? [
                       "01 Extrait de Naissance original",
                       "04 Photos d'identité de même tirage",
                       "Relevé de notes de la classe précédente",
-                    ].map((doc, i) => (
+                    ] : [
+                      "01 Original Birth Certificate",
+                      "04 Passport-size photos (identical print)",
+                      "Previous year's school report card",
+                    ]).map((doc, i) => (
                       <DocItem key={i} index={i + 1} text={doc} />
                     ))}
                     {/* Special CM2 item */}
                     <div className="flex gap-3 items-start p-4 rounded-2xl bg-brand-gold/10 border border-brand-gold/30">
                       <div className="w-8 h-8 rounded-full bg-brand-gold/25 text-brand-blue-deep flex items-center justify-center font-bold text-xs shrink-0 font-mono mt-0.5">04</div>
                       <div>
-                        <strong className="block text-brand-blue-deep text-sm font-sans">Droit d'examen obligatoire</strong>
+                        <strong className="block text-brand-blue-deep text-sm font-sans">{fr ? "Droit d'examen obligatoire" : 'Mandatory exam fee'}</strong>
                         <span className="font-serif text-xs text-brand-dark/90 leading-relaxed">
-                          Montant réglementaire de <strong>3 000 FCFA</strong> payable obligatoirement lors de l'inscription physique.
+                          {fr
+                            ? <>Montant réglementaire de <strong>3 000 FCFA</strong> payable obligatoirement lors de l'inscription physique.</>
+                            : <>Regulatory amount of <strong>3,000 FCFA</strong> payable at physical enrollment.</>}
                         </span>
                       </div>
                     </div>
@@ -501,7 +554,10 @@ export const Admissions: React.FC = () => {
 
               <div className="mt-6 pt-4 border-t border-brand-border/40 flex gap-2 items-start text-[10px] text-brand-muted leading-relaxed font-serif">
                 <AlertCircle size={14} className="text-brand-gold shrink-0 mt-0.5" />
-                <span>Tous les documents physiques originaux doivent être présentés sous chemise cartonnée (Maternelle : Bleue, Primaire : Jaune).</span>
+                <span>{fr
+                  ? "Tous les documents physiques originaux doivent être présentés sous chemise cartonnée (Maternelle : Bleue, Primaire : Jaune)."
+                  : "All original physical documents must be presented in a cardboard folder (Kindergarten: Blue, Primary: Yellow)."}
+                </span>
               </div>
             </div>
           </div>
@@ -518,15 +574,17 @@ export const Admissions: React.FC = () => {
           transition={{ duration: 0.6 }}
         >
           <div className="text-center mb-10">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-red-600 text-[10px] font-bold uppercase tracking-wider">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
-              Places extrêmement limitées
+            <span className="inline-flex items-center gap-1.5 text-red-600 text-[10px] font-bold uppercase tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping shrink-0" />
+              {fr ? 'Places extrêmement limitées' : 'Extremely limited spots'}
             </span>
             <h2 className="font-sans font-extrabold text-2xl md:text-4xl text-brand-blue-deep mt-3 tracking-tight">
-              Compte à Rebours des Places
+              {fr ? 'Compte à Rebours des Places' : 'Enrollment Countdown'}
             </h2>
             <p className="font-serif text-sm text-brand-muted mt-2 max-w-xl mx-auto">
-              Effectifs restreints à <strong>15 élèves max</strong> en Maternelle et <strong>20 max</strong> en Primaire.
+              {fr
+                ? <>Effectifs restreints à <strong>15 élèves max</strong> en Maternelle et <strong>20 max</strong> en Primaire.</>
+                : <>Class sizes capped at <strong>15 students max</strong> in Kindergarten and <strong>20 max</strong> in Primary.</>}
             </p>
           </div>
 
@@ -540,20 +598,19 @@ export const Admissions: React.FC = () => {
             <div className="relative py-10 px-6 text-center space-y-4">
               <div className="flex items-center justify-center gap-2">
                 <Clock size={14} className="text-brand-gold" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-brand-gold font-mono">
-                  Phase 1 · Clôture du Guichet d'Excellence
-                </span>
               </div>
 
               <p className="font-serif text-slate-300 text-xs max-w-sm mx-auto leading-relaxed">
-                Le traitement prioritaire des dossiers parentaux d'Abidjan s'achève automatiquement à la fin de ce décompte.
+                {fr
+                  ? "Le traitement prioritaire des dossiers parentaux d'Abidjan s'achève automatiquement à la fin de ce décompte."
+                  : "Priority processing of parent applications in Abidjan ends automatically when this countdown reaches zero."}
               </p>
 
               {/* Digits */}
               <div className="flex justify-center items-end gap-3 md:gap-5 select-none py-3">
                 {[
-                  { val: timeLeft.days, label: "Jours", gold: true },
-                  { val: timeLeft.hours, label: "Heures", gold: false },
+                  { val: timeLeft.days, label: fr ? "Jours" : "Days", gold: true },
+                  { val: timeLeft.hours, label: fr ? "Heures" : "Hours", gold: false },
                   { val: timeLeft.minutes, label: "Min", gold: false },
                   { val: timeLeft.seconds, label: "Sec", gold: false },
                 ].map((unit, i) => (
@@ -581,7 +638,7 @@ export const Admissions: React.FC = () => {
 
               <div className="pt-2 flex items-center justify-center gap-2 text-[9px] text-slate-400 uppercase font-mono tracking-wider">
                 <span className="w-2 h-2 bg-emerald-400 rounded-full animate-ping shrink-0" />
-                Attribution en flux continu à Abidjan
+                {fr ? 'Attribution en flux continu à Abidjan' : 'Rolling allocation in Abidjan'}
               </div>
             </div>
           </div>
@@ -611,21 +668,23 @@ export const Admissions: React.FC = () => {
                 let gaugeColor = "bg-brand-green";
                 let badgeStyle = "bg-green-50 text-brand-green border-green-200";
                 let dotColor = "bg-brand-green";
-                let alertLabel = `${remaining} places disponibles`;
-                let statusLabel = "Dispo";
+                let alertLabel = fr ? `${remaining} places disponibles` : `${remaining} spots available`;
+                let statusLabel = fr ? "Dispo" : "Open";
 
                 if (remaining <= 3) {
                   gaugeColor = "bg-red-500";
                   badgeStyle = "bg-red-50 text-red-600 border-red-200";
                   dotColor = "bg-red-500 animate-ping";
-                  alertLabel = remaining === 0 ? "Complet" : `Plus que ${remaining} places !`;
-                  statusLabel = remaining === 0 ? "Complet" : "Tension";
+                  alertLabel = remaining === 0
+                    ? (fr ? "Complet" : "Full")
+                    : (fr ? `Plus que ${remaining} places !` : `Only ${remaining} spots left!`);
+                  statusLabel = remaining === 0 ? (fr ? "Complet" : "Full") : (fr ? "Tension" : "Urgent");
                 } else if (remaining <= 6) {
                   gaugeColor = "bg-brand-gold";
                   badgeStyle = "bg-amber-50 text-amber-700 border-amber-200";
                   dotColor = "bg-brand-gold";
-                  alertLabel = `Remplissage rapide : ${remaining} places`;
-                  statusLabel = "Rapide";
+                  alertLabel = fr ? `Remplissage rapide : ${remaining} places` : `Filling fast: ${remaining} spots`;
+                  statusLabel = fr ? "Rapide" : "Fast";
                 }
 
                 return (
@@ -672,7 +731,7 @@ export const Admissions: React.FC = () => {
             </motion.div>
           ) : (
             <div className="text-center text-xs text-brand-muted font-sans py-8">
-              Mise à jour en temps réel des quotas académiques...
+              {fr ? 'Mise à jour en temps réel des quotas académiques...' : 'Real-time update of academic quotas...'}
             </div>
           )}
         </motion.section>
@@ -690,21 +749,51 @@ export const Admissions: React.FC = () => {
           className="scroll-mt-20"
         >
           {!successCode ? (
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-10">
-                <span className="text-xs font-bold uppercase tracking-widest text-brand-gold font-sans">
-                  Étape 1 du processus
-                </span>
-                <h2 className="font-sans font-extrabold text-2xl md:text-4xl text-brand-blue-deep mt-2 tracking-tight">
-                  Commencer ma Pré-inscription
-                </h2>
-                <p className="font-serif text-sm text-brand-muted mt-2 max-w-xl mx-auto">
-                  Remplissez le formulaire en quelques minutes. Un code parrainage unique vous sera alloué après validation.
-                </p>
-                <div className="h-1 w-16 bg-brand-gold mx-auto mt-4 rounded-full" />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+              {/* Colonne gauche — contexte */}
+              <div className="space-y-6">
+                <div>
+                  <h2 className="font-sans font-extrabold text-2xl md:text-3xl text-brand-blue-deep tracking-tight">
+                    {fr ? 'Commencer ma Pré-inscription' : 'Start my Pre-enrollment'}
+                  </h2>
+                  <p className="font-serif text-sm text-brand-muted mt-3 leading-relaxed">
+                    {fr
+                      ? "Remplissez le formulaire en quelques minutes. Un code parrainage unique vous sera alloué après validation."
+                      : "Fill in the form in a few minutes. A unique referral code will be assigned after validation."}
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  {[
+                    { step: '01', title: fr ? 'Pré-inscription en ligne' : 'Online pre-enrollment', desc: fr ? 'Formulaire rapide, 2 minutes chrono.' : 'Quick form, 2 minutes.' },
+                    { step: '02', title: fr ? 'Évaluation de l\'enfant' : 'Child assessment', desc: fr ? 'Test gratuit et bienveillant sur rendez-vous.' : 'Free caring test by appointment.' },
+                    { step: '03', title: fr ? 'Validation du dossier' : 'File validation', desc: fr ? 'Dépôt des pièces physiques au secrétariat.' : 'Physical documents submitted at secretariat.' },
+                    { step: '04', title: fr ? 'Confirmation' : 'Confirmation', desc: fr ? 'Règlement et validation définitive.' : 'Payment and final validation.' },
+                  ].map((s) => (
+                    <div key={s.step} className="flex items-start gap-4">
+                      <span className="font-mono font-extrabold text-sm text-brand-gold shrink-0 mt-0.5">{s.step}</span>
+                      <div>
+                        <p className="font-sans font-bold text-xs text-brand-blue-deep">{s.title}</p>
+                        <p className="font-serif text-xs text-brand-muted leading-relaxed">{s.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="p-5 rounded-2xl bg-brand-gold/8 border border-brand-gold/20">
+                  <p className="font-sans font-bold text-xs text-brand-blue-deep mb-1">
+                    {fr ? 'Avantage parrainage 10%' : '10% referral benefit'}
+                  </p>
+                  <p className="font-serif text-xs text-brand-muted leading-relaxed">
+                    {fr
+                      ? "À la validation, vous recevez un code parrainage personnel. Pour chaque filleul inscrit, obtenez 10% de réduction cumulable sur la scolarité."
+                      : "Upon validation, you receive a personal referral code. For each referred family enrolled, earn a cumulative 10% tuition discount."}
+                  </p>
+                </div>
               </div>
 
-              <div className="rounded-3xl shadow-[0_4px_30px_rgba(13,46,92,0.10)] bg-white border border-brand-border/40 p-8 md:p-12">
+              {/* Colonne droite — formulaire */}
+              <div className="rounded-3xl shadow-[0_4px_30px_rgba(13,46,92,0.10)] bg-white border border-brand-border/40 p-6 md:p-10 sticky top-24">
                 <PreInscriptionForm onSuccess={handleFormSuccess} />
               </div>
             </div>
@@ -716,28 +805,30 @@ export const Admissions: React.FC = () => {
                   <div className="bg-gradient-to-r from-emerald-500 to-green-600 py-6 px-8 text-center text-white">
                     <CheckCircle size={48} className="mx-auto mb-3 stroke-[2]" />
                     <h2 className="font-sans font-extrabold text-2xl">
-                      Pré-inscription Enregistrée avec Succès !
+                      {fr ? 'Pré-inscription Enregistrée avec Succès !' : 'Pre-enrollment Successfully Registered!'}
                     </h2>
                   </div>
 
                   <div className="p-8 space-y-6 text-center">
                     <p className="font-serif text-sm text-brand-dark/90 max-w-xl mx-auto leading-relaxed">
-                      Félicitations parent <strong>{createdProspect?.prenomParent} {createdProspect?.nomParent}</strong>, le dossier de{' '}
-                      <strong>{createdProspect?.prenomEnfant} {createdProspect?.nomEnfant}</strong> est inscrit sous le statut{' '}
-                      <strong>Prospect</strong>.
+                      {fr
+                        ? <>Félicitations parent <strong>{createdProspect?.prenomParent} {createdProspect?.nomParent}</strong>, le dossier de{' '}<strong>{createdProspect?.prenomEnfant} {createdProspect?.nomEnfant}</strong> est inscrit sous le statut <strong>Prospect</strong>.</>
+                        : <>Congratulations <strong>{createdProspect?.prenomParent} {createdProspect?.nomParent}</strong>, the file for{' '}<strong>{createdProspect?.prenomEnfant} {createdProspect?.nomEnfant}</strong> has been registered with <strong>Prospect</strong> status.</>}
                     </p>
 
                     {/* Parrainage showcase */}
                     <div className="rounded-2xl bg-[#F4F8FF] border border-brand-border/50 p-6 max-w-lg mx-auto space-y-4">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-gold/15 text-brand-blue-deep text-xs font-bold uppercase tracking-wider border border-brand-gold/30">
+                      <p className="flex items-center gap-1.5 text-brand-blue-deep text-xs font-bold uppercase tracking-wider">
                         <Gift size={12} />
-                        Votre avantage parrainage exclusif
-                      </span>
+                        {fr ? 'Votre avantage parrainage' : 'Your referral benefit'}
+                      </p>
                       <p className="font-serif text-xs text-brand-muted leading-relaxed">
-                        Partagez votre code personnel avec vos proches. Pour chaque enfant inscrit avec votre code, vous obtenez <strong>10% de réduction cumulable</strong> sur la scolarité !
+                        {fr
+                          ? <>Partagez votre code personnel avec vos proches. Pour chaque enfant inscrit avec votre code, vous obtenez <strong>10% de réduction cumulable</strong> sur la scolarité !</>
+                          : <>Share your personal code with family and friends. For each child enrolled with your code, you receive a <strong>cumulative 10% discount</strong> on tuition!</>}
                       </p>
                       <div className="bg-white border border-brand-border/80 rounded-xl p-4 text-center">
-                        <span className="text-[10px] text-brand-muted uppercase tracking-widest block font-sans mb-1">Votre code personnel</span>
+                        <span className="text-[10px] text-brand-muted uppercase tracking-widest block font-sans mb-1">{fr ? 'Votre code personnel' : 'Your personal code'}</span>
                         <strong className="font-mono text-3xl text-brand-blue-deep font-extrabold tracking-widest">{successCode}</strong>
                       </div>
                     </div>
@@ -747,13 +838,13 @@ export const Admissions: React.FC = () => {
                       <div className="flex items-center gap-2 mb-2">
                         <Lock size={14} className="text-[#0D2E5C]" />
                         <span className="text-xs font-bold uppercase tracking-wider text-[#0D2E5C] font-sans">
-                          Vos identifiants Espace Parent
+                          {fr ? 'Vos identifiants Espace Parent' : 'Your Parent Space credentials'}
                         </span>
                       </div>
                       <div className="bg-white border border-brand-border/60 rounded-xl p-4 space-y-3">
                         <div className="flex items-center justify-between gap-2">
                           <div>
-                            <p className="text-[9px] font-semibold text-brand-muted uppercase tracking-widest mb-0.5">Identifiant (email)</p>
+                            <p className="text-[9px] font-semibold text-brand-muted uppercase tracking-widest mb-0.5">{fr ? 'Identifiant (email)' : 'Login (email)'}</p>
                             <p className="text-xs font-mono font-semibold text-brand-blue-deep">{createdProspect?.email}</p>
                           </div>
                           <Mail size={16} className="text-slate-300 shrink-0" />
@@ -761,33 +852,29 @@ export const Admissions: React.FC = () => {
                         <div className="border-t border-brand-border/40" />
                         <div className="flex items-center justify-between gap-2">
                           <div>
-                            <p className="text-[9px] font-semibold text-brand-muted uppercase tracking-widest mb-0.5">Mot de passe initial</p>
+                            <p className="text-[9px] font-semibold text-brand-muted uppercase tracking-widest mb-0.5">{fr ? 'Mot de passe initial' : 'Initial password'}</p>
                             <p className="text-xs font-mono font-semibold text-brand-blue-deep">{createdProspect?.telephone}</p>
                           </div>
                           <Phone size={16} className="text-slate-300 shrink-0" />
                         </div>
                       </div>
                       <p className="text-[10px] text-brand-muted leading-relaxed">
-                        Conservez ces informations. Vous pouvez changer votre mot de passe depuis l'Espace Parent après connexion.
+                        {fr
+                          ? "Conservez ces informations. Vous pouvez changer votre mot de passe depuis l'Espace Parent après connexion."
+                          : "Keep this information safe. You can change your password from the Parent Space after logging in."}
                       </p>
                     </div>
 
                     <p className="font-serif text-xs text-brand-muted max-w-md mx-auto leading-normal">
-                      Une notification email et un rappel WhatsApp ont été envoyés à votre destination.
+                      {fr
+                        ? "Une notification email et un rappel WhatsApp ont été envoyés à votre destination."
+                        : "An email notification and a WhatsApp reminder have been sent to your contact."}
                     </p>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
+                    <div className="flex justify-center pt-2">
                       <Button variant="cta" className="px-6 font-bold" onClick={() => setShowRdvBooking(true)}>
-                        <Calendar size={14} /> Planifier mon Entretien Physique
+                        <Calendar size={14} /> {fr ? 'Planifier mon Entretien Physique' : 'Schedule my In-Person Interview'}
                       </Button>
-                      <a
-                        href="https://wa.me/2250778981456?text=Bonjour%20EPV%20Horizons%20Savants%2C%20je%20souhaite%20finaliser%20le%20dossier%20de%20mon%20enfant."
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-6 py-2.5 rounded-lg border border-brand-border bg-white text-brand-blue-deep text-sm font-semibold hover:border-brand-blue-light transition-all cursor-pointer flex items-center justify-center gap-2"
-                      >
-                        <Phone size={14} className="text-green-500" /> WhatsApp Direct Secrétariat
-                      </a>
                     </div>
                   </div>
                 </div>
@@ -796,14 +883,13 @@ export const Admissions: React.FC = () => {
                   {!rdvBooked ? (
                     <div className="rounded-3xl shadow-[0_4px_30px_rgba(13,46,92,0.10)] bg-white border border-brand-border/40 p-8 md:p-12 space-y-6">
                       <div className="text-center">
-                        <span className="text-xs font-bold text-brand-green uppercase tracking-widest block mb-2 font-sans">
-                          Étape Pédagogique Requise
-                        </span>
                         <h2 className="font-sans font-extrabold text-xl md:text-2xl text-brand-blue-deep">
-                          Planification de votre créneau d'évaluation
+                          {fr ? "Planifier votre entretien d'évaluation" : 'Schedule your evaluation interview'}
                         </h2>
                         <p className="font-serif text-xs text-brand-muted max-w-md mx-auto mt-2 leading-normal">
-                          Les dates d'évaluation et de visite des locaux d'Abidjan sont attribuées sous 30 minutes.
+                          {fr
+                            ? "Les dates d'évaluation et de visite des locaux d'Abidjan sont attribuées sous 30 minutes."
+                            : "Evaluation and campus visit dates in Abidjan are confirmed within 30 minutes."}
                         </p>
                       </div>
                       <AppointmentForm initialProspect={createdProspect} onSuccess={handleRdvSuccess} />
@@ -813,15 +899,17 @@ export const Admissions: React.FC = () => {
                       <div className="bg-gradient-to-r from-emerald-500 to-green-600 py-6 px-8 text-center text-white">
                         <CheckCircle size={48} className="mx-auto mb-3 stroke-[2]" />
                         <h2 className="font-sans font-extrabold text-xl">
-                          Rendez-vous Planifié avec Succès !
+                          {fr ? 'Rendez-vous Planifié avec Succès !' : 'Appointment Successfully Scheduled!'}
                         </h2>
                       </div>
                       <div className="p-8 text-center space-y-4">
                         <p className="font-serif text-xs text-brand-dark/90 max-w-md mx-auto leading-relaxed">
-                          Votre entretien d'excellence physique d'Abidjan est officiellement réservé. Le secrétariat vous envoie les coordonnées par SMS/WhatsApp.
+                          {fr
+                            ? "Votre entretien d'excellence physique d'Abidjan est officiellement réservé. Le secrétariat vous envoie les coordonnées par SMS/WhatsApp."
+                            : "Your in-person excellence interview in Abidjan is officially booked. The secretariat will send you the details by SMS/WhatsApp."}
                         </p>
                         <Button variant="primary" onClick={() => setSuccessCode(null)}>
-                          Faire un nouveau dépôt de dossier parent
+                          {fr ? 'Faire un nouveau dépôt de dossier parent' : 'Submit a new parent application'}
                         </Button>
                       </div>
                     </div>
@@ -842,21 +930,49 @@ export const Admissions: React.FC = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
           id="rdv-anchor"
-          className="scroll-mt-20 max-w-4xl mx-auto"
+          className="scroll-mt-20"
         >
-          <div className="text-center mb-10">
-            <span className="text-xs font-bold uppercase tracking-widest text-brand-gold font-sans">
-              Prise de rendez-vous directe
-            </span>
-            <h2 className="font-sans font-extrabold text-2xl md:text-4xl text-brand-blue-deep mt-2 tracking-tight">
-              Planifier une Visite ou un Entretien
-            </h2>
-            <p className="font-serif text-sm text-brand-muted mt-2 max-w-xl mx-auto">
-              Vous souhaitez visiter l'école ou obtenir plus d'informations sans passer par la pré-inscription ? Réservez directement votre créneau.
-            </p>
-          </div>
-          <div className="rounded-3xl shadow-[0_4px_30px_rgba(13,46,92,0.10)] bg-white border border-brand-border/40 p-8 md:p-12">
-            <AppointmentForm onSuccess={() => {}} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            {/* Colonne gauche — contexte */}
+            <div className="space-y-6">
+              <div>
+                <h2 className="font-sans font-extrabold text-2xl md:text-3xl text-brand-blue-deep tracking-tight">
+                  {fr ? 'Planifier une Visite ou un Entretien' : 'Schedule a Visit or an Interview'}
+                </h2>
+                <p className="font-serif text-sm text-brand-muted mt-3 leading-relaxed">
+                  {fr
+                    ? "Visitez nos locaux ou rencontrez notre équipe pédagogique sans passer par la pré-inscription. Créneaux disponibles du lundi au samedi."
+                    : "Visit our premises or meet our academic team without going through pre-enrollment. Slots available Monday to Saturday."}
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {[
+                  { title: fr ? 'Visite des locaux' : 'Campus tour', desc: fr ? 'Découvrez nos salles, le jardin pédagogique et les espaces de vie.' : 'Discover our classrooms, ecological garden and living spaces.' },
+                  { title: fr ? 'Entretien pédagogique' : 'Pedagogical interview', desc: fr ? 'Échangez avec notre directrice académique sur le projet éducatif.' : 'Meet our academic director about our educational project.' },
+                  { title: fr ? 'Évaluation de l\'enfant' : 'Child assessment', desc: fr ? 'Test gratuit et bienveillant pour placer votre enfant dans la bonne section.' : 'Free caring test to place your child in the right class.' },
+                ].map((item) => (
+                  <div key={item.title} className="flex items-start gap-3 p-4 rounded-2xl bg-white shadow-[0_2px_12px_rgba(13,46,92,0.06)]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-gold shrink-0 mt-1.5" />
+                    <div>
+                      <p className="font-sans font-bold text-xs text-brand-blue-deep">{item.title}</p>
+                      <p className="font-serif text-xs text-brand-muted leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <p className="font-serif text-xs text-brand-muted italic">
+                {fr
+                  ? '* Les créneaux sont confirmés par SMS/WhatsApp dans les 30 minutes suivant votre demande.'
+                  : '* Slots are confirmed by SMS/WhatsApp within 30 minutes of your request.'}
+              </p>
+            </div>
+
+            {/* Colonne droite — formulaire */}
+            <div className="rounded-3xl shadow-[0_4px_30px_rgba(13,46,92,0.10)] bg-white border border-brand-border/40 p-6 md:p-10 sticky top-24">
+              <AppointmentForm onSuccess={() => {}} />
+            </div>
           </div>
         </motion.section>
 
@@ -872,14 +988,13 @@ export const Admissions: React.FC = () => {
           className="pb-8"
         >
           <div className="text-center mb-12">
-            <span className="text-xs font-bold uppercase tracking-widest text-brand-gold font-sans">
-              Service Client Académique
-            </span>
-            <h2 className="font-sans font-extrabold text-2xl md:text-4xl text-brand-blue-deep mt-2 uppercase tracking-tight">
-              Foire Aux Questions Parents
+            <h2 className="font-sans font-extrabold text-2xl md:text-4xl text-brand-blue-deep uppercase tracking-tight">
+              {fr ? 'Questions Fréquentes' : 'Frequently Asked Questions'}
             </h2>
             <p className="font-serif text-sm text-brand-muted mt-2 max-w-lg mx-auto leading-relaxed">
-              Retrouvez l'essentiel des réponses aux interrogations sur l'excellence éducative en Côte d'Ivoire.
+              {fr
+                ? "Retrouvez l'essentiel des réponses aux interrogations sur l'excellence éducative en Côte d'Ivoire."
+                : "Find the key answers to your questions about educational excellence in Côte d'Ivoire."}
             </p>
             <div className="h-1 w-16 bg-brand-gold mx-auto mt-5 rounded-full" />
           </div>
@@ -891,8 +1006,8 @@ export const Admissions: React.FC = () => {
                 <HelpCircle size={18} className="text-brand-gold" />
               </div>
               <div>
-                <span className="font-sans font-bold text-brand-blue-deep text-sm block">Questions fréquentes</span>
-                <span className="text-[10px] text-brand-muted font-serif">{faqList.length} questions répondues par notre équipe</span>
+                <span className="font-sans font-bold text-brand-blue-deep text-sm block">{fr ? 'Questions fréquentes' : 'Frequently asked questions'}</span>
+                <span className="text-[10px] text-brand-muted font-serif">{faqList.length} {fr ? 'questions répondues par notre équipe' : 'questions answered by our team'}</span>
               </div>
             </div>
 

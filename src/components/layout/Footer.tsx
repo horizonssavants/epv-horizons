@@ -132,7 +132,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, id }) => {
               <Shield size={12} className="text-brand-gold" />
               {fr ? 'Agrément Ministère N° 2026/MENA/SAG' : 'Ministry Accreditation No. 2026/MENA/SAG'}
             </span>
-            <span>{fr ? 'Sécurisation de données conforme RGPD' : 'GDPR-compliant data protection'}</span>
             <span>Abidjan, CIV</span>
           </div>
         </div>

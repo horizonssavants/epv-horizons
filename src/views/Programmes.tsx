@@ -7,7 +7,8 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Accordion } from '../components/ui/Accordion.tsx';
 import { Card } from '../components/ui/Card.tsx';
-import { GraduationCap, BookOpen, Clock, Apple, Star, Zap, Shield } from 'lucide-react';
+import { BookOpen, Clock, Heart, Cpu, Calculator, Utensils } from 'lucide-react';
+import { House, Translate, Baby, Student } from '@phosphor-icons/react';
 import { useLang } from '../lib/LanguageContext.tsx';
 
 const fadeUp = {
@@ -31,18 +32,16 @@ export const Programmes: React.FC = () => {
   const { lang } = useLang();
   const fr = lang === 'fr';
 
-  const schoolLevels = [
+  const schoolLevels = fr ? [
     {
       title: "Petite Section (Maternelle | 2-3 ans)",
       content: (
         <div className="space-y-3 font-serif">
-          <p>
-            <strong>Pédagogie et Éveil :</strong> Introduction à l'acquisition du langage matériel, socialisation bienveillante intensive, motricité fine et manipulation active inspirée des méthodes Montessori.
-          </p>
+          <p><strong>Pédagogie et Éveil :</strong> Introduction à l'acquisition du langage matériel, socialisation bienveillante intensive, motricité fine et manipulation active inspirée des méthodes Montessori.</p>
           <ul className="list-disc pl-5 space-y-1 text-xs">
             <li>Effectif : 15 élèves maximum par éducateur</li>
             <li>Immersion : Comptines, histoires de contes et rituels quotidiens d'éveil en Anglais (30%)</li>
-            <li>Infrastructures d'Éveil : Dortoirs climatisés douillets, salle de motricité fine, aire de jeux extérieure ombragée</li>
+            <li>Infrastructures : Dortoirs climatisés douillets, salle de motricité fine, aire de jeux extérieure ombragée</li>
           </ul>
         </div>
       )
@@ -51,9 +50,7 @@ export const Programmes: React.FC = () => {
       title: "Moyenne Section (Maternelle | 3-4 ans)",
       content: (
         <div className="space-y-3 font-serif">
-          <p>
-            <strong>Structures Logiques et Autonomie :</strong> Apprentissage du graphisme, exercices préparatoires d'écriture précoce de l'alphabet, exploration d'exercices spatiaux et logiques d'éveil.
-          </p>
+          <p><strong>Structures Logiques et Autonomie :</strong> Apprentissage du graphisme, exercices préparatoires d'écriture précoce de l'alphabet, exploration d'exercices spatiaux et logiques d'éveil.</p>
           <ul className="list-disc pl-5 space-y-1 text-xs">
             <li>Immersion Anglais : Récits partagés, vocabulaire thématique et conversations élémentaires (40% de la journée)</li>
             <li>Ateliers phares : Initiation artistique à la poterie d'argile, rythmique corporelle, parcours d'éveil sportif</li>
@@ -66,13 +63,11 @@ export const Programmes: React.FC = () => {
       title: "Grande Section (Maternelle | 5-6 ans)",
       content: (
         <div className="space-y-3 font-serif">
-          <p>
-            <strong>Passerelle vers l'Écriture Active :</strong> Consolidation intense du graphisme, déchiffrage syllabique phonique préparant à l'entrée au CP, écriture complète cursive et manipulations numériques structurées.
-          </p>
+          <p><strong>Passerelle vers l'Écriture Active :</strong> Consolidation intense du graphisme, déchiffrage syllabique phonique préparant à l'entrée au CP, écriture complète cursive et manipulations numériques structurées.</p>
           <ul className="list-disc pl-5 space-y-1 text-xs">
-            <li>Bilinguisme : Journées alternées d'activités scolaires exclusives en Anglais et Français (50/50)</li>
-            <li>Introduction STEM : Ateliers d'initiation innovante à la logique du codage informatique (sans écran lourd, par blocs tactiles d'éveil)</li>
-            <li>Objectif : Un grand épanouissement comportemental et mental pour aborder sereinement le cycle d'école élémentaire</li>
+            <li>Bilinguisme : Journées alternées d'activités scolaires en Anglais et Français (50/50)</li>
+            <li>Introduction STEM : Ateliers d'initiation à la logique du codage informatique par blocs tactiles</li>
+            <li>Objectif : Épanouissement comportemental et mental pour aborder sereinement le cycle élémentaire</li>
           </ul>
         </div>
       )
@@ -81,13 +76,11 @@ export const Programmes: React.FC = () => {
       title: "CPI / CP (Élémentaire | 6-7 ans)",
       content: (
         <div className="space-y-3 font-serif">
-          <p>
-            <strong>Le Cycle Fondamental d'Excellence :</strong> Entière maîtrise du décodage fluide de lecture, écriture cursive sans fautes de structure, et mémorisation mathématique fondamentale.
-          </p>
+          <p><strong>Le Cycle Fondamental d'Excellence :</strong> Maîtrise du décodage fluide de lecture, écriture cursive, et mémorisation mathématique fondamentale.</p>
           <ul className="list-disc pl-5 space-y-1 text-xs">
-            <li>Méthode Singapour : Pratique active des quatre opérations mathématiques fondamentales par la modélisation en 3 étapes (Concret → Imagé → Abstrait)</li>
-            <li>Langue renforcée : Lecture de récits littéraires authentiques de Lora en français et en anglais de niveau international</li>
-            <li>Projets de Découverte : Expériences guidées en sciences de la terre et botanique dans le jardin écologique de l'école</li>
+            <li>Méthode Singapour : Modélisation en 3 étapes (Concret → Imagé → Abstrait)</li>
+            <li>Lecture : Récits littéraires authentiques en français et en anglais</li>
+            <li>Projets de Découverte : Sciences de la terre et botanique dans le jardin écologique</li>
           </ul>
         </div>
       )
@@ -96,13 +89,11 @@ export const Programmes: React.FC = () => {
       title: "CE1 & CE2 (Élémentaire | 7-9 ans)",
       content: (
         <div className="space-y-3 font-serif">
-          <p>
-            <strong>Consolidation et Analyse Critique :</strong> Orthographe lexicale et grammaticale rigoureuse, résolutions complexes de problèmes mathématiques à plusieurs étapes, étude géopolitique et géographique structurée.
-          </p>
+          <p><strong>Consolidation et Analyse Critique :</strong> Orthographe rigoureuse, résolution de problèmes mathématiques complexes, étude géographique structurée.</p>
           <ul className="list-disc pl-5 space-y-1 text-xs">
-            <li>Grammaire & Vocabulaire : Systématisation active d'évolutions de texte complexes</li>
-            <li>Sciences appliquées : Expérimentations d'ingénierie et robotique pédagogique active hebdomadaire au centre multimédia</li>
-            <li>Activités : Théâtre d'expression orale pour l'aisance verbale publique, piscine d'Abidjan sous surveillance d'éducateurs expérimentés</li>
+            <li>Grammaire & Vocabulaire : Systématisation active de textes complexes</li>
+            <li>Sciences appliquées : Ingénierie et robotique pédagogique hebdomadaire</li>
+            <li>Activités : Théâtre d'expression orale, piscine sous surveillance d'éducateurs expérimentés</li>
           </ul>
         </div>
       )
@@ -111,27 +102,112 @@ export const Programmes: React.FC = () => {
       title: "CM1 & CM2 (Élémentaire | 9-11 ans)",
       content: (
         <div className="space-y-3 font-serif">
-          <p>
-            <strong>Cycle de Liaison et Préparation d'Élite :</strong> Enseignements littéraires de Lora enrichis, approfondissements géométriques, philosophie pour enfants, histoire d'Afrique et du Monde, programmation avancée d'algorithmes.
-          </p>
+          <p><strong>Cycle de Liaison et Préparation d'Élite :</strong> Littérature enrichie, géométrie, philosophie pour enfants, histoire d'Afrique et du Monde, programmation avancée.</p>
           <ul className="list-disc pl-5 space-y-1 text-xs">
-            <li>Littérature : Échanges argumentés basés sur des lectures intégrales régulières en Français et en Anglais</li>
-            <li>Préparation intense : Entraînement aux examens d'admission prestigieux des plus grands collèges d'excellence régionaux d'Abidjan</li>
-            <li>Leadership social : Prise de parole publique, sensibilisation écologique active et projets collaboratifs de citoyenneté</li>
+            <li>Littérature : Échanges argumentés sur des lectures intégrales en Français et en Anglais</li>
+            <li>Préparation intense : Entraînement aux examens des collèges d'excellence régionaux</li>
+            <li>Leadership social : Prise de parole publique et projets collaboratifs de citoyenneté</li>
+          </ul>
+        </div>
+      )
+    }
+  ] : [
+    {
+      title: "Nursery Class — PS (2-3 years)",
+      content: (
+        <div className="space-y-3 font-serif">
+          <p><strong>Pedagogy & Awakening:</strong> Introduction to language acquisition, intensive caring socialization, fine motor skills and active manipulation inspired by Montessori methods.</p>
+          <ul className="list-disc pl-5 space-y-1 text-xs">
+            <li>Class size: 15 students maximum per educator</li>
+            <li>Immersion: Nursery rhymes, storytelling and daily English awakening rituals (30%)</li>
+            <li>Facilities: Air-conditioned dormitories, fine motor skills room, shaded outdoor play area</li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      title: "Middle Kindergarten — MS (3-4 years)",
+      content: (
+        <div className="space-y-3 font-serif">
+          <p><strong>Logic Structures & Autonomy:</strong> Handwriting learning, preparatory early alphabet exercises, spatial and logical awakening exploration.</p>
+          <ul className="list-disc pl-5 space-y-1 text-xs">
+            <li>English Immersion: Shared stories, thematic vocabulary and elementary conversations (40% of the day)</li>
+            <li>Key Workshops: Clay pottery, body rhythm, sports awakening</li>
+            <li>Active Pedagogy: Mathematical concepts through awakening objects</li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      title: "Senior Kindergarten — GS (5-6 years)",
+      content: (
+        <div className="space-y-3 font-serif">
+          <p><strong>Gateway to Active Writing:</strong> Intense handwriting consolidation, phonetic syllabic decoding preparing for primary school, full cursive writing and structured digital manipulations.</p>
+          <ul className="list-disc pl-5 space-y-1 text-xs">
+            <li>Bilingualism: Alternating school activity days in English and French (50/50)</li>
+            <li>STEM Introduction: Coding logic workshops using tactile blocks (screen-free)</li>
+            <li>Goal: Behavioral and mental development to smoothly transition to primary school</li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      title: "Grade 1 — CP (6-7 years)",
+      content: (
+        <div className="space-y-3 font-serif">
+          <p><strong>The Fundamental Cycle of Excellence:</strong> Full mastery of fluent reading decoding, structured cursive writing, and foundational mathematical memorization.</p>
+          <ul className="list-disc pl-5 space-y-1 text-xs">
+            <li>Singapore Method: 3-step modeling (Concrete → Pictorial → Abstract)</li>
+            <li>Language: Literary reading in French and international-level English</li>
+            <li>Discovery Projects: Earth sciences and botany in the school's ecological garden</li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      title: "Grades 2 & 3 — CE1 & CE2 (7-9 years)",
+      content: (
+        <div className="space-y-3 font-serif">
+          <p><strong>Consolidation & Critical Analysis:</strong> Rigorous spelling and grammar, complex multi-step math problem solving, structured geopolitical and geographical study.</p>
+          <ul className="list-disc pl-5 space-y-1 text-xs">
+            <li>Grammar & Vocabulary: Active systematization of complex texts</li>
+            <li>Applied Sciences: Weekly engineering and educational robotics experiments</li>
+            <li>Activities: Oral expression theater, supervised swimming at Abidjan pool</li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      title: "Grades 4 & 5 — CM1 & CM2 (9-11 years)",
+      content: (
+        <div className="space-y-3 font-serif">
+          <p><strong>Elite Preparation Cycle:</strong> Enriched literature, geometry, children's philosophy, African and World history, advanced algorithm programming.</p>
+          <ul className="list-disc pl-5 space-y-1 text-xs">
+            <li>Literature: Argued discussions based on full readings in French and English</li>
+            <li>Intensive Preparation: Training for prestigious regional college entrance exams</li>
+            <li>Social Leadership: Public speaking and collaborative citizenship projects</li>
           </ul>
         </div>
       )
     }
   ];
 
-  const calendarEvents = [
+  const calendarEvents = fr ? [
     { period: "Août 2026", text: "Visites privées d'orientation du campus et rendez-vous d'évaluation académique sur réservation.", color: "bg-brand-blue-deep" },
-    { period: "Mardi 1er Septembre 2026", text: "Grande Rentée Scolaire solennelle des élèves de Maternelle et Primaire.", color: "bg-brand-gold" },
-    { period: "Octobre 2026", text: "Congés scolaires de la Toussaint (1 semaine d'activités optionnelles de loisir d'éveil).", color: "bg-brand-blue-medium" },
-    { period: "Décembre 2026", text: "Vacances d'Hiver académique & grande fête artistique de fin d'année d'Abidjan.", color: "bg-brand-green" },
+    { period: "Mardi 1er Septembre 2026", text: "Grande Rentrée Scolaire solennelle des élèves de Maternelle et Primaire.", color: "bg-brand-gold" },
+    { period: "Octobre 2026", text: "Congés scolaires de la Toussaint (1 semaine d'activités optionnelles de loisir).", color: "bg-brand-blue-medium" },
+    { period: "Décembre 2026", text: "Vacances d'Hiver académique & grande fête artistique de fin d'année.", color: "bg-brand-green" },
     { period: "Février 2027", text: "Semaine de l'entrepreneuriat et de l'innovation robotique (exposition parentale).", color: "bg-brand-blue-deep" },
     { period: "Avril 2027", text: "Congés scolaires de Pâques (fouilles archéologiques simulées sur l'aire de jeux).", color: "bg-brand-gold" },
     { period: "Juin 2027", text: "Kermesse de l'excellence académique & distribution solennelle des bulletins annuels.", color: "bg-brand-green" },
+  ] : [
+    { period: "August 2026", text: "Private campus orientation visits and academic evaluation appointments by reservation.", color: "bg-brand-blue-deep" },
+    { period: "Tuesday, September 1, 2026", text: "Solemn Grand School Opening for Kindergarten and Primary students.", color: "bg-brand-gold" },
+    { period: "October 2026", text: "All Saints holiday break (1 week of optional leisure and awakening activities).", color: "bg-brand-blue-medium" },
+    { period: "December 2026", text: "Academic Winter break & grand artistic year-end celebration in Abidjan.", color: "bg-brand-green" },
+    { period: "February 2027", text: "Entrepreneurship and Robotics Innovation Week (parent exhibition).", color: "bg-brand-blue-deep" },
+    { period: "April 2027", text: "Easter school break (simulated archaeological excavations on the playground).", color: "bg-brand-gold" },
+    { period: "June 2027", text: "Academic Excellence Festival & solemn distribution of annual school reports.", color: "bg-brand-green" },
   ];
 
   return (
@@ -152,13 +228,9 @@ export const Programmes: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-gold/15 border border-brand-gold/30 text-brand-gold text-xs font-bold uppercase tracking-[0.35em] mb-6">
-            <GraduationCap size={13} />
-            {fr ? "Cursus d'Excellence Agréé" : 'Accredited Excellence Curriculum'}
-          </span>
           <h1 className="font-sans font-extrabold text-4xl md:text-6xl text-white uppercase tracking-tight leading-[1.05]">
             {fr ? 'Programmes' : 'Academic'}{' '}
-            <span className="bg-brand-gold text-brand-blue-deep px-3 rounded-md">
+            <span className="text-brand-gold">
               {fr ? 'Scolaires' : 'Programs'}
             </span>
             <br />{fr ? '& Pédagogie' : '& Pedagogy'}
@@ -176,10 +248,9 @@ export const Programmes: React.FC = () => {
         {/* ── BENTO CARDS MATERNELLE / PRIMAIRE ── */}
         <motion.section {...fadeUp}>
           <div className="text-center mb-12">
-            <p className="text-brand-gold font-bold uppercase tracking-[0.35em] text-xs mb-3">{fr ? 'Nos Deux Cycles' : 'Our Two Cycles'}</p>
             <h2 className="font-sans font-extrabold text-3xl md:text-4xl text-brand-blue-deep uppercase tracking-tight">
               {fr ? 'Une École, Deux' : 'One School, Two'}{' '}
-              <span className="bg-brand-gold text-brand-blue-deep px-2">{fr ? 'Ambitions' : 'Ambitions'}</span>
+              <span className="text-brand-gold">{fr ? 'Ambitions' : 'Ambitions'}</span>
             </h2>
           </div>
 
@@ -197,14 +268,17 @@ export const Programmes: React.FC = () => {
                   <div className="absolute inset-0 opacity-20"
                     style={{ backgroundImage: 'radial-gradient(circle at 30% 60%, #F5A623 0%, transparent 50%)' }}
                   />
-                  <div className="relative flex flex-col items-center gap-3">
-                    <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20">
-                      <Apple size={32} className="text-brand-gold" />
-                    </div>
-                    <div className="flex gap-2">
-                      {['PS', 'MS', 'GS'].map(badge => (
-                        <span key={badge} className="px-2.5 py-0.5 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 text-white text-[10px] font-bold tracking-wider">
-                          {badge}
+                  <div className="relative flex flex-col items-center gap-4">
+                    <Baby size={44} weight="fill" className="text-brand-gold" />
+                    <div className="flex gap-4">
+                      {[
+                        { code: 'PS', label: fr ? 'Petite Section' : 'Nursery' },
+                        { code: 'MS', label: fr ? 'Moyenne Section' : 'Middle Class' },
+                        { code: 'GS', label: fr ? 'Grande Section' : 'Senior Class' },
+                      ].map(({ code, label }) => (
+                        <span key={code} className="flex flex-col items-center text-white">
+                          <span className="text-[12px] font-extrabold tracking-wider leading-none">{code}</span>
+                          <span className="text-[8px] font-medium opacity-75 leading-none mt-0.5">{label}</span>
                         </span>
                       ))}
                     </div>
@@ -213,34 +287,34 @@ export const Programmes: React.FC = () => {
 
                 <div className="p-7 flex flex-col flex-1 space-y-5">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-brand-green">2 à 6 ans · Option Bilingue Immersive</span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-brand-green">{fr ? '2 à 6 ans · Bilinguisme Immersif' : '2 to 6 years · Immersive Bilingualism'}</span>
                     <h2 className="font-sans font-extrabold text-xl text-brand-blue-deep leading-tight mt-1">
-                      Le Cycle Maternelle · Horizons Éveil
+                      {fr ? 'Cycle Maternelle' : 'Kindergarten Cycle'}
                     </h2>
                     <p className="text-xs text-brand-muted leading-relaxed font-serif mt-3">
-                      La maternelle est la fondation essentielle du devenir d'excellence de l'enfant. Notre approche s'articule autour de l'estime de soi, du respect collectif, et d'un apprentissage progressif par le mouvement tactile. Tout est pensé pour éveiller la créativité.
+                      {fr
+                        ? "La maternelle est la fondation essentielle du devenir d'excellence de l'enfant. Notre approche s'articule autour de l'estime de soi, du respect collectif, et d'un apprentissage progressif par le mouvement tactile."
+                        : "Kindergarten is the essential foundation of a child's excellence. Our approach focuses on self-esteem, collective respect, and progressive learning through tactile movement."}
                     </p>
                   </div>
 
                   <div className="space-y-3 flex-1">
                     {[
-                      { icon: Shield, text: <><strong>Espaces climatisés douillets :</strong> Salles aérées adaptées avec sanitaires intégrés pour la sécurité et propreté autonome.</> },
-                      { icon: Star, text: <><strong>Double langue précoce :</strong> Conversations d'éveil, chants épurés en français et initiation d'usage en anglais parlé.</> },
-                      { icon: Zap, text: <><strong>Nutrition saine :</strong> Collations saines composées de fruits d'Abidjan, sous suivi diététique académique.</> },
+                      { icon: House,     text: fr ? <><strong>Espaces climatisés douillets :</strong> Salles aérées avec sanitaires intégrés pour la sécurité et propreté autonome.</> : <><strong>Cozy air-conditioned spaces:</strong> Airy rooms with integrated facilities for child safety and autonomy.</> },
+                      { icon: Translate, text: fr ? <><strong>Double langue précoce :</strong> Conversations d'éveil, chants en français et initiation en anglais parlé.</> : <><strong>Early bilingualism:</strong> Awakening conversations, songs in French and spoken English initiation.</> },
+                      { icon: Utensils, text: fr ? <><strong>Nutrition saine :</strong> Collations composées de fruits d'Abidjan, sous suivi diététique académique.</> : <><strong>Healthy nutrition:</strong> Snacks made from Abidjan fruits, under academic dietary supervision.</> },
                     ].map(({ icon: Icon, text }, i) => (
                       <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-brand-blue-deep/[0.03] hover:bg-brand-blue-deep/[0.06] transition-colors">
-                        <div className="w-6 h-6 rounded-lg bg-brand-gold/15 flex items-center justify-center shrink-0 mt-0.5">
-                          <Icon size={12} className="text-brand-gold" />
-                        </div>
+                        <Icon size={15} className="text-brand-gold shrink-0 mt-0.5" />
                         <span className="text-xs text-brand-muted font-sans leading-relaxed">{text}</span>
                       </div>
                     ))}
                   </div>
 
                   <div className="pt-4 border-t border-brand-border/40 flex items-center justify-between">
-                    <span className="text-[11px] font-semibold text-brand-blue-medium">Effectif : 15 places max / classe</span>
+                    <span className="text-[11px] font-semibold text-brand-blue-medium">{fr ? '15 élèves max / classe' : '15 students max / class'}</span>
                     <a href="#/programmes/maternelle" className="text-brand-green hover:text-brand-blue-deep font-bold text-xs uppercase tracking-wider flex items-center gap-1 transition-colors">
-                      Dossier détaillé →
+                      {fr ? 'Voir le programme →' : 'View program →'}
                     </a>
                   </div>
                 </div>
@@ -254,14 +328,19 @@ export const Programmes: React.FC = () => {
                   <div className="absolute inset-0 opacity-25"
                     style={{ backgroundImage: 'radial-gradient(circle at 70% 30%, #0D2E5C 0%, transparent 55%)' }}
                   />
-                  <div className="relative flex flex-col items-center gap-3">
-                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-                      <BookOpen size={32} className="text-brand-blue-deep" />
-                    </div>
-                    <div className="flex gap-2 flex-wrap justify-center">
-                      {['CP', 'CE1', 'CE2', 'CM1', 'CM2'].map(badge => (
-                        <span key={badge} className="px-2.5 py-0.5 rounded-full bg-brand-blue-deep/20 backdrop-blur-sm border border-brand-blue-deep/20 text-brand-blue-deep text-[10px] font-bold tracking-wider">
-                          {badge}
+                  <div className="relative flex flex-col items-center gap-4">
+                    <Student size={44} weight="fill" className="text-brand-blue-deep" />
+                    <div className="flex gap-3 flex-wrap justify-center">
+                      {[
+                        { code: 'CP',  label: fr ? '6-7 ans' : 'Grade 1' },
+                        { code: 'CE1', label: fr ? '7-8 ans' : 'Grade 2' },
+                        { code: 'CE2', label: fr ? '8-9 ans' : 'Grade 3' },
+                        { code: 'CM1', label: fr ? '9-10 ans' : 'Grade 4' },
+                        { code: 'CM2', label: fr ? '10-11 ans' : 'Grade 5' },
+                      ].map(({ code, label }) => (
+                        <span key={code} className="flex flex-col items-center text-brand-blue-deep">
+                          <span className="text-[12px] font-extrabold tracking-wider leading-none">{code}</span>
+                          <span className="text-[8px] font-medium opacity-60 leading-none mt-0.5">{label}</span>
                         </span>
                       ))}
                     </div>
@@ -270,34 +349,34 @@ export const Programmes: React.FC = () => {
 
                 <div className="p-7 flex flex-col flex-1 space-y-5">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-brand-blue-medium">6 à 11 ans · Excellence Littéraire & STEM</span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-brand-blue-medium">{fr ? '6 à 11 ans · Excellence & STEM' : '6 to 11 years · Excellence & STEM'}</span>
                     <h2 className="font-sans font-extrabold text-xl text-brand-blue-deep leading-tight mt-1">
-                      Le Cycle Primaire · Horizons Académique
+                      {fr ? 'Cycle Primaire' : 'Primary Cycle'}
                     </h2>
                     <p className="text-xs text-brand-muted leading-relaxed font-serif mt-3">
-                      Le cycle élémentaire scelle le passeport académique. Nous offrons les bases nationales officielles bonifiées par un enrichissement international rigoureux : résolution analytique, écriture, bilinguisme total, et projets pratiques.
+                      {fr
+                        ? "Le cycle élémentaire scelle le parcours académique. Nous offrons les bases nationales officielles enrichies par les meilleures méthodes internationales."
+                        : "The primary cycle builds the academic journey. We offer official national foundations enhanced by the best international methods: analytical thinking, bilingualism, and practical projects."}
                     </p>
                   </div>
 
                   <div className="space-y-3 flex-1">
                     {[
-                      { icon: Zap, text: <><strong>Méthodes Mathématiques actives :</strong> Modélisation intuitive Singapour pour appréhender l'abstraction de la pensée.</> },
-                      { icon: Star, text: <><strong>Anglais académique soutenu :</strong> Écritures, expressions orales d'éloquences publiques, lectures d'excellence.</> },
-                      { icon: Shield, text: <><strong>Initiations technologiques :</strong> Manipulations de robotique active Lego Education pour le raisonnement logique.</> },
+                      { icon: Calculator, text: fr ? <><strong>Méthodes Mathématiques actives :</strong> Modélisation intuitive Singapour pour appréhender l'abstraction.</> : <><strong>Active Math Methods:</strong> Singapore intuitive modeling to grasp abstract thinking.</> },
+                      { icon: Translate,  text: fr ? <><strong>Anglais académique soutenu :</strong> Écritures, expressions orales, lectures d'excellence.</> : <><strong>Academic English:</strong> Writing, public eloquence, excellence-level reading.</> },
+                      { icon: Cpu,        text: fr ? <><strong>Initiations technologiques :</strong> Robotique active Lego Education pour le raisonnement logique.</> : <><strong>Technology initiation:</strong> Lego Education active robotics for logical reasoning.</> },
                     ].map(({ icon: Icon, text }, i) => (
                       <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-brand-gold/[0.04] hover:bg-brand-gold/[0.08] transition-colors">
-                        <div className="w-6 h-6 rounded-lg bg-brand-blue-deep/10 flex items-center justify-center shrink-0 mt-0.5">
-                          <Icon size={12} className="text-brand-blue-deep" />
-                        </div>
+                        <Icon size={15} className="text-brand-blue-deep shrink-0 mt-0.5" />
                         <span className="text-xs text-brand-muted font-sans leading-relaxed">{text}</span>
                       </div>
                     ))}
                   </div>
 
                   <div className="pt-4 border-t border-brand-border/40 flex items-center justify-between">
-                    <span className="text-[11px] font-semibold text-brand-blue-medium">Effectif : 20 places max / classe</span>
+                    <span className="text-[11px] font-semibold text-brand-blue-medium">{fr ? '20 élèves max / classe' : '20 students max / class'}</span>
                     <a href="#/programmes/primaire" className="text-brand-blue-deep hover:text-brand-gold font-bold text-xs uppercase tracking-wider flex items-center gap-1 transition-colors">
-                      Dossier détaillé →
+                      {fr ? 'Voir le programme →' : 'View program →'}
                     </a>
                   </div>
                 </div>
@@ -318,12 +397,14 @@ export const Programmes: React.FC = () => {
         {/* ── ACCORDION SECTION ── */}
         <motion.section {...fadeUp}>
           <div className="text-center mb-12">
-            <p className="text-brand-gold font-bold uppercase tracking-[0.35em] text-xs mb-3">Détail par Classe</p>
             <h2 className="font-sans font-extrabold text-3xl md:text-4xl text-brand-blue-deep uppercase tracking-tight">
-              Programme Académique par <span className="bg-brand-gold text-brand-blue-deep px-2">Niveau</span>
+              {fr ? 'Programme par' : 'Program by'}{' '}
+              <span className="text-brand-gold">{fr ? 'Niveau' : 'Level'}</span>
             </h2>
             <p className="text-xs text-brand-muted mt-4 font-serif max-w-xl mx-auto leading-relaxed">
-              Cliquez sur les niveaux ci-dessous pour découvrir le projet d'excellence de la maternelle au CM2 d'Abidjan.
+              {fr
+                ? "Cliquez sur les niveaux ci-dessous pour découvrir le projet d'excellence de la maternelle au CM2 d'Abidjan."
+                : "Click on the levels below to discover the excellence program from Kindergarten to Grade 5 in Abidjan."}
             </p>
           </div>
 
@@ -356,12 +437,12 @@ export const Programmes: React.FC = () => {
         {/* ── TIMELINE CALENDRIER ── */}
         <motion.section {...fadeUp}>
           <div className="text-center mb-12">
-            <p className="text-brand-gold font-bold uppercase tracking-[0.35em] text-xs mb-3">Planification Annuelle</p>
             <h2 className="font-sans font-extrabold text-3xl md:text-4xl text-brand-blue-deep uppercase tracking-tight">
-              Calendrier <span className="bg-brand-gold text-brand-blue-deep px-2">Académique</span>
+              {fr ? 'Calendrier' : 'Academic'}{' '}
+              <span className="text-brand-gold">{fr ? 'Scolaire' : 'Calendar'}</span>
             </h2>
             <p className="text-[11px] text-brand-muted mt-3 font-serif">
-              Année Scolaire 2026/2027 · Conforme au Ministère de l'Éducation de Côte d'Ivoire
+              {fr ? "Année Scolaire 2026/2027 · Conforme au Ministère de l'Éducation de Côte d'Ivoire" : 'School Year 2026/2027 · In accordance with the Côte d\'Ivoire Ministry of Education'}
             </p>
           </div>
 
@@ -372,8 +453,8 @@ export const Programmes: React.FC = () => {
                   <Clock size={22} className="text-brand-green" />
                 </div>
                 <div>
-                  <h3 className="font-sans font-extrabold text-lg text-brand-blue-deep">Grand Calendrier Académique</h3>
-                  <span className="text-[11px] font-semibold text-brand-muted">Rentrée 2026/2027 · Provisoire</span>
+                  <h3 className="font-sans font-extrabold text-lg text-brand-blue-deep">{fr ? 'Grand Calendrier Académique' : 'Full Academic Calendar'}</h3>
+                  <span className="text-[11px] font-semibold text-brand-muted">{fr ? 'Rentrée 2026/2027 · Provisoire' : 'School Year 2026/2027 · Provisional'}</span>
                 </div>
               </div>
 

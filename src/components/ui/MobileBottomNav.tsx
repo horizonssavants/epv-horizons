@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Home, GraduationCap, UserPlus, ShieldCheck } from 'lucide-react';
+import { Home, GraduationCap, UserPlus, UserCircle } from 'lucide-react';
 import { useLang } from '../../lib/LanguageContext.tsx';
 import { t } from '../../lib/i18n.ts';
 
@@ -37,7 +37,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     { hash: '#',              labelKey: 'bnav.home',       Icon: Home,         cta: false },
     { hash: '#/programmes',   labelKey: 'bnav.programmes', Icon: GraduationCap, cta: false },
     { hash: '#/admissions',   labelKey: 'bnav.admission',  Icon: UserPlus,      cta: false },
-    { hash: '#/espace-parent', labelKey: 'bnav.parent',   Icon: ShieldCheck,   cta: true  },
+    { hash: '#/espace-parent', labelKey: 'bnav.parent',   Icon: UserCircle,    cta: true  },
   ];
 
   return (
@@ -54,8 +54,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             className={`mbn-item${cta ? ' mbn-item--cta' : ''}${isActive ? ' active' : ''}`}
             aria-current={isActive ? 'page' : undefined}
           >
-            <Icon size={16} />
-            <span>{t(labelKey, lang)}</span>
+            <Icon size={20} />
           </button>
         );
       })}

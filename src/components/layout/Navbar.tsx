@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
-  Menu, X, BookOpen, GraduationCap, ShieldCheck,
+  Menu, X, BookOpen, GraduationCap, UserCircle,
   Home, Mail, HelpCircle, Newspaper, UserPlus, ChevronRight, Globe,
 } from 'lucide-react';
 import { useLang } from '../../lib/LanguageContext.tsx';
@@ -47,8 +47,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, onNavigate, id }) =
     { key: 'nav.programmes', hash: '#/programmes',     Icon: GraduationCap },
     { key: 'nav.admissions', hash: '#/admissions',     Icon: UserPlus      },
     { key: 'nav.ecole',      hash: '#/ecole',          Icon: BookOpen      },
-    { key: 'nav.blog',       hash: '#/blog',           Icon: Newspaper     },
-    { key: 'nav.faq',        hash: '#/faq',            Icon: HelpCircle    },
     { key: 'nav.contact',    hash: '#/contact',        Icon: Mail          },
   ];
 
@@ -59,8 +57,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, onNavigate, id }) =
     { key: 'nav.primaire',   hash: '#/programmes/primaire',   Icon: GraduationCap, sub: true  },
     { key: 'nav.admissions', hash: '#/admissions',            Icon: UserPlus,      sub: false },
     { key: 'nav.ecole',      hash: '#/ecole',                 Icon: BookOpen,      sub: false },
-    { key: 'nav.blog',       hash: '#/blog',                  Icon: Newspaper,     sub: false },
-    { key: 'nav.faq',        hash: '#/faq',                   Icon: HelpCircle,    sub: false },
     { key: 'nav.contact',    hash: '#/contact',               Icon: Mail,          sub: false },
   ];
 
@@ -128,7 +124,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, onNavigate, id }) =
                       ? 'bg-white text-brand-blue-deep font-bold border-transparent'
                       : 'bg-brand-blue-medium hover:bg-brand-blue-light/20 border-brand-blue-light/40 text-white'
                   }`}>
-                  <ShieldCheck size={13} className="text-brand-gold shrink-0" />
+                  <UserCircle size={13} className="text-brand-gold shrink-0" />
                   {t('nav.parent', lang)}
                 </button>
               </div>
@@ -275,7 +271,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, onNavigate, id }) =
                   style={{ background: 'linear-gradient(135deg, #0D2E5C 0%, #1A4F8B 100%)',
                            boxShadow: '0 8px 24px rgba(13,46,92,0.30)' }}
                 >
-                  <ShieldCheck size={17} className="text-brand-gold" />
+                  <UserCircle size={17} className="text-brand-gold" />
                   {t('drawer.cta', lang)}
                 </motion.button>
               </div>

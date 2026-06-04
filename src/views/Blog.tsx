@@ -287,20 +287,9 @@ export const Blog: React.FC = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
-          {/* Overline */}
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <span className="h-px w-8 bg-brand-gold rounded-full" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-gold font-sans">
-              {fr ? "Chroniques de l'Élite Pédagogique" : 'Chronicles of Academic Excellence'}
-            </span>
-            <span className="h-px w-8 bg-brand-gold rounded-full" />
-          </div>
-
           <h1 className="font-sans font-extrabold text-3xl md:text-5xl text-brand-blue-deep tracking-tight uppercase leading-tight">
             Le Blog{' '}
-            <span className="bg-brand-gold text-brand-blue-deep px-2 rounded-sm">
-              d'EPV
-            </span>{' '}
+            <span className="text-brand-gold">d'EPV</span>{' '}
             Horizons Savants
           </h1>
 
@@ -567,7 +556,7 @@ export const Blog: React.FC = () => {
                           </span>
                         </div>
                         <span className="flex items-center gap-0.5 text-brand-blue-deep group-hover:text-brand-gold text-[10px] font-bold font-sans transition-colors">
-                          Lire <ChevronRight size={12} />
+                          {fr ? 'Lire' : 'Read'} <ChevronRight size={12} />
                         </span>
                       </div>
                     </div>
@@ -629,7 +618,7 @@ export const Blog: React.FC = () => {
               {/* Footer */}
               <div className="shrink-0 border-t border-brand-border/40 pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <span className="text-[10px] text-brand-muted italic font-serif leading-relaxed">
-                  EPV Horizons Savants d'Abidjan · Éveil culturel &amp; bilingue
+                  {fr ? "EPV Horizons Savants d'Abidjan · Éveil culturel & bilingue" : 'EPV Horizons Savants · Cultural & Bilingual Awakening'}
                 </span>
                 <div className="flex gap-2 shrink-0">
                   <Button
@@ -638,14 +627,14 @@ export const Blog: React.FC = () => {
                     onClick={handleShare}
                   >
                     <Share2 size={11} />
-                    {shareCopied ? 'Lien copié !' : 'Partager'}
+                    {shareCopied ? (fr ? 'Lien copié !' : 'Copied!') : (fr ? 'Partager' : 'Share')}
                   </Button>
                   <Button
                     variant="primary"
                     className="px-5 py-1.5 text-[10px]"
                     onClick={() => setActiveArticle(null)}
                   >
-                    Fermer
+                    {fr ? 'Fermer' : 'Close'}
                   </Button>
                 </div>
               </div>

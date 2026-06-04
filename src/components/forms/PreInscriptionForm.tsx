@@ -12,6 +12,7 @@ import {
   GraduationCap, Phone, User, Landmark, Mail, Heart,
   ChevronLeft, ChevronRight, CheckCircle, AlertTriangle, Users,
 } from 'lucide-react';
+import { useLang } from '../../lib/LanguageContext.tsx';
 
 interface ChildData {
   prenomEnfant: string;
@@ -29,7 +30,7 @@ const emptyChild = (): ChildData => ({
   prenomEnfant: '', nomEnfant: '', dateNaissance: '', sectionVisee: 'PS',
 });
 
-const LEVELS = [
+const LEVELS_FR = [
   { value: 'PS',  label: 'Petite Section (2-3 ans)' },
   { value: 'MS',  label: 'Moyenne Section (3-4 ans)' },
   { value: 'GS',  label: 'Grande Section (5-6 ans)' },
@@ -39,13 +40,23 @@ const LEVELS = [
   { value: 'CM1', label: 'CM1 (9-10 ans)' },
   { value: 'CM2', label: 'CM2 (10-11 ans)' },
 ];
+const LEVELS_EN = [
+  { value: 'PS',  label: 'Nursery PS (2-3 years)' },
+  { value: 'MS',  label: 'Middle Kindergarten MS (3-4 years)' },
+  { value: 'GS',  label: 'Senior Kindergarten GS (5-6 years)' },
+  { value: 'CP',  label: 'Grade 1 CP (6-7 years)' },
+  { value: 'CE1', label: 'Grade 2 CE1 (7-8 years)' },
+  { value: 'CE2', label: 'Grade 3 CE2 (8-9 years)' },
+  { value: 'CM1', label: 'Grade 4 CM1 (9-10 years)' },
+  { value: 'CM2', label: 'Grade 5 CM2 (10-11 years)' },
+];
 
 const COMMUNES = [
   'Cocody','Marcory','Plateau','Yopougon','Abobo',
   'Adjamé','Treichville','Port-Bouët','Koumassi','Bingerville','Songon','Anyama',
 ];
 
-const SOURCES = [
+const SOURCES_FR = [
   'Réseaux sociaux (Facebook/Insta)',
   'Bouche-à-oreille (Famille/Ami)',
   'Flyer terrain (Distribution)',
@@ -54,11 +65,25 @@ const SOURCES = [
   'Commerces / Boulangerie',
   'Autre',
 ];
+const SOURCES_EN = [
+  'Social media (Facebook/Instagram)',
+  'Word of mouth (Family/Friend)',
+  'Flyer / Leaflet distribution',
+  'Public signage / Poster',
+  'Church / Mosque / Place of worship',
+  'Shops / Local businesses',
+  'Other',
+];
 
 const inputCls = 'w-full px-3.5 py-2.5 border border-brand-border focus:border-brand-blue-medium focus:ring-1 focus:ring-brand-blue-light/50 focus:outline-none text-xs text-brand-dark transition-all';
 const labelCls = 'block text-xs font-semibold text-brand-blue-medium mb-1.5';
 
 export const PreInscriptionForm: React.FC<PreInscriptionFormProps> = ({ onSuccess, id }) => {
+  const { lang } = useLang();
+  const fr = lang === 'fr';
+  const LEVELS  = fr ? LEVELS_FR  : LEVELS_EN;
+  const SOURCES = fr ? SOURCES_FR : SOURCES_EN;
+
   /* ── Nombre d'enfants ── */
   const [nbEnfants, setNbEnfants] = useState(1);
   const [children,  setChildren]  = useState<ChildData[]>([emptyChild()]);
@@ -90,10 +115,10 @@ export const PreInscriptionForm: React.FC<PreInscriptionFormProps> = ({ onSucces
   const FINAL_STEP  = nbEnfants + 2;
 
   const steps = [
-    { label: 'Nb. enfants', description: 'Combien ?' },
-    ...children.map((_, i) => ({ label: `Enfant ${i + 1}`, description: 'État civil & classe' })),
-    { label: 'Parent',       description: 'Responsable légal' },
-    { label: 'Finalisation', description: 'Résidence & code' },
+    { label: fr ? 'Nb. enfants' : 'Children', description: fr ? 'Combien ?' : 'How many?' },
+    ...children.map((_, i) => ({ label: fr ? `Enfant ${i + 1}` : `Child ${i + 1}`, description: fr ? 'État civil & classe' : 'Details & class' })),
+    { label: fr ? 'Parent'       : 'Parent',      description: fr ? 'Responsable légal'  : 'Legal guardian' },
+    { label: fr ? 'Finalisation' : 'Finalization', description: fr ? 'Résidence & code'   : 'Residence & code' },
   ];
 
   /* UTM auto-fill */
@@ -127,20 +152,20 @@ export const PreInscriptionForm: React.FC<PreInscriptionFormProps> = ({ onSucces
   const validate = (): boolean => {
     setError(null);
     if (step === 0) {
-      if (nbEnfants < 1) { setError('Précisez le nombre d\'enfants.'); return false; }
+      if (nbEnfants < 1) { setError(fr ? 'Précisez le nombre d\'enfants.' : 'Please specify the number of children.'); return false; }
       return true;
     }
     if (step >= 1 && step <= nbEnfants) {
       const c = children[step - 1];
       if (!c.prenomEnfant.trim() || !c.nomEnfant.trim() || !c.dateNaissance) {
-        setError(`Veuillez renseigner tous les détails de l'enfant ${step}.`);
+        setError(fr ? `Veuillez renseigner tous les détails de l'enfant ${step}.` : `Please fill in all details for child ${step}.`);
         return false;
       }
       return true;
     }
     if (step === PARENT_STEP) {
       if (!prenomParent.trim() || !nomParent.trim() || !telephone.trim() || !email.trim()) {
-        setError('Veuillez renseigner les détails du responsable légal.'); return false;
+        setError(fr ? 'Veuillez renseigner les détails du responsable légal.' : 'Please fill in the legal guardian details.'); return false;
       }
       if (telephone.replace(/\s+/g, '').length < 8) {
         setError('Numéro de téléphone invalide.'); return false;
@@ -203,10 +228,10 @@ export const PreInscriptionForm: React.FC<PreInscriptionFormProps> = ({ onSucces
 
       <div className="mb-6 border-b border-brand-border/40 pb-4">
         <h3 className="font-sans font-bold text-xl text-brand-blue-deep text-center">
-          Formulaire de Pré-inscription en Ligne
+          {fr ? 'Formulaire de Pré-inscription en Ligne' : 'Online Pre-Enrollment Form'}
         </h3>
         <p className="text-center text-xs text-brand-muted mt-1">
-          Rentrée scolaire 2026/2027 · Places contingentées par section.
+          {fr ? 'Rentrée scolaire 2026/2027 · Places contingentées par section.' : 'School Year 2026/2027 · Limited places per class.'}
         </p>
       </div>
 
@@ -230,7 +255,7 @@ export const PreInscriptionForm: React.FC<PreInscriptionFormProps> = ({ onSucces
               initial={{ opacity:0, x:20 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:-20 }}
               transition={{ duration:0.22 }} className="space-y-6">
               <h4 className="font-sans font-semibold text-brand-blue-deep text-sm flex items-center gap-1.5 border-b border-brand-border/40 pb-2">
-                <Users size={16} className="text-brand-gold" /> Combien d'enfants souhaitez-vous inscrire ?
+                <Users size={16} className="text-brand-gold" /> {fr ? "Combien d'enfants souhaitez-vous inscrire ?" : 'How many children would you like to enroll?'}
               </h4>
 
               <div className="space-y-4">
@@ -249,7 +274,7 @@ export const PreInscriptionForm: React.FC<PreInscriptionFormProps> = ({ onSucces
                   >
                     {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
                       <option key={n} value={n}>
-                        {n} {n === 1 ? 'enfant' : 'enfants'}
+                        {n} {fr ? (n === 1 ? 'enfant' : 'enfants') : (n === 1 ? 'child' : 'children')}
                       </option>
                     ))}
                   </select>
@@ -279,14 +304,15 @@ export const PreInscriptionForm: React.FC<PreInscriptionFormProps> = ({ onSucces
                 </div>
 
                 <p className="text-center text-sm font-semibold text-brand-blue-deep">
-                  {nbEnfants} {nbEnfants === 1 ? 'enfant sélectionné' : 'enfants sélectionnés'}
+                  {nbEnfants} {fr ? (nbEnfants === 1 ? 'enfant sélectionné' : 'enfants sélectionnés') : (nbEnfants === 1 ? 'child selected' : 'children selected')}
                 </p>
               </div>
 
               <div className="p-3.5 bg-blue-50 border border-blue-100 rounded-lg">
                 <p className="text-[11px] text-brand-blue-deep leading-relaxed font-sans">
-                  <strong>Important :</strong> Un dossier distinct sera créé pour chaque enfant, avec les mêmes informations parentales.
-                  Chaque enfant bénéficiera de son propre code de parrainage.
+                  <strong>{fr ? 'Important :' : 'Note:'}</strong> {fr
+                    ? "Un dossier distinct sera créé pour chaque enfant, avec les mêmes informations parentales. Chaque enfant bénéficiera de son propre code de parrainage."
+                    : "A separate file will be created for each child with the same parental information. Each child will receive their own referral code."}
                 </p>
               </div>
             </motion.div>
@@ -302,7 +328,7 @@ export const PreInscriptionForm: React.FC<PreInscriptionFormProps> = ({ onSucces
               <div className="flex items-center justify-between border-b border-brand-border/40 pb-2">
                 <h4 className="font-sans font-semibold text-brand-blue-deep text-sm flex items-center gap-1.5">
                   <GraduationCap size={16} className="text-brand-gold" />
-                  Enfant {step} {nbEnfants > 1 && <span className="text-brand-muted text-xs">/ {nbEnfants}</span>}
+                  {fr ? 'Enfant' : 'Child'} {step} {nbEnfants > 1 && <span className="text-brand-muted text-xs">/ {nbEnfants}</span>}
                 </h4>
                 {/* Pills indicateurs */}
                 {nbEnfants > 1 && (
@@ -328,30 +354,30 @@ export const PreInscriptionForm: React.FC<PreInscriptionFormProps> = ({ onSucces
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className={labelCls}>Nom de famille *</label>
+                        <label className={labelCls}>{fr ? 'Nom de famille *' : 'Last name *'}</label>
                         <div className="relative">
                           <User className="absolute left-3 top-3 text-brand-muted" size={14} />
                           <input type="text" required value={c.nomEnfant} onChange={e => set('nomEnfant')(e.target.value)}
-                            placeholder="Nom officiel" className={`${inputCls} pl-9`} />
+                            placeholder={fr ? 'Nom officiel' : 'Official last name'} className={`${inputCls} pl-9`} />
                         </div>
                       </div>
                       <div>
-                        <label className={labelCls}>Prénom(s) *</label>
+                        <label className={labelCls}>{fr ? 'Prénom(s) *' : 'First name(s) *'}</label>
                         <div className="relative">
                           <User className="absolute left-3 top-3 text-brand-muted" size={14} />
                           <input type="text" required value={c.prenomEnfant} onChange={e => set('prenomEnfant')(e.target.value)}
-                            placeholder="Tous les prénoms" className={`${inputCls} pl-9`} />
+                            placeholder={fr ? 'Tous les prénoms' : 'All first names'} className={`${inputCls} pl-9`} />
                         </div>
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className={labelCls}>Date de naissance *</label>
+                        <label className={labelCls}>{fr ? 'Date de naissance *' : 'Date of birth *'}</label>
                         <input type="date" required value={c.dateNaissance} onChange={e => set('dateNaissance')(e.target.value)}
                           className={inputCls} />
                       </div>
                       <div>
-                        <label className={labelCls}>Section / Classe visée *</label>
+                        <label className={labelCls}>{fr ? 'Section / Classe visée *' : 'Target class *'}</label>
                         <select value={c.sectionVisee} onChange={e => set('sectionVisee')(e.target.value)}
                           className={`${inputCls} bg-white`}>
                           {LEVELS.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
@@ -362,8 +388,8 @@ export const PreInscriptionForm: React.FC<PreInscriptionFormProps> = ({ onSucces
                       <div className="p-3.5 bg-brand-gold/15 border-l-4 border-brand-gold text-[11px] font-sans text-brand-dark flex gap-2.5 items-start">
                         <AlertTriangle size={14} className="text-brand-gold shrink-0 mt-0.5" />
                         <div>
-                          <strong className="font-bold text-brand-blue-deep">Droit d'examen · 3 000 FCFA :</strong>
-                          {' '}Fin de cycle primaire (entrée en 6ème). Règlement au secrétariat.
+                          <strong className="font-bold text-brand-blue-deep">{fr ? "Droit d'examen · 3 000 FCFA :" : 'Exam fee · 3,000 FCFA:'}</strong>
+                          {' '}{fr ? 'Fin de cycle primaire (entrée en 6ème). Règlement au secrétariat.' : 'End of primary cycle (entry to 6th grade). Payment at the secretariat.'}
                         </div>
                       </div>
                     )}
@@ -379,39 +405,39 @@ export const PreInscriptionForm: React.FC<PreInscriptionFormProps> = ({ onSucces
               initial={{ opacity:0, x:20 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:-20 }}
               transition={{ duration:0.22 }} className="space-y-4">
               <h4 className="font-sans font-semibold text-brand-blue-deep text-sm flex items-center gap-1.5 border-b border-brand-border/40 pb-2">
-                <User size={16} className="text-brand-gold" /> Identité du responsable légal
+                <User size={16} className="text-brand-gold" /> {fr ? 'Identité du responsable légal' : 'Legal guardian details'}
               </h4>
               {nbEnfants > 1 && (
                 <div className="p-2.5 bg-emerald-50 border border-emerald-100 rounded-lg text-[11px] text-emerald-800 font-sans">
-                  Ces informations seront associées aux {nbEnfants} dossiers.
+                  {fr ? `Ces informations seront associées aux ${nbEnfants} dossiers.` : `This information will be linked to all ${nbEnfants} files.`}
                 </div>
               )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelCls}>Nom de famille *</label>
+                  <label className={labelCls}>{fr ? 'Nom de famille *' : 'Last name *'}</label>
                   <input type="text" required value={nomParent} onChange={e => setNomParent(e.target.value)}
-                    placeholder="Nom officiel" className={inputCls} />
+                    placeholder={fr ? 'Nom officiel' : 'Official last name'} className={inputCls} />
                 </div>
                 <div>
-                  <label className={labelCls}>Prénom(s) *</label>
+                  <label className={labelCls}>{fr ? 'Prénom(s) *' : 'First name(s) *'}</label>
                   <input type="text" required value={prenomParent} onChange={e => setPrenomParent(e.target.value)}
-                    placeholder="Prénom(s)" className={inputCls} />
+                    placeholder={fr ? 'Prénom(s)' : 'First name(s)'} className={inputCls} />
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelCls}>Lien de parenté *</label>
+                  <label className={labelCls}>{fr ? 'Lien de parenté *' : 'Relationship *'}</label>
                   <div className="flex gap-2 p-1 bg-brand-pale border border-brand-border/60">
                     {(['Mère','Père','Tuteur'] as const).map(opt => (
                       <button key={opt} type="button" onClick={() => setLienParente(opt)}
                         className={`flex-1 py-1.5 font-sans text-xs font-semibold cursor-pointer transition-all border ${
                           lienParente === opt ? 'bg-brand-blue-deep text-white border-brand-blue-deep' : 'text-brand-muted border-transparent hover:text-brand-dark'
-                        }`}>{opt}</button>
+                        }`}>{fr ? opt : opt === 'Mère' ? 'Mother' : opt === 'Père' ? 'Father' : 'Guardian'}</button>
                     ))}
                   </div>
                 </div>
                 <div>
-                  <label className={labelCls}>Téléphone WhatsApp (CIV) *</label>
+                  <label className={labelCls}>{fr ? 'Téléphone WhatsApp (CIV) *' : 'WhatsApp Phone (CIV) *'}</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-3 text-brand-muted" size={14} />
                     <input type="tel" required value={telephone} onChange={e => setTelephone(e.target.value)}
