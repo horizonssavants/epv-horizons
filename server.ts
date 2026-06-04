@@ -546,9 +546,13 @@ async function seedOperational(isEmpty: (t: string) => Promise<boolean>) {
 // ─── Notifications — Infobip ─────────────────────────────────────────────────
 
 function infobipPhone(raw: string): string {
+  // Retire espaces, +, tirets, parenthèses
   const clean = raw.trim().replace(/[\s+\-().]/g, '');
-  if (clean.startsWith('225')) return clean;
-  if (clean.startsWith('0'))   return '225' + clean.slice(1);
+  // Si déjà un numéro international complet (>= 10 chiffres et ne commence pas par 0)
+  if (clean.length >= 10 && !clean.startsWith('0')) return clean;
+  // Numéro local ivoirien commençant par 0
+  if (clean.startsWith('0')) return '225' + clean.slice(1);
+  // Sinon ajouter préfixe CI par défaut
   return '225' + clean;
 }
 
@@ -560,6 +564,9 @@ async function sendInfobipWhatsApp(to: string, content: string): Promise<boolean
     console.log(`[WhatsApp Simulation] To: ${to} | ${content.slice(0, 80)}`);
     return false;
   }
+  const toFormatted = infobipPhone(to);
+  const payload = { from: sender.replace(/[\s+]/g,''), to: toFormatted, content: { text: content } };
+  console.log(`[Infobip WA] Sending → from:${payload.from} to:${payload.to} url:https://${baseUrl}/whatsapp/1/message/text`);
   try {
     const r = await fetch(`https://${baseUrl}/whatsapp/1/message/text`, {
       method: 'POST',
@@ -568,17 +575,13 @@ async function sendInfobipWhatsApp(to: string, content: string): Promise<boolean
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: JSON.stringify({
-        from: sender,
-        to: infobipPhone(to),
-        content: { text: content },
-      }),
+      body: JSON.stringify(payload),
     });
+    const responseText = await r.text();
     if (!r.ok) {
-      const errBody = await r.text();
-      console.error(`[Infobip WA ERROR ${r.status}] To:${to} | ${errBody}`);
+      console.error(`[Infobip WA ERROR ${r.status}] To:${toFormatted} | Body: ${responseText}`);
     } else {
-      console.log(`[Infobip WA OK] Sent to ${to}`);
+      console.log(`[Infobip WA OK ${r.status}] Sent to ${toFormatted} | Response: ${responseText.slice(0,120)}`);
     }
     return r.ok;
   } catch (e) { console.error('[Infobip WA]', e); return false; }
@@ -2038,6 +2041,49 @@ app.get('/api/parent/bulletins', requireAuth, async (req: any, res) => {
 app.get('/api/parent/notes', requireAuth, async (req: any, res) => {
   const { rows } = await q('SELECT * FROM notes WHERE prospect_id=$1', [req.user.prospectId]);
   res.json(rowsToObjs(rows));
+});
+
+// ─── Debug WhatsApp — tester l'envoi directement ─────────────────────────────
+app.post('/api/debug/whatsapp', requireAdmin, async (req, res) => {
+  const { telephone, message } = req.body;
+  const to = telephone || '2250778981456';
+  const msg = message || `🔧 Test EPV — ${new Date().toLocaleTimeString('fr-FR')}`;
+
+  const baseUrl = process.env.INFOBIP_BASE_URL;
+  const apiKey  = process.env.INFOBIP_API_KEY;
+  const sender  = process.env.INFOBIP_WHATSAPP_SENDER;
+
+  const config = {
+    baseUrl: baseUrl ? `${baseUrl.slice(0,10)}...` : 'MANQUANT',
+    apiKey:  apiKey  ? `${apiKey.slice(0,8)}...`  : 'MANQUANT',
+    sender:  sender  || 'MANQUANT',
+  };
+
+  if (!baseUrl || !apiKey || !sender) {
+    return res.json({ ok: false, mode: 'simulation', config, message: 'Variables Infobip manquantes — envoi simulé uniquement' });
+  }
+
+  const toFormatted = infobipPhone(to);
+  const fromClean   = sender.replace(/[\s+]/g,'');
+  const payload     = { from: fromClean, to: toFormatted, content: { text: msg } };
+
+  try {
+    const r = await fetch(`https://${baseUrl}/whatsapp/1/message/text`, {
+      method: 'POST',
+      headers: { 'Authorization': `App ${apiKey}`, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const body = await r.text();
+    res.json({
+      ok: r.ok,
+      status: r.status,
+      config,
+      payload: { from: fromClean, to: toFormatted },
+      infobipResponse: body,
+    });
+  } catch (e: any) {
+    res.status(500).json({ ok: false, error: e.message, config });
+  }
 });
 
 // ─── Démarrage ────────────────────────────────────────────────────────────────
