@@ -1863,55 +1863,104 @@ function BulletinParentTab({ session }: { session: Prospect }) {
   }
 
   function printBulletinParent(b: any) {
+    const logo = `${window.location.origin}/img/logo.jpg`;
     const detail: any[] = b.notesDetail || [];
+    const nc = (n: number) => n>=16?'#16a34a':n>=12?'#2563eb':n>=10?'#d97706':'#dc2626';
+    const mentionBg = b.mention==='Félicitations'?'#FEF3C7':b.mention==='Très bien'?'#DBEAFE':b.mention==='Bien'?'#DCFCE7':'#F1F5F9';
+    const mentionFg = b.mention==='Félicitations'?'#92400E':b.mention==='Très bien'?'#1E40AF':b.mention==='Bien'?'#14532D':'#475569';
     const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
     <title>Bulletin ${session.prenomEnfant} — ${b.trimestre}</title>
     <style>
-      @page{size:A4;margin:18mm}body{font-family:Arial,sans-serif;color:#1e293b;font-size:11pt}
-      .hd{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #0D2E5C;padding-bottom:10px;margin-bottom:16px}
-      .sc h1{margin:0;font-size:15pt;color:#0D2E5C}.sc p{margin:2px 0;font-size:9pt;color:#475569}
-      .badge{background:#0D2E5C;color:white;padding:6px 14px;border-radius:8px;font-size:10pt;font-weight:bold}
-      .ig{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;background:#F8FAFF;padding:10px;border-radius:8px;border:1px solid #e2e8f0}
-      .ig label{font-size:8pt;color:#94a3b8;text-transform:uppercase;display:block}.ig span{font-weight:700;color:#0D2E5C}
-      .sum{display:flex;gap:12px;margin-bottom:16px}
-      .sc2{flex:1;text-align:center;border:1px solid #e2e8f0;border-radius:10px;padding:10px}
-      .sc2 .v{font-size:22pt;font-weight:900;color:#0D2E5C}.sc2 .l{font-size:8pt;color:#94a3b8}
-      table{width:100%;border-collapse:collapse;margin-bottom:16px}
-      th{background:#0D2E5C;color:white;padding:7px 10px;text-align:left;font-size:9pt}
-      td{padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:10pt}
+      @page{size:A4 portrait;margin:0}
+      @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:'Arial','Helvetica',sans-serif;color:#1e293b;background:white}
+      .wrap{padding:12mm}
+      table{width:100%;border-collapse:collapse}
+      th{background:#0D2E5C;color:white;padding:8px 10px;font-size:8.5pt;font-weight:700;text-align:left}
+      td{padding:7px 10px;border-bottom:1px solid #e2e8f0;font-size:9.5pt;vertical-align:middle}
       tr:nth-child(even) td{background:#F8FAFF}
-      .g{color:#16a34a;font-weight:700}.ok{color:#2563eb;font-weight:600}.avg{color:#d97706}.low{color:#dc2626}
-      .men{display:inline-block;padding:5px 14px;border-radius:20px;font-weight:700;border:2px solid #F5A623;background:#FFF7ED;color:#c2410c}
-      .sig{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:30px}
-      .sb{border:1px solid #e2e8f0;border-radius:8px;padding:10px;min-height:60px}
-      .sb label{font-size:8pt;color:#94a3b8;display:block;margin-bottom:4px}
-      .ft{margin-top:24px;border-top:1px solid #e2e8f0;padding-top:12px;font-size:8pt;color:#94a3b8;text-align:center}
     </style></head><body>
-    <div class="hd"><div class="sc"><h1>EPV Horizons Savants</h1>
-    <p>École Maternelle & Primaire d'Excellence · Abidjan</p>
-    <p>Bingerville Mtn Kro · contact@horizonssavants.com</p></div>
-    <div class="badge">BULLETIN SCOLAIRE</div></div>
-    <div class="ig">
-      <div><label>Élève</label><span>${session.prenomEnfant} ${session.nomEnfant}</span></div>
-      <div><label>Section</label><span>${SECTION_LABEL_B[session.sectionVisee] || session.sectionVisee}</span></div>
-      <div><label>Trimestre</label><span>${b.trimestre} — 2026-2027</span></div>
-      <div><label>Effectif</label><span>${b.effectifClasse ?? '—'} élèves</span></div>
+    <div style="background:#0D2E5C;padding:14px 12mm;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="${logo}" alt="EPV" style="width:50px;height:50px;border-radius:8px;object-fit:cover;border:2px solid rgba(255,255,255,0.3)"/>
+        <div>
+          <div style="color:white;font-size:14pt;font-weight:900">EPV Horizons Savants</div>
+          <div style="color:rgba(255,255,255,0.7);font-size:8pt;margin-top:2px">École Maternelle & Primaire d'Excellence bilingue · Abidjan</div>
+          <div style="color:rgba(255,255,255,0.5);font-size:7.5pt">Agrément MENA N° 2026/SAG · contact@horizonssavants.com</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="background:#F5A623;color:#0D2E5C;font-size:11pt;font-weight:900;padding:7px 16px;border-radius:8px">BULLETIN SCOLAIRE</div>
+        <div style="color:rgba(255,255,255,0.7);font-size:9pt;margin-top:5px;font-weight:700">${b.trimestre} — 2026 / 2027</div>
+      </div>
     </div>
-    <div class="sum">
-      <div class="sc2"><div class="v">${b.moyenneGenerale?.toFixed(2) ?? '—'}</div><div class="l">Moyenne / 20</div></div>
-      <div class="sc2"><div class="v">${b.rang ?? '—'}</div><div class="l">Classement</div></div>
-      <div class="sc2"><div class="v"><span class="men">${b.mention || '—'}</span></div><div class="l">Mention</div></div>
+    <div style="background:#EFF6FF;border-bottom:2px solid #BFDBFE;padding:10px 12mm;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:12px">
+      <div>
+        <div style="font-size:7pt;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Nom & Prénom de l'élève</div>
+        <div style="font-size:13pt;font-weight:900;color:#0D2E5C">${session.nomEnfant} ${session.prenomEnfant}</div>
+      </div>
+      <div>
+        <div style="font-size:7pt;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Classe</div>
+        <div style="font-size:10pt;font-weight:700;color:#0D2E5C">${SECTION_LABEL_B[session.sectionVisee]||session.sectionVisee}</div>
+      </div>
+      <div>
+        <div style="font-size:7pt;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Trimestre</div>
+        <div style="font-size:10pt;font-weight:700;color:#0D2E5C">${b.trimestre}</div>
+      </div>
+      <div>
+        <div style="font-size:7pt;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Effectif classe</div>
+        <div style="font-size:10pt;font-weight:700;color:#0D2E5C">${b.effectifClasse??'—'} élèves</div>
+      </div>
     </div>
-    <table><thead><tr><th>Matière</th><th>Note / 20</th><th>Coeff.</th><th>Appréciation</th></tr></thead>
-    <tbody>${detail.map((n: any) => {
-      const cls = n.note >= 16 ? 'g' : n.note >= 12 ? 'ok' : n.note >= 10 ? 'avg' : 'low';
-      return `<tr><td>${n.matiere}</td><td class="${cls}">${n.note?.toFixed(2) ?? '—'}</td><td>${n.coef}</td><td>${n.appreciation || ''}</td></tr>`;
-    }).join('')}</tbody></table>
-    <div class="sig">
-      <div class="sb"><label>Signature du parent / tuteur</label></div>
-      <div class="sb"><label>Cachet & Signature de la Direction</label></div>
+    <div class="wrap">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:10px;margin-bottom:16px">
+        <div style="border:2px solid ${nc(b.moyenneGenerale)};border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:26pt;font-weight:900;color:${nc(b.moyenneGenerale)};line-height:1">${b.moyenneGenerale?.toFixed(2)??'—'}</div>
+          <div style="font-size:7.5pt;color:#64748b;text-transform:uppercase;margin-top:4px">Moyenne / 20</div>
+        </div>
+        <div style="border:2px solid #e2e8f0;border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:26pt;font-weight:900;color:#0D2E5C;line-height:1">${b.rang??'—'}</div>
+          <div style="font-size:7.5pt;color:#64748b;text-transform:uppercase;margin-top:4px">Rang / ${b.effectifClasse??'?'}</div>
+        </div>
+        <div style="border:2px solid #e2e8f0;border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:26pt;font-weight:900;color:#0D2E5C;line-height:1">${b.effectifClasse??'—'}</div>
+          <div style="font-size:7.5pt;color:#64748b;text-transform:uppercase;margin-top:4px">Effectif</div>
+        </div>
+        <div style="border:2px solid ${mentionBg};border-radius:10px;padding:12px;background:${mentionBg};display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font-size:7.5pt;color:#64748b;text-transform:uppercase;margin-bottom:6px">Mention</div>
+          <div style="font-size:16pt;font-weight:900;color:${mentionFg}">${b.mention||'—'}</div>
+        </div>
+      </div>
+      <table style="margin-bottom:16px">
+        <thead><tr>
+          <th style="width:32%">Matière</th>
+          <th style="width:18%;text-align:center">Note / 20</th>
+          <th style="width:12%;text-align:center">Coeff.</th>
+          <th>Appréciation</th>
+        </tr></thead>
+        <tbody>${detail.map((n:any,i:number)=>`
+          <tr style="background:${i%2===0?'white':'#F8FAFF'}">
+            <td style="font-weight:700">${n.matiere}</td>
+            <td style="text-align:center;font-size:11pt;font-weight:900;color:${nc(n.note)}">${n.note?.toFixed(2)??'—'}</td>
+            <td style="text-align:center;color:#64748b">${n.coef}</td>
+            <td style="color:#475569;font-style:italic;font-size:9pt">${n.appreciation||''}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px">
+        <div style="border:1px solid #e2e8f0;border-radius:8px;padding:12px;min-height:65px">
+          <div style="font-size:7.5pt;color:#94a3b8;font-weight:700;text-transform:uppercase">Signature du parent / tuteur légal</div>
+        </div>
+        <div style="border:1px solid #e2e8f0;border-radius:8px;padding:12px;min-height:65px">
+          <div style="font-size:7.5pt;color:#94a3b8;font-weight:700;text-transform:uppercase">Cachet & Signature de la Direction</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding-top:8px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;font-size:7.5pt;color:#94a3b8">
+        <span>EPV Horizons Savants · Bingerville, Abidjan · Document officiel 2026-2027</span>
+        <span>Imprimé le ${new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}</span>
+      </div>
     </div>
-    <div class="ft">EPV Horizons Savants · Abidjan 2026-2027 · Document officiel</div>
     </body></html>`;
     const w = window.open('','_blank')!;
     w.document.write(html); w.document.close();
