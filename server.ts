@@ -13,6 +13,9 @@ import fs from "fs";
 import { randomBytes, scrypt, timingSafeEqual } from "crypto";
 import { createRemoteJWKSet, jwtVerify, SignJWT } from "jose";
 import { StatutProspect, StatutRendezVous, Prospect, RendezVous, Parrainage, SectionPlace, NotificationLog } from "./src/types.js";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import multer from "multer";
+import { randomUUID } from "crypto";
 
 // ─── Neon HTTP driver — HTTPS port 443, fonctionne partout ───────────────────
 
@@ -41,6 +44,44 @@ async function q(text: string, params?: any[]): Promise<{ rows: any[] }> {
     }
   }
   throw new Error('DB inaccessible après 4 tentatives');
+}
+
+// ─── Cloudflare R2 — stockage fichiers ───────────────────────────────────────
+
+const r2 = new S3Client({
+  region: 'auto',
+  endpoint: `https://${process.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId:     process.env.CF_R2_ACCESS_KEY ?? '',
+    secretAccessKey: process.env.CF_R2_SECRET_KEY ?? '',
+  },
+});
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20 Mo max
+});
+
+async function uploadToR2(buffer: Buffer, mimetype: string, folder: string): Promise<string> {
+  const ext = mimetype.split('/')[1]?.replace('jpeg', 'jpg') ?? 'bin';
+  const key = `${folder}/${randomUUID()}.${ext}`;
+  await r2.send(new PutObjectCommand({
+    Bucket:      process.env.CF_R2_BUCKET!,
+    Key:         key,
+    Body:        buffer,
+    ContentType: mimetype,
+  }));
+  return `${process.env.CF_R2_PUBLIC_URL}/${key}`;
+}
+
+async function deleteFromR2(publicUrl: string): Promise<void> {
+  try {
+    const base = process.env.CF_R2_PUBLIC_URL ?? '';
+    const key  = publicUrl.startsWith(base) ? publicUrl.slice(base.length + 1) : publicUrl;
+    await r2.send(new DeleteObjectCommand({ Bucket: process.env.CF_R2_BUCKET!, Key: key }));
+  } catch (e) {
+    console.warn('R2 delete warning:', e);
+  }
 }
 
 // ─── JWT local (HS256) — aucune dépendance réseau externe ───────────────────
@@ -1771,6 +1812,33 @@ crudTable('newsletters', 'nl');
 crudTable('articles',    'article');
 crudTable('faq',         'faq');
 crudTable('temoignages', 'temo');
+// ── Galerie — upload photo vers R2 ──────────────────────────────────────────
+app.post('/api/galerie/upload', requireAdmin, upload.single('photo'), async (req: any, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'Fichier manquant.' });
+    const url = await uploadToR2(req.file.buffer, req.file.mimetype, 'galerie');
+    const id  = uid('media');
+    await q(
+      `INSERT INTO galerie (id, titre, url, cat, classe, date, created_at, updated_at)
+       VALUES ($1,$2,$3,$4,$5,NOW(),NOW(),NOW())`,
+      [id, req.body.titre ?? '', url, req.body.cat ?? '', req.body.classe ?? null]
+    );
+    await logAction('CREATE', 'galerie', `Photo uploadée : ${url}`);
+    res.status(201).json({ id, url });
+  } catch (e) { console.error(e); res.status(500).json({ error: 'Erreur upload.' }); }
+});
+
+// Override delete galerie → nettoie R2 avant de supprimer dans Neon
+app.delete('/api/galerie/:id', requireAdmin, async (req: any, res) => {
+  try {
+    const { rows } = await q('SELECT url FROM galerie WHERE id=$1', [req.params.id]);
+    if (rows[0]?.url) await deleteFromR2(rows[0].url);
+    await q('DELETE FROM galerie WHERE id=$1', [req.params.id]);
+    await logAction('DELETE', 'galerie', `Media ${req.params.id} supprimé`);
+    res.json({ success: true });
+  } catch (e) { console.error(e); res.status(500).json({ error: 'Erreur serveur.' }); }
+});
+
 crudTable('galerie',     'media');
 crudTable('devoirs',     'devoir');
 crudTable('cantine',     'cantine');
@@ -1780,6 +1848,34 @@ crudTable('assiduite',   'assiduite');
 crudTable('transport',   'transport');
 crudTable('sante_eleve', 'sante');
 crudTable('bilinguisme', 'bil');
+
+// ── Documents — upload PDF/fichier vers R2 ───────────────────────────────────
+app.post('/api/documents/upload', requireAdmin, upload.single('fichier'), async (req: any, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'Fichier manquant.' });
+    const url = await uploadToR2(req.file.buffer, req.file.mimetype, 'documents');
+    const id  = uid('doc');
+    await q(
+      `INSERT INTO documents (id, titre, fichier, cat, actif, ordre, created_at, updated_at)
+       VALUES ($1,$2,$3,$4,TRUE,$5,NOW(),NOW())`,
+      [id, req.body.titre ?? '', url, req.body.cat ?? 'Général', req.body.ordre ?? 0]
+    );
+    await logAction('CREATE', 'documents', `Document uploadé : ${url}`);
+    res.status(201).json({ id, url });
+  } catch (e) { console.error(e); res.status(500).json({ error: 'Erreur upload.' }); }
+});
+
+// Override delete documents → nettoie R2
+app.delete('/api/documents/:id', requireAdmin, async (req: any, res) => {
+  try {
+    const { rows } = await q('SELECT fichier FROM documents WHERE id=$1', [req.params.id]);
+    if (rows[0]?.fichier) await deleteFromR2(rows[0].fichier);
+    await q('DELETE FROM documents WHERE id=$1', [req.params.id]);
+    await logAction('DELETE', 'documents', `Document ${req.params.id} supprimé`);
+    res.json({ success: true });
+  } catch (e) { console.error(e); res.status(500).json({ error: 'Erreur serveur.' }); }
+});
+
 crudTable('documents',    'doc');
 crudTable('qr_campaigns', 'qr');
 
