@@ -159,8 +159,8 @@ interface OtpEntry {
 async function dbSetOtp(digits: string, entry: OtpEntry) {
   await q(
     `INSERT INTO configuration (cle, valeur, description, updated_at)
-     VALUES ($1, $2, 'OTP temporaire', NOW())
-     ON CONFLICT (cle) DO UPDATE SET valeur = $2, updated_at = NOW()`,
+     VALUES ($1, $2::jsonb, 'OTP temporaire', NOW())
+     ON CONFLICT (cle) DO UPDATE SET valeur = $2::jsonb, updated_at = NOW()`,
     [`otp_${digits}`, JSON.stringify(entry)]
   );
 }
@@ -678,19 +678,29 @@ async function logAction(action: string, module: string, detail: string) {
 const app = express();
 const PORT = 3000;
 
-// CORS — localhost, réseau local, Vercel (.vercel.app) et APP_URL
+// CORS — localhost, réseau local, Vercel (.vercel.app) et APP_URL (www + non-www)
 app.use(cors({
   origin: (origin, cb) => {
     if (!origin) return cb(null, true); // curl, server-to-server, same-origin
+    // Dérive automatiquement www et non-www depuis APP_URL
+    const appUrl = process.env.APP_URL || '';
+    const allowedAppUrls = new Set<string>();
+    if (appUrl) {
+      allowedAppUrls.add(appUrl);
+      allowedAppUrls.add(
+        appUrl.includes('://www.')
+          ? appUrl.replace('://www.', '://')
+          : appUrl.replace('://', '://www.')
+      );
+    }
     const ok =
       origin.startsWith('http://localhost') ||
       origin.startsWith('http://127.') ||
       /^http:\/\/10\./.test(origin) ||
       /^http:\/\/192\.168\./.test(origin) ||
       /^http:\/\/172\.(1[6-9]|2\d|3[01])\./.test(origin) ||
-      origin.endsWith('.vercel.app') ||               // tous les déploiements Vercel
-      origin === 'https://epv-nine.vercel.app' ||     // production explicite
-      (process.env.APP_URL ? origin === process.env.APP_URL : false);
+      origin.endsWith('.vercel.app') ||
+      allowedAppUrls.has(origin);
     ok ? cb(null, true) : cb(new Error(`CORS bloqué: ${origin}`));
   },
   credentials: true,
@@ -1009,7 +1019,7 @@ app.post('/api/parent/otp/send', async (req, res) => {
     await dbSetOtp(digits, { otp, prospectId: prospect.id, name: prospect.prenomParent, expiresAt, attempts: 0 });
 
     const msg = `🎓 *EPV Horizons Savants*\n\nBonjour ${prospect.prenomParent},\n\nVotre code d'accès à l'Espace Parent est :\n\n*${otp}*\n\n⏱ Valable 10 minutes.\n\n_Ne le partagez jamais._`;
-    await logNotification('whatsapp', prospect.telephone, msg, 'Code OTP Espace Parent');
+    logNotification('whatsapp', prospect.telephone, msg, 'Code OTP Espace Parent').catch(console.error);
 
     // En dev : log console pour faciliter les tests
     console.log(`[OTP] ${prospect.prenomParent} ${prospect.nomParent} → ${otp}`);
@@ -1023,47 +1033,52 @@ app.post('/api/parent/otp/send', async (req, res) => {
 
 // ─── OTP : vérification ───────────────────────────────────────────────────────
 app.post('/api/parent/otp/verify', async (req, res) => {
-  const { telephone, otp } = req.body;
-  if (!telephone || !otp) return res.status(400).json({ error: 'Données manquantes.' });
+  try {
+    const { telephone, otp } = req.body;
+    if (!telephone || !otp) return res.status(400).json({ error: 'Données manquantes.' });
 
-  const digits = String(telephone).replace(/\D/g, '').slice(-8);
-  const entry  = await dbGetOtp(digits);
+    const digits = String(telephone).replace(/\D/g, '').slice(-8);
+    const entry  = await dbGetOtp(digits);
 
-  if (!entry)
-    return res.status(400).json({ error: 'Aucun code OTP actif. Demandez un nouveau code.' });
-  if (Date.now() > entry.expiresAt) {
+    if (!entry)
+      return res.status(400).json({ error: 'Aucun code OTP actif. Demandez un nouveau code.' });
+    if (Date.now() > entry.expiresAt) {
+      await dbDelOtp(digits);
+      return res.status(400).json({ error: 'Code expiré. Demandez un nouveau code.' });
+    }
+    if (entry.attempts >= 5) {
+      await dbDelOtp(digits);
+      return res.status(429).json({ error: 'Trop de tentatives. Demandez un nouveau code.' });
+    }
+    if (entry.otp !== String(otp).trim()) {
+      entry.attempts++;
+      await dbSetOtp(digits, entry);
+      return res.status(401).json({
+        error: `Code incorrect — ${5 - entry.attempts} tentative(s) restante(s).`
+      });
+    }
+
+    // ✅ Code valide — retourner TOUS les enfants du parent
     await dbDelOtp(digits);
-    return res.status(400).json({ error: 'Code expiré. Demandez un nouveau code.' });
-  }
-  if (entry.attempts >= 5) {
-    await dbDelOtp(digits);
-    return res.status(429).json({ error: 'Trop de tentatives. Demandez un nouveau code.' });
-  }
-  if (entry.otp !== String(otp).trim()) {
-    entry.attempts++;
-    await dbSetOtp(digits, entry);
-    return res.status(401).json({
-      error: `Code incorrect — ${5 - entry.attempts} tentative(s) restante(s).`
-    });
-  }
 
-  // ✅ Code valide — retourner TOUS les enfants du parent
-  await dbDelOtp(digits);
+    const { rows: allRows } = await q(
+      `SELECT * FROM prospects WHERE REGEXP_REPLACE(telephone,'\\D','','g') LIKE $1 ORDER BY created_at`,
+      [`%${digits}`]
+    );
+    if (allRows.length === 0) return res.status(404).json({ error: 'Dossier introuvable.' });
 
-  const { rows: allRows } = await q(
-    `SELECT * FROM prospects WHERE REGEXP_REPLACE(telephone,'\\D','','g') LIKE $1 ORDER BY created_at`,
-    [`%${digits}`]
-  );
-  if (allRows.length === 0) return res.status(404).json({ error: 'Dossier introuvable.' });
-
-  const children = allRows.map(r => rowToObj(r) as Prospect);
-  const token = await signJWT({
-    email: children[0].email,
-    role: 'parent',
-    sub: children[0].email,
-    prospectId: children[0].id,
-  }, '365d');
-  res.json({ success: true, prospect: children[0], children, token });
+    const children = allRows.map(r => rowToObj(r) as Prospect);
+    const token = await signJWT({
+      email: children[0].email,
+      role: 'parent',
+      sub: children[0].email,
+      prospectId: children[0].id,
+    }, '365d');
+    res.json({ success: true, prospect: children[0], children, token });
+  } catch (e: any) {
+    console.error('[otp/verify]', e.message);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
 });
 
 // ─── Tous les enfants d'un parent (par téléphone) ────────────────────────────
@@ -1098,41 +1113,56 @@ app.post('/api/parent/reset-password', async (req, res) => {
 // ─── Places — compteurs calculés dynamiquement depuis prospects ───────────────
 
 app.get('/api/places', async (_req, res) => {
-  const { rows } = await q(`
-    SELECT
-      p.section,
-      p.capacite_max,
-      COALESCE(SUM(CASE WHEN pr.statut = $1 THEN 1 ELSE 0 END), 0) AS inscrits_confirmes,
-      COALESCE(SUM(CASE WHEN pr.statut = $2 THEN 1 ELSE 0 END), 0) AS pre_inscrits
-    FROM places p
-    LEFT JOIN prospects pr ON pr.section_visee = p.section
-      AND pr.statut NOT IN ($3, $4)
-    GROUP BY p.section, p.capacite_max
-    ORDER BY p.section
-  `, [StatutProspect.INSCRIT, StatutProspect.PRE_INSCRIT, StatutProspect.ARCHIVE, '']);
-  res.json(rows.map(r => ({
-    section: r.section,
-    capaciteMax: r.capacite_max,
-    inscritsConfirmes: parseInt(r.inscrits_confirmes),
-    preInscrits: parseInt(r.pre_inscrits),
-  })));
+  try {
+    const { rows } = await q(`
+      SELECT
+        p.section,
+        p.capacite_max,
+        COALESCE(SUM(CASE WHEN pr.statut = $1 THEN 1 ELSE 0 END), 0) AS inscrits_confirmes,
+        COALESCE(SUM(CASE WHEN pr.statut = $2 THEN 1 ELSE 0 END), 0) AS pre_inscrits
+      FROM places p
+      LEFT JOIN prospects pr ON pr.section_visee = p.section
+        AND pr.statut NOT IN ($3, $4)
+      GROUP BY p.section, p.capacite_max
+      ORDER BY p.section
+    `, [StatutProspect.INSCRIT, StatutProspect.PRE_INSCRIT, StatutProspect.ARCHIVE, '']);
+    res.json(rows.map(r => ({
+      section: r.section,
+      capaciteMax: r.capacite_max,
+      inscritsConfirmes: parseInt(r.inscrits_confirmes),
+      preInscrits: parseInt(r.pre_inscrits),
+    })));
+  } catch (e: any) {
+    console.error('[/api/places]', e.message);
+    res.status(500).json({ error: 'Could not load quotas.' });
+  }
 });
 
 // ─── Configuration (tarifs, paramètres) ──────────────────────────────────────
 
 app.get('/api/configuration', async (_req, res) => {
-  const { rows } = await q('SELECT cle, valeur FROM configuration ORDER BY cle');
-  const config: Record<string, any> = {};
-  rows.forEach(r => { config[r.cle] = r.valeur; });
-  res.json(config);
+  try {
+    const { rows } = await q('SELECT cle, valeur FROM configuration ORDER BY cle');
+    const config: Record<string, any> = {};
+    rows.forEach(r => { config[r.cle] = r.valeur; });
+    res.json(config);
+  } catch (e: any) {
+    console.error('[/api/configuration]', e.message);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
 });
 
 app.patch('/api/configuration/:cle', requireAdmin, async (req, res) => {
-  const { cle } = req.params;
-  const { valeur } = req.body;
-  await q('INSERT INTO configuration (cle,valeur,updated_at) VALUES ($1,$2,NOW()) ON CONFLICT (cle) DO UPDATE SET valeur=$2, updated_at=NOW()',
-    [cle, JSON.stringify(valeur)]);
-  res.json({ success: true });
+  try {
+    const { cle } = req.params;
+    const { valeur } = req.body;
+    await q('INSERT INTO configuration (cle,valeur,updated_at) VALUES ($1,$2,NOW()) ON CONFLICT (cle) DO UPDATE SET valeur=$2, updated_at=NOW()',
+      [cle, JSON.stringify(valeur)]);
+    res.json({ success: true });
+  } catch (e: any) {
+    console.error('[PATCH /api/configuration]', e.message);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
 });
 
 // ─── Paiements ────────────────────────────────────────────────────────────────
@@ -1884,39 +1914,47 @@ crudTable('qr_campaigns', 'qr');
 // ═══════════════════════════════════════════════════════════════════════════════
 
 app.get('/api/compositions', requireAdmin, async (_req, res) => {
-  const { rows } = await q('SELECT * FROM compositions ORDER BY date_debut DESC');
-  res.json(rowsToObjs(rows));
+  try {
+    const { rows } = await q('SELECT * FROM compositions ORDER BY date_debut DESC');
+    res.json(rowsToObjs(rows));
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
 app.post('/api/compositions', requireAdmin, async (req, res) => {
-  const { titre, section, trimestre, dateDebut, dateFin, matieres } = req.body;
-  if (!titre || !section || !trimestre || !dateDebut) return res.status(400).json({ error: 'Champs requis manquants.' });
-  const id = uid('comp');
-  await q(
-    `INSERT INTO compositions (id,titre,section,trimestre,date_debut,date_fin,matieres,statut)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,'planifie')`,
-    [id, titre, section, trimestre, dateDebut, dateFin || null, JSON.stringify(matieres || [])]
-  );
-  res.json({ id });
+  try {
+    const { titre, section, trimestre, dateDebut, dateFin, matieres } = req.body;
+    if (!titre || !section || !trimestre || !dateDebut) return res.status(400).json({ error: 'Champs requis manquants.' });
+    const id = uid('comp');
+    await q(
+      `INSERT INTO compositions (id,titre,section,trimestre,date_debut,date_fin,matieres,statut)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,'planifie')`,
+      [id, titre, section, trimestre, dateDebut, dateFin || null, JSON.stringify(matieres || [])]
+    );
+    res.json({ id });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
 app.patch('/api/compositions/:id', requireAdmin, async (req, res) => {
-  const fields = req.body;
-  const sets: string[] = [];
-  const vals: any[] = [];
-  let i = 1;
-  if (fields.statut)    { sets.push(`statut=$${i++}`);    vals.push(fields.statut); }
-  if (fields.notifEnvoye !== undefined) { sets.push(`notif_envoye=$${i++}`); vals.push(fields.notifEnvoye); }
-  if (!sets.length) return res.status(400).json({ error: 'Rien à mettre à jour.' });
-  sets.push(`updated_at=NOW()`);
-  vals.push(req.params.id);
-  await q(`UPDATE compositions SET ${sets.join(',')} WHERE id=$${i}`, vals);
-  res.json({ ok: true });
+  try {
+    const fields = req.body;
+    const sets: string[] = [];
+    const vals: any[] = [];
+    let i = 1;
+    if (fields.statut)    { sets.push(`statut=$${i++}`);    vals.push(fields.statut); }
+    if (fields.notifEnvoye !== undefined) { sets.push(`notif_envoye=$${i++}`); vals.push(fields.notifEnvoye); }
+    if (!sets.length) return res.status(400).json({ error: 'Rien à mettre à jour.' });
+    sets.push(`updated_at=NOW()`);
+    vals.push(req.params.id);
+    await q(`UPDATE compositions SET ${sets.join(',')} WHERE id=$${i}`, vals);
+    res.json({ ok: true });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
 app.delete('/api/compositions/:id', requireAdmin, async (req, res) => {
-  await q('DELETE FROM compositions WHERE id=$1', [req.params.id]);
-  res.json({ ok: true });
+  try {
+    await q('DELETE FROM compositions WHERE id=$1', [req.params.id]);
+    res.json({ ok: true });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
 // Notifier les parents d'une section d'une composition
@@ -1951,35 +1989,39 @@ app.post('/api/compositions/:id/notify', requireAdmin, async (req, res) => {
 
 // Liste de classe complète (tous les champs élève)
 app.get('/api/classes/:section', requireAdmin, async (req, res) => {
-  const { rows } = await q(
-    `SELECT id, prenom_enfant, nom_enfant, date_naissance, commune,
-            prenom_parent, nom_parent, lien_parente, telephone, email,
-            section_visee, statut, created_at
-     FROM prospects
-     WHERE section_visee=$1 AND statut IN ('Inscrit','Pré-inscrit')
-     ORDER BY nom_enfant, prenom_enfant`,
-    [req.params.section]
-  );
-  res.json(rowsToObjs(rows));
+  try {
+    const { rows } = await q(
+      `SELECT id, prenom_enfant, nom_enfant, date_naissance, commune,
+              prenom_parent, nom_parent, lien_parente, telephone, email,
+              section_visee, statut, created_at
+       FROM prospects
+       WHERE section_visee=$1 AND statut IN ('Inscrit','Pré-inscrit')
+       ORDER BY nom_enfant, prenom_enfant`,
+      [req.params.section]
+    );
+    res.json(rowsToObjs(rows));
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
 // Lister les notes d'une section + trimestre
 app.get('/api/notes/classe/:section/:trimestre', requireAdmin, async (req, res) => {
-  const { section, trimestre } = req.params;
-  const { rows: prospects } = await q(
-    `SELECT id, prenom_enfant, nom_enfant, date_naissance, commune,
-            prenom_parent, nom_parent, lien_parente, telephone, email, statut
-     FROM prospects
-     WHERE section_visee=$1 AND statut='Inscrit' ORDER BY nom_enfant, prenom_enfant`,
-    [section]
-  );
-  const { rows: notes } = await q(
-    `SELECT * FROM notes WHERE prospect_id = ANY($1::text[])`,
-    [prospects.map((p: any) => p.id)]
-  );
-  const notesMap: Record<string, any[]> = {};
-  for (const n of notes) { const no = rowToObj(n) as any; (notesMap[no.prospectId] = notesMap[no.prospectId] || []).push(no); }
-  res.json({ prospects: rowsToObjs(prospects), notes: notesMap });
+  try {
+    const { section, trimestre } = req.params;
+    const { rows: prospects } = await q(
+      `SELECT id, prenom_enfant, nom_enfant, date_naissance, commune,
+              prenom_parent, nom_parent, lien_parente, telephone, email, statut
+       FROM prospects
+       WHERE section_visee=$1 AND statut='Inscrit' ORDER BY nom_enfant, prenom_enfant`,
+      [section]
+    );
+    const { rows: notes } = await q(
+      `SELECT * FROM notes WHERE prospect_id = ANY($1::text[])`,
+      [prospects.map((p: any) => p.id)]
+    );
+    const notesMap: Record<string, any[]> = {};
+    for (const n of notes) { const no = rowToObj(n) as any; (notesMap[no.prospectId] = notesMap[no.prospectId] || []).push(no); }
+    res.json({ prospects: rowsToObjs(prospects), notes: notesMap });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
 // Sauvegarder les notes d'un élève (upsert par matière)
@@ -2126,17 +2168,21 @@ app.post('/api/bulletins/publier-classe', requireAdmin, async (req, res) => {
 
 // Parent — consulter ses bulletins
 app.get('/api/parent/bulletins', requireAuth, async (req: any, res) => {
-  const { rows } = await q(
-    `SELECT * FROM bulletins WHERE prospect_id=$1 AND publie=TRUE ORDER BY trimestre DESC`,
-    [req.user.prospectId]
-  );
-  res.json(rowsToObjs(rows));
+  try {
+    const { rows } = await q(
+      `SELECT * FROM bulletins WHERE prospect_id=$1 AND publie=TRUE ORDER BY trimestre DESC`,
+      [req.user.prospectId]
+    );
+    res.json(rowsToObjs(rows));
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
 // Parent — consulter les notes de son enfant
 app.get('/api/parent/notes', requireAuth, async (req: any, res) => {
-  const { rows } = await q('SELECT * FROM notes WHERE prospect_id=$1', [req.user.prospectId]);
-  res.json(rowsToObjs(rows));
+  try {
+    const { rows } = await q('SELECT * FROM notes WHERE prospect_id=$1', [req.user.prospectId]);
+    res.json(rowsToObjs(rows));
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
 // ─── Debug WhatsApp — tester l'envoi directement ─────────────────────────────
