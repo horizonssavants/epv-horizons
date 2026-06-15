@@ -332,11 +332,12 @@ export const Programmes: React.FC = () => {
                     <Student size={44} weight="fill" className="text-brand-blue-deep" />
                     <div className="flex gap-3 flex-wrap justify-center">
                       {[
-                        { code: 'CP',  label: fr ? '6-7 ans' : 'Grade 1' },
-                        { code: 'CE1', label: fr ? '7-8 ans' : 'Grade 2' },
-                        { code: 'CE2', label: fr ? '8-9 ans' : 'Grade 3' },
-                        { code: 'CM1', label: fr ? '9-10 ans' : 'Grade 4' },
-                        { code: 'CM2', label: fr ? '10-11 ans' : 'Grade 5' },
+                        { code: 'CP1', label: fr ? '6-7 ans' : 'Grade 1' },
+                        { code: 'CP2', label: fr ? '7-8 ans' : 'Grade 2' },
+                        { code: 'CE1', label: fr ? '8-9 ans' : 'Grade 3' },
+                        { code: 'CE2', label: fr ? '9-10 ans' : 'Grade 4' },
+                        { code: 'CM1', label: fr ? '10-11 ans' : 'Grade 5' },
+                        { code: 'CM2', label: fr ? '11-12 ans' : 'Grade 6' },
                       ].map(({ code, label }) => (
                         <span key={code} className="flex flex-col items-center text-brand-blue-deep">
                           <span className="text-[12px] font-extrabold tracking-wider leading-none">{code}</span>

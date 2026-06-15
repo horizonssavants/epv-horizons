@@ -37,7 +37,7 @@ type ParentTab =
 
 const SECTION_LABEL: Record<string, string> = {
   PS:'Petite Section', MS:'Moyenne Section', GS:'Grande Section',
-  CP:'CP', CE1:'CE1', CE2:'CE2', CM1:'CM1', CM2:'CM2',
+  CP1:'CP1 (CPI)', CP2:'CP2 (CPII)', CE1:'CE1', CE2:'CE2', CM1:'CM1', CM2:'CM2',
 };
 
 const STATUT_STEP = (s: StatutProspect) =>
@@ -52,7 +52,7 @@ const STEPS = [
 
 const TARIFS_DEFAUT: Record<string, number> = {
   PS:1350000, MS:1350000, GS:1350000,
-  CP:1650000, CE1:1650000, CE2:1650000,
+  CP1:1650000, CP2:1650000, CE1:1650000, CE2:1650000,
   CM1:1880000, CM2:1880000,
 };
 
@@ -1820,7 +1820,7 @@ function ProfilTab({ session, sante, onSessionUpdate }: {
 
 const SECTION_LABEL_B: Record<string,string> = {
   PS:'Petite Section', MS:'Moyenne Section', GS:'Grande Section',
-  CP:'CP', CE1:'CE1', CE2:'CE2', CM1:'CM1', CM2:'CM2',
+  CP1:'CP1 (CPI)', CP2:'CP2 (CPII)', CE1:'CE1', CE2:'CE2', CM1:'CM1', CM2:'CM2',
 };
 
 function noteCls(n?: number) {

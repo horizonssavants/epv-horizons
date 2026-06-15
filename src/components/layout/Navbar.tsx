@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Menu, X, BookOpen, GraduationCap, UserCircle,
-  Home, Mail, HelpCircle, Newspaper, UserPlus, ChevronRight, Globe,
+  Home, Mail, HelpCircle, Newspaper, UserPlus, ChevronRight, Globe, Shirt, Camera,
 } from 'lucide-react';
 import { useLang } from '../../lib/LanguageContext.tsx';
 import { t } from '../../lib/i18n.ts';
@@ -42,12 +42,15 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, onNavigate, id }) =
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Labels courts pour le desktop (évite le débordement avec 7 items)
   const NAV = [
-    { key: 'nav.home',       hash: '#',                Icon: Home          },
-    { key: 'nav.programmes', hash: '#/programmes',     Icon: GraduationCap },
-    { key: 'nav.admissions', hash: '#/admissions',     Icon: UserPlus      },
-    { key: 'nav.ecole',      hash: '#/ecole',          Icon: BookOpen      },
-    { key: 'nav.contact',    hash: '#/contact',        Icon: Mail          },
+    { key: 'nav.home',       hash: '#',             Icon: Home,          short: { fr: 'Accueil',    en: 'Home'       } },
+    { key: 'nav.programmes', hash: '#/programmes',  Icon: GraduationCap, short: { fr: 'Programmes', en: 'Programs'   } },
+    { key: 'nav.admissions', hash: '#/admissions',  Icon: UserPlus,      short: { fr: 'Admissions', en: 'Admissions' } },
+    { key: 'nav.ecole',      hash: '#/ecole',       Icon: BookOpen,      short: { fr: 'Vie scolaire', en: 'School Life' } },
+    { key: 'nav.tenues',     hash: '#/tenues',      Icon: Shirt,         short: { fr: 'Tenues',     en: 'Uniforms'   } },
+    { key: 'nav.visite',     hash: '#/visite',      Icon: Camera,        short: { fr: 'École en Images', en: 'School in Pictures' } },
+    { key: 'nav.contact',    hash: '#/contact',     Icon: Mail,          short: { fr: 'Contact',    en: 'Contact'    } },
   ];
 
   const DRAWER = [
@@ -57,6 +60,8 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, onNavigate, id }) =
     { key: 'nav.primaire',   hash: '#/programmes/primaire',   Icon: GraduationCap, sub: true  },
     { key: 'nav.admissions', hash: '#/admissions',            Icon: UserPlus,      sub: false },
     { key: 'nav.ecole',      hash: '#/ecole',                 Icon: BookOpen,      sub: false },
+    { key: 'nav.tenues',     hash: '#/tenues',                Icon: Shirt,         sub: false },
+    { key: 'nav.visite',     hash: '#/visite',                Icon: Camera,        sub: false },
     { key: 'nav.contact',    hash: '#/contact',               Icon: Mail,          sub: false },
   ];
 
@@ -71,16 +76,16 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, onNavigate, id }) =
             : 'bg-brand-blue-deep py-3'
         }`}
       >
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4 h-14">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 xl:px-10">
+          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 h-14">
 
             {/* Logo */}
             <div onClick={() => go('#')} className="flex items-center gap-2.5 cursor-pointer shrink-0 select-none group">
               <div className="relative w-10 h-10 rounded-xl overflow-hidden shrink-0 ring-2 ring-brand-gold/40 group-hover:ring-brand-gold group-hover:scale-105 transition-all shadow-sm">
                 <img src="/img/logo.jpg" alt="Logo EPV" className="w-full h-full object-cover" />
               </div>
-              <div>
-                <span className="font-sans font-extrabold text-sm md:text-base block tracking-wide text-white leading-tight group-hover:text-brand-gold transition-colors">
+              <div className="hidden sm:block">
+                <span className="font-sans font-extrabold text-sm block tracking-wide text-white leading-tight group-hover:text-brand-gold transition-colors">
                   EPV Horizons Savants
                 </span>
                 <span className="text-[9px] font-sans tracking-widest text-brand-gold-light font-medium block uppercase">
@@ -89,17 +94,17 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, onNavigate, id }) =
               </div>
             </div>
 
-            {/* Nav desktop */}
-            <div className="hidden lg:flex items-center justify-center gap-0.5">
-              {NAV.map(({ key, hash, Icon }) => {
+            {/* Nav desktop — visible seulement à xl (1280px+) */}
+            <div className="hidden xl:flex items-center justify-center gap-0.5">
+              {NAV.map(({ hash, Icon, short }) => {
                 const active = currentHash === hash || (hash === '#' && !currentHash);
                 return (
                   <button key={hash} onClick={() => go(hash)}
-                    className={`px-3 py-2 rounded-lg font-sans font-medium text-[11px] tracking-wide transition-all uppercase cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                    className={`px-2.5 py-2 rounded-lg font-sans font-medium text-[10.5px] tracking-wide transition-all uppercase cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                       active ? 'bg-brand-gold text-brand-blue-deep font-bold shadow-sm'
                              : 'text-white/75 hover:bg-white/8 hover:text-white'
                     }`}>
-                    <Icon size={13} /> {t(key, lang)}
+                    <Icon size={12} /> {short[lang as 'fr' | 'en']}
                   </button>
                 );
               })}
@@ -108,7 +113,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, onNavigate, id }) =
             {/* Actions desktop + burger mobile */}
             <div className="flex items-center gap-2 justify-end">
               {/* Desktop : langue + espace parent */}
-              <div className="hidden lg:flex items-center gap-2">
+              <div className="hidden xl:flex items-center gap-2">
                 {/* Toggle langue */}
                 <button
                   onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}
@@ -129,8 +134,8 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, onNavigate, id }) =
                 </button>
               </div>
 
-              {/* Burger pill mobile */}
-              <button className="header-burger lg:hidden" onClick={() => setIsOpen(v => !v)}
+              {/* Burger — visible sous xl (< 1280px) */}
+              <button className="header-burger xl:hidden" onClick={() => setIsOpen(v => !v)}
                 aria-label={isOpen ? 'Fermer' : 'Menu'}>
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div
@@ -155,7 +160,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, onNavigate, id }) =
           <>
             {/* Overlay flouté */}
             <motion.div
-              className="drawer-overlay lg:hidden"
+              className="drawer-overlay xl:hidden"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               transition={{ duration: 0.22 }}
               onClick={() => setIsOpen(false)}
@@ -163,7 +168,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentHash, onNavigate, id }) =
 
             {/* Panel droit avec bords arrondis */}
             <motion.aside
-              className="header-drawer lg:hidden"
+              className="header-drawer xl:hidden"
               style={{ borderRadius: '1.5rem 0 0 1.5rem' }}
               initial={{ x: '100%', opacity: 0.5 }}
               animate={{ x: 0, opacity: 1 }}

@@ -319,7 +319,7 @@
   transition: opacity 0.2s;
 }
 .header-burger:hover { opacity: 0.85; }
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .header-burger { display: none; }
 }
 

@@ -125,7 +125,7 @@ const DAY_ABBR   = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 
 const SECTION_LABEL: Record<string, string> = {
   PS:'Petite Section', MS:'Moyenne Section', GS:'Grande Section',
-  CP:'CP', CE1:'CE1', CE2:'CE2', CM1:'CM1', CM2:'CM2',
+  CP1:'CP1 (CPI)', CP2:'CP2 (CPII)', CE1:'CE1', CE2:'CE2', CM1:'CM1', CM2:'CM2',
 };
 
 const statutColor = (s: StatutProspect) =>
@@ -148,7 +148,7 @@ const fmtTime = (iso: string) =>
 
 const TARIFS_DEFAUT: Record<string, number> = {
   PS:1350000, MS:1350000, GS:1350000,
-  CP:1650000, CE1:1650000, CE2:1650000,
+  CP1:1650000, CP2:1650000, CE1:1650000, CE2:1650000,
   CM1:1880000, CM2:1880000,
 };
 
@@ -329,6 +329,37 @@ function ProspectDrawer({ prospect, appointments, onClose, onStatus, onToast, on
   ];
   const stepIdx = STEPS.findIndex(s => s.s === prospect.statut);
 
+  const [photoUrl,     setPhotoUrl]     = useState(prospect.photoUrl ?? null);
+  const [uploading,    setUploading]    = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { onToast('Fichier non valide. Choisissez une image.'); return; }
+    if (file.size > 5 * 1024 * 1024) { onToast('Image trop lourde (max 5 Mo).'); return; }
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append('photo', file);
+      const r = await authFetch(`/api/prospects/${prospect.id}/photo`, { method: 'POST', body: form });
+      const data = await r.json();
+      if (data.url) { setPhotoUrl(data.url); onToast('Photo mise à jour ✓'); onRefresh(); }
+      else onToast('Erreur upload.');
+    } catch { onToast('Erreur upload.'); }
+    finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ''; }
+  };
+
+  const handleDeletePhoto = async () => {
+    if (!photoUrl) return;
+    setUploading(true);
+    try {
+      await authFetch(`/api/prospects/${prospect.id}/photo`, { method: 'DELETE' });
+      setPhotoUrl(null); onToast('Photo supprimée.'); onRefresh();
+    } catch { onToast('Erreur suppression.'); }
+    finally { setUploading(false); }
+  };
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 bg-black/40 flex justify-end" onClick={onClose}>
@@ -337,11 +368,42 @@ function ProspectDrawer({ prospect, appointments, onClose, onStatus, onToast, on
         className="w-full max-w-md bg-white h-full overflow-y-auto shadow-2xl"
         onClick={e => e.stopPropagation()}>
 
-        {/* Header */}
+        {/* Header avec photo */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 sticky top-0 bg-white z-10">
-          <div>
-            <p className="text-sm font-semibold text-slate-900">{prospect.prenomEnfant} {prospect.nomEnfant}</p>
-            <p className="text-[11px] text-slate-400">{SECTION_LABEL[prospect.sectionVisee] || prospect.sectionVisee}</p>
+          <div className="flex items-center gap-3">
+            {/* Avatar photo */}
+            <div className="relative group shrink-0">
+              <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 border-2 border-slate-200 flex items-center justify-center">
+                {photoUrl ? (
+                  <img src={photoUrl} alt={prospect.prenomEnfant}
+                    className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-lg font-bold text-slate-400 select-none">
+                    {prospect.prenomEnfant[0]}{prospect.nomEnfant[0]}
+                  </span>
+                )}
+              </div>
+              {/* Overlay caméra au survol */}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="absolute inset-0 rounded-xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                {uploading
+                  ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  : <Upload size={14} className="text-white" />}
+              </button>
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-900">{prospect.prenomEnfant} {prospect.nomEnfant}</p>
+              <p className="text-[11px] text-slate-400">{SECTION_LABEL[prospect.sectionVisee] || prospect.sectionVisee}</p>
+              {photoUrl && (
+                <button onClick={handleDeletePhoto} disabled={uploading}
+                  className="text-[10px] text-red-400 hover:text-red-600 cursor-pointer transition-colors mt-0.5">
+                  Supprimer photo
+                </button>
+              )}
+            </div>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-md hover:bg-slate-100 cursor-pointer transition-colors">
             <X size={16} className="text-slate-400" />
@@ -458,6 +520,18 @@ function ProspectDrawer({ prospect, appointments, onClose, onStatus, onToast, on
               <p className="text-xs text-slate-700 leading-relaxed">{prospect.notesAdmin}</p>
             </Card>
           )}
+
+          {/* ── Notes & résultats ── */}
+          <Card className="p-4">
+            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-3">Notes & Résultats</p>
+            <NotesSection prospectId={prospect.id} />
+          </Card>
+
+          {/* ── Scolarité / paiements ── */}
+          <Card className="p-4">
+            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-3">Scolarité</p>
+            <ScolariteSection prospect={prospect} />
+          </Card>
 
           {/* ── Saisie pédagogique rapide ── */}
           <SaisiePedagogique prospect={prospect} onToast={onToast} onRefresh={onRefresh} />
@@ -603,6 +677,107 @@ function EnvoyerMessageParent({ prospect, onToast }: {
         </button>
       </div>
     </Card>
+  );
+}
+
+/* ─── Notes d'un élève dans le drawer ───────────────────────── */
+function NotesSection({ prospectId }: { prospectId: string }) {
+  const [notes, setNotes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    authFetch(`/api/notes/eleve/${prospectId}`)
+      .then(r => r.ok ? r.json() : [])
+      .then(d => { setNotes(Array.isArray(d) ? d : []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, [prospectId]);
+
+  if (loading) return <p className="text-[11px] text-slate-400 text-center py-3">Chargement…</p>;
+  if (!notes.length) return <p className="text-[11px] text-slate-400 text-center py-3">Aucune note enregistrée pour cet élève.</p>;
+
+  const fmtNote = (v: number | null) => v != null ? v.toFixed(1) : '—';
+  const moy = (n: any) => {
+    const vals = [n.t1, n.t2, n.t3].filter(v => v != null) as number[];
+    return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1) : '—';
+  };
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-xs min-w-[260px]">
+        <thead>
+          <tr className="border-b border-slate-100">
+            {['Matière','T1','T2','T3','Moy.'].map(h => (
+              <th key={h} className={`py-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wide ${h === 'Matière' ? 'text-left' : 'text-center'}`}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-50">
+          {notes.map(n => (
+            <tr key={n.matiere}>
+              <td className="py-2 text-slate-700 font-medium pr-2">{n.matiere}</td>
+              {[n.t1, n.t2, n.t3].map((v, i) => (
+                <td key={i} className={`py-2 text-center font-mono ${v != null ? (v >= 10 ? 'text-emerald-700' : 'text-red-600') : 'text-slate-300'}`}>
+                  {fmtNote(v)}
+                </td>
+              ))}
+              <td className="py-2 text-center font-mono font-bold text-slate-800">{moy(n)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/* ─── Scolarité / paiements dans le drawer ───────────────────── */
+function ScolariteSection({ prospect }: { prospect: Prospect }) {
+  const [paiements, setPaiements] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    authFetch('/api/paiements')
+      .then(r => r.ok ? r.json() : [])
+      .then(d => {
+        setPaiements(Array.isArray(d) ? d.filter((p: any) => p.prospectId === prospect.id) : []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [prospect.id]);
+
+  const annuel = TARIFS_DEFAUT[prospect.sectionVisee] || 1500000;
+  const t1v = Math.round(annuel / 3);
+  const t2v = Math.round(annuel / 3);
+  const t3v = annuel - t1v - t2v;
+  const hasPay = (trim: string) => paiements.some(p => p.trimestre === trim && p.statut === 'validé');
+  const totalPayé = paiements.filter(p => ['T1','T2','T3'].includes(p.trimestre) && p.statut === 'validé')
+    .reduce((s: number, p: any) => s + Number(p.montant), 0);
+  const solde = annuel - totalPayé;
+  const fmtF = (n: number) => n.toLocaleString('fr-FR') + ' F';
+
+  if (loading) return <p className="text-[11px] text-slate-400 text-center py-3">Chargement…</p>;
+
+  return (
+    <div className="space-y-1.5">
+      {([['T1', t1v], ['T2', t2v], ['T3', t3v]] as [string, number][]).map(([k, v]) => {
+        const paid = hasPay(k);
+        return (
+          <div key={k} className="flex items-center justify-between p-2.5 rounded-md bg-slate-50 border border-slate-100">
+            <span className="text-[11px] font-bold text-slate-600 w-6">{k}</span>
+            <span className="text-[11px] font-mono text-slate-600 flex-1 text-center">{fmtF(v)}</span>
+            <span className={`text-[9px] font-semibold px-2 py-0.5 rounded border ${paid ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
+              {paid ? 'Payé' : 'En attente'}
+            </span>
+          </div>
+        );
+      })}
+      <div className={`flex items-center justify-between p-2.5 rounded-md border mt-2 ${solde > 0 ? 'bg-amber-50/60 border-amber-200' : 'bg-emerald-50/60 border-emerald-200'}`}>
+        <span className="text-xs font-bold text-slate-700">Solde restant</span>
+        <span className={`text-sm font-bold ${solde > 0 ? 'text-amber-700' : 'text-emerald-700'}`}>
+          {solde > 0 ? fmtF(solde) : 'À jour ✓'}
+        </span>
+      </div>
+      <p className="text-[10px] text-slate-400 text-right">Total annuel : {fmtF(annuel)}</p>
+    </div>
   );
 }
 
@@ -893,7 +1068,7 @@ function AnnuaireTab({ prospects, appointments, onProspectStatus, onToast, onRef
         </div>
         <div className="flex gap-2 flex-wrap">
           {[
-            { val: section, setter: setSection, opts: [['ALL','Toutes sections'], ...['PS','MS','GS','CP','CE1','CE2','CM1','CM2'].map(s => [s,s])] },
+            { val: section, setter: setSection, opts: [['ALL','Toutes sections'], ...['PS','MS','GS','CP1','CP2','CE1','CE2','CM1','CM2'].map(s => [s,s])] },
             { val: statut,  setter: setStatut,  opts: [['ALL','Tous statuts'], [StatutProspect.PROSPECT,'Prospect'], [StatutProspect.PRE_INSCRIT,'Pré-inscrit'], [StatutProspect.INSCRIT,'Inscrit'], [StatutProspect.ARCHIVE,'Archivé']] },
             { val: commune, setter: setCommune, opts: [['ALL','Toutes communes'], ...communes.map(c => [c,c])] },
           ].map((f, i) => (
@@ -1192,10 +1367,17 @@ function InscriptionsTab({ appointments, prospects, onRdvStatus, onToast }: Data
 // CLASSES & QUOTAS
 // ════════════════════════════════════════════════════════════════════════════
 
-function ClassesTab({ quotas }: DataProps) {
-  const totalCap     = quotas.reduce((s, q) => s + q.capaciteMax, 0);
+function ClassesTab({ quotas, prospects, appointments, onProspectStatus, onToast, onRefresh }: DataProps) {
+  const totalCap      = quotas.reduce((s, q) => s + q.capaciteMax, 0);
   const totalInscrits = quotas.reduce((s, q) => s + q.inscritsConfirmes, 0);
-  const totalDispo   = totalCap - totalInscrits;
+  const totalDispo    = totalCap - totalInscrits;
+
+  const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [selectedStudent,  setSelectedStudent]  = useState<Prospect | null>(null);
+
+  const studentsInSection = (section: string) =>
+    prospects.filter(p => p.sectionVisee === section &&
+      (p.statut === StatutProspect.INSCRIT || p.statut === StatutProspect.PRE_INSCRIT));
 
   return (
     <PageLayout title="Classes & Quotas" sub="Capacité d'accueil par niveau — Rentrée 2026/2027">
@@ -1209,12 +1391,12 @@ function ClassesTab({ quotas }: DataProps) {
         ))}
       </div>
       <Card>
-        <CardHeader title="Détail par section" />
+        <CardHeader title="Détail par section" sub="Cliquez sur une ligne pour voir les élèves" />
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead className="border-b border-slate-100 bg-slate-50">
               <tr>
-                {['Section','Niveau','Inscrits','Pré-inscrits','Capacité max','Places libres','Occupation'].map(h => (
+                {['Section','Niveau','Inscrits','Pré-inscrits','Capacité max','Places libres','Occupation',''].map(h => (
                   <th key={h} className="px-5 py-3 text-left font-semibold text-slate-400 text-[10px] uppercase tracking-wide">{h}</th>
                 ))}
               </tr>
@@ -1224,29 +1406,88 @@ function ClassesTab({ quotas }: DataProps) {
                 const pct    = Math.round((q.inscritsConfirmes / q.capaciteMax) * 100);
                 const dispo  = q.capaciteMax - q.inscritsConfirmes;
                 const status = pct >= 80 ? 'text-red-600' : pct >= 60 ? 'text-amber-600' : 'text-emerald-600';
+                const open   = expandedSection === q.section;
+                const students = studentsInSection(q.section);
                 return (
-                  <tr key={q.section} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-5 py-4 font-bold text-slate-900">{q.section}</td>
-                    <td className="px-5 py-4 text-slate-500">{SECTION_LABEL[q.section] || q.section}</td>
-                    <td className="px-5 py-4 font-mono font-semibold text-slate-800">{q.inscritsConfirmes}</td>
-                    <td className="px-5 py-4 font-mono text-slate-500">{q.preInscrits}</td>
-                    <td className="px-5 py-4 font-mono text-slate-400">{q.capaciteMax}</td>
-                    <td className={`px-5 py-4 font-mono font-semibold ${dispo <= 3 ? 'text-red-600' : 'text-slate-700'}`}>{dispo}</td>
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-2.5">
-                        <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden min-w-[60px]">
-                          <div className={`h-full rounded-full ${pct>=80?'bg-red-500':pct>=60?'bg-amber-400':'bg-emerald-500'}`} style={{ width:`${pct}%` }} />
+                  <React.Fragment key={q.section}>
+                    <tr
+                      onClick={() => setExpandedSection(open ? null : q.section)}
+                      className="hover:bg-slate-50 cursor-pointer transition-colors">
+                      <td className="px-5 py-4 font-bold text-slate-900 flex items-center gap-2">
+                        <span className={`transition-transform ${open ? 'rotate-90' : ''}`}>
+                          <ChevronRight size={13} className="text-slate-400" />
+                        </span>
+                        {q.section}
+                      </td>
+                      <td className="px-5 py-4 text-slate-500">{SECTION_LABEL[q.section] || q.section}</td>
+                      <td className="px-5 py-4 font-mono font-semibold text-slate-800">{q.inscritsConfirmes}</td>
+                      <td className="px-5 py-4 font-mono text-slate-500">{q.preInscrits}</td>
+                      <td className="px-5 py-4 font-mono text-slate-400">{q.capaciteMax}</td>
+                      <td className={`px-5 py-4 font-mono font-semibold ${dispo <= 3 ? 'text-red-600' : 'text-slate-700'}`}>{dispo}</td>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden min-w-[60px]">
+                            <div className={`h-full rounded-full ${pct>=80?'bg-red-500':pct>=60?'bg-amber-400':'bg-emerald-500'}`} style={{ width:`${pct}%` }} />
+                          </div>
+                          <span className={`font-mono font-semibold text-[11px] ${status}`}>{pct}%</span>
                         </div>
-                        <span className={`font-mono font-semibold text-[11px] ${status}`}>{pct}%</span>
-                      </div>
-                    </td>
-                  </tr>
+                      </td>
+                      <td className="px-5 py-4 text-right">
+                        <span className="text-[10px] text-slate-400">{students.length} élève{students.length > 1 ? 's' : ''}</span>
+                      </td>
+                    </tr>
+
+                    {/* Rangée dépliée — liste des élèves */}
+                    {open && (
+                      <tr>
+                        <td colSpan={8} className="bg-slate-50/70 px-0 py-0 border-b border-slate-100">
+                          {students.length === 0 ? (
+                            <p className="px-10 py-4 text-xs text-slate-400 italic">Aucun élève inscrit dans cette section.</p>
+                          ) : (
+                            <div className="divide-y divide-slate-100">
+                              {students.map(p => (
+                                <div key={p.id}
+                                  onClick={e => { e.stopPropagation(); setSelectedStudent(p); }}
+                                  className="flex items-center gap-4 px-10 py-2.5 hover:bg-blue-50/40 cursor-pointer transition-colors group">
+                                  <div className="flex-1">
+                                    <span className="font-semibold text-slate-800 text-xs group-hover:text-brand-blue-medium transition-colors">
+                                      {p.prenomEnfant} {p.nomEnfant}
+                                    </span>
+                                    <span className="text-[10px] text-slate-400 ml-2">{p.prenomParent} {p.nomParent}</span>
+                                  </div>
+                                  <span className={`text-[9px] font-semibold px-2 py-0.5 rounded border ${
+                                    p.statut === StatutProspect.INSCRIT
+                                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                      : 'bg-amber-50 text-amber-700 border-amber-200'
+                                  }`}>{p.statut}</span>
+                                  <Eye size={12} className="text-slate-300 group-hover:text-slate-500 transition-colors shrink-0" />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 );
               })}
             </tbody>
           </table>
         </div>
       </Card>
+
+      <AnimatePresence>
+        {selectedStudent && (
+          <ProspectDrawer
+            prospect={selectedStudent}
+            appointments={appointments}
+            onClose={() => setSelectedStudent(null)}
+            onStatus={(id, s) => { onProspectStatus(id, s); setSelectedStudent(null); }}
+            onToast={onToast}
+            onRefresh={onRefresh}
+          />
+        )}
+      </AnimatePresence>
     </PageLayout>
   );
 }
@@ -1265,7 +1506,7 @@ function StatistiquesTab({ prospects }: DataProps) {
   }, [prospects]);
 
   const sectionData = useMemo(() =>
-    ['PS','MS','GS','CP','CE1','CE2','CM1','CM2'].map(s => ({
+    ['PS','MS','GS','CP1','CP2','CE1','CE2','CM1','CM2'].map(s => ({
       s, count: prospects.filter(p => p.sectionVisee === s).length,
     })).sort((a, b) => b.count - a.count),
   [prospects]);
@@ -1350,7 +1591,7 @@ function StatistiquesTab({ prospects }: DataProps) {
 // MESSAGERIE
 // ════════════════════════════════════════════════════════════════════════════
 
-const SECTIONS_MSG = ['PS','MS','GS','CP','CE1','CE2','CM1','CM2'];
+const SECTIONS_MSG = ['PS','MS','GS','CP1','CP2','CE1','CE2','CM1','CM2'];
 const EXPEDITEURS  = ['Direction EPV Horizons Savants','Service Scolarité','Service Infirmerie EPV','Équipe Pédagogique'];
 
 function MessagerieTab({ contacts, notifications, prospects, onContactStatus, onToast }: DataProps) {
@@ -1844,7 +2085,7 @@ function AdminDocuments({ onToast }: { onToast: (m: string) => void }) {
   );
 }
 
-const SECTIONS_ORDER = ['PS','MS','GS','CP','CE1','CE2','CM1','CM2'];
+const SECTIONS_ORDER = ['PS','MS','GS','CP1','CP2','CE1','CE2','CM1','CM2'];
 
 function ConfigurationTab({ onToast, onRefresh, config, tarifs }: DataProps) {
   const etab = config.etablissement || {};
@@ -1957,7 +2198,7 @@ function ConfigurationTab({ onToast, onRefresh, config, tarifs }: DataProps) {
             <tbody className="divide-y divide-slate-50">
               {SECTIONS_ORDER.map(s => {
                 const val = editTarifs ? (localTarifs[s] || 0) : (tarifs[s] || 0);
-                const cycle = ['PS','MS','GS'].includes(s) ? 'Maternelle' : ['CP','CE1','CE2'].includes(s) ? 'Primaire C1' : 'Primaire C2';
+                const cycle = ['PS','MS','GS'].includes(s) ? 'Maternelle' : ['CP1','CP2','CE1','CE2'].includes(s) ? 'Primaire C1' : 'Primaire C2';
                 return (
                   <tr key={s} className="hover:bg-slate-50 transition-colors">
                     <td className="px-5 py-3.5">
@@ -2009,11 +2250,12 @@ function ConfigurationTab({ onToast, onRefresh, config, tarifs }: DataProps) {
 // 1. ASSIDUITÉ
 // ════════════════════════════════════════════════════════════════════════════
 
-function AssiduiteTab({ prospects, onToast }: DataProps) {
-  const sections = ['PS','MS','GS','CP','CE1','CE2','CM1','CM2'];
-  const [selectedSection, setSelectedSection] = useState('CP');
+function AssiduiteTab({ prospects, appointments, onProspectStatus, onToast, onRefresh }: DataProps) {
+  const sections = ['PS','MS','GS','CP1','CP2','CE1','CE2','CM1','CM2'];
+  const [selectedSection, setSelectedSection] = useState('CP1');
   const [selectedDate,    setSelectedDate]    = useState(new Date().toISOString().slice(0, 10));
   const [saving,          setSaving]          = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<Prospect | null>(null);
 
   const students = useMemo(() =>
     prospects.filter(p => p.sectionVisee === selectedSection && p.statut === StatutProspect.INSCRIT),
@@ -2146,7 +2388,13 @@ function AssiduiteTab({ prospects, onToast }: DataProps) {
                 const a = attendance[p.id];
                 return (
                   <tr key={p.id} className={`transition-colors ${a === 'absent' ? 'bg-red-50/40' : a === 'retard' ? 'bg-amber-50/40' : ''}`}>
-                    <td className="px-5 py-3.5 font-semibold text-slate-800">{p.prenomEnfant} {p.nomEnfant}</td>
+                    <td className="px-5 py-3.5">
+                      <button onClick={() => setSelectedStudent(p)}
+                        className="font-semibold text-slate-800 hover:text-brand-blue-medium cursor-pointer text-left flex items-center gap-1.5 group">
+                        {p.prenomEnfant} {p.nomEnfant}
+                        <Eye size={11} className="text-slate-300 group-hover:text-brand-blue-medium transition-colors" />
+                      </button>
+                    </td>
                     <td className="px-5 py-3.5 text-slate-500">{fmtDate(p.dateNaissance)}</td>
                     <td className="px-5 py-3.5 text-slate-500">{p.prenomParent} {p.nomParent}</td>
                     <td className="px-5 py-3.5">
@@ -2169,6 +2417,19 @@ function AssiduiteTab({ prospects, onToast }: DataProps) {
           </div>
         </Card>
       )}
+
+      <AnimatePresence>
+        {selectedStudent && (
+          <ProspectDrawer
+            prospect={selectedStudent}
+            appointments={appointments}
+            onClose={() => setSelectedStudent(null)}
+            onStatus={(id, s) => { onProspectStatus(id, s); setSelectedStudent(null); }}
+            onToast={onToast}
+            onRefresh={onRefresh}
+          />
+        )}
+      </AnimatePresence>
     </PageLayout>
   );
 }
@@ -2516,9 +2777,10 @@ function RhTab({ onToast }: DataProps) {
 // 4. SCOLARITÉS
 // ════════════════════════════════════════════════════════════════════════════
 
-function ScolaritesTab({ prospects, tarifs }: DataProps) {
+function ScolaritesTab({ prospects, tarifs, appointments, onProspectStatus, onToast, onRefresh }: DataProps) {
   const [filter, setFilter] = useState('ALL');
   const [allPaiements, setAllPaiements] = useState<any[]>([]);
+  const [selected, setSelected] = useState<Prospect | null>(null);
   const inscrits = prospects.filter(p => p.statut === StatutProspect.INSCRIT || p.statut === StatutProspect.PRE_INSCRIT);
 
   useEffect(() => {
@@ -2579,8 +2841,13 @@ function ScolaritesTab({ prospects, tarifs }: DataProps) {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {filtered.map(({ p, t1, t2, t3, paiements, annuel, solde }) => (
-                <tr key={p.id} className={`hover:bg-slate-50 transition-colors ${solde > 0 ? 'bg-amber-50/20' : ''}`}>
-                  <td className="px-4 py-3.5 font-semibold text-slate-800">{p.prenomEnfant} {p.nomEnfant}</td>
+                <tr key={p.id}
+                  onClick={() => setSelected(p)}
+                  className={`hover:bg-slate-50 cursor-pointer transition-colors ${solde > 0 ? 'bg-amber-50/20' : ''}`}>
+                  <td className="px-4 py-3.5">
+                    <p className="font-semibold text-slate-800">{p.prenomEnfant} {p.nomEnfant}</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">{p.prenomParent} {p.nomParent}</p>
+                  </td>
                   <td className="px-4 py-3.5">
                     <span className="font-bold text-[10px] bg-slate-900 text-white px-2 py-0.5 rounded">{p.sectionVisee}</span>
                   </td>
@@ -2596,9 +2863,9 @@ function ScolaritesTab({ prospects, tarifs }: DataProps) {
                   <td className={`px-4 py-3.5 font-mono font-bold ${solde > 0 ? 'text-amber-700' : 'text-emerald-700'}`}>
                     {solde > 0 ? fmtF(solde) : 'À jour'}
                   </td>
-                  <td className="px-4 py-3.5">
-                    <button className="text-[10px] font-semibold text-slate-600 border border-slate-200 px-2 py-1 rounded hover:bg-slate-50 cursor-pointer transition-colors">
-                      <Printer size={11} />
+                  <td className="px-4 py-3.5" onClick={e => e.stopPropagation()}>
+                    <button className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer transition-colors" title="Imprimer">
+                      <Printer size={13} />
                     </button>
                   </td>
                 </tr>
@@ -2607,6 +2874,19 @@ function ScolaritesTab({ prospects, tarifs }: DataProps) {
           </table>
         </div>
       </Card>
+
+      <AnimatePresence>
+        {selected && (
+          <ProspectDrawer
+            prospect={selected}
+            appointments={appointments}
+            onClose={() => setSelected(null)}
+            onStatus={(id, s) => { onProspectStatus(id, s); setSelected(null); }}
+            onToast={onToast}
+            onRefresh={onRefresh}
+          />
+        )}
+      </AnimatePresence>
     </PageLayout>
   );
 }
@@ -2908,7 +3188,7 @@ function NewslettersTab({ prospects, onToast }: DataProps) {
   const [objet, setObjet]       = useState('');
   const [contenu, setContenu]   = useState('');
   const [cible, setCible]       = useState('ALL');
-  const sections = ['PS','MS','GS','CP','CE1','CE2','CM1','CM2'];
+  const sections = ['PS','MS','GS','CP1','CP2','CE1','CE2','CM1','CM2'];
   const nbDest = cible === 'ALL' ? prospects.length : prospects.filter(p=>p.sectionVisee===cible).length;
 
   useEffect(() => { apiFetch('/api/newsletters').then(setNewsletters).catch(console.error); }, []);
@@ -3720,6 +4000,7 @@ export const AdminDashboard: React.FC = () => {
   const [toast,        setToast]        = useState<string | null>(null);
   const [refresh,      setRefresh]      = useState(false);
   const [globalSearch, setGlobalSearch] = useState('');
+  const [bulletinDrawerProspect, setBulletinDrawerProspect] = useState<Prospect | null>(null);
 
   // Vérification de session Neon Auth au montage
   useEffect(() => {
@@ -3958,7 +4239,11 @@ export const AdminDashboard: React.FC = () => {
               {tab === 'annuaire'     && <AnnuaireTab        {...dataProps} />}
               {tab === 'inscriptions' && <InscriptionsTab    {...dataProps} />}
               {tab === 'classes'      && <ClassesTab         {...dataProps} />}
-              {tab === 'bulletins'    && <BulletinsTab onToast={dataProps.onToast} />}
+              {tab === 'bulletins'    && <BulletinsTab onToast={dataProps.onToast}
+                onSelectEleve={id => {
+                  const p = prospects.find(pr => pr.id === id);
+                  if (p) setBulletinDrawerProspect(p);
+                }} />}
               {tab === 'messages'     && <MessagerieTab      {...dataProps} />}
               {tab === 'notif-log'    && <MessagerieTab      {...dataProps} />}
               {tab === 'configuration'&& <ConfigurationTab   {...dataProps} />}
@@ -3980,6 +4265,20 @@ export const AdminDashboard: React.FC = () => {
           </AnimatePresence>
         </main>
       </div>
+
+      {/* Drawer élève — depuis Bulletins/Notes */}
+      <AnimatePresence>
+        {bulletinDrawerProspect && (
+          <ProspectDrawer
+            prospect={bulletinDrawerProspect}
+            appointments={appointments}
+            onClose={() => setBulletinDrawerProspect(null)}
+            onStatus={(id, s) => { handleProspectStatus(id, s); setBulletinDrawerProspect(null); }}
+            onToast={m => setToast(m)}
+            onRefresh={() => setRefresh(r => !r)}
+          />
+        )}
+      </AnimatePresence>
 
       {toast && <Toast message={toast} type="info" onClose={() => setToast(null)} />}
     </div>

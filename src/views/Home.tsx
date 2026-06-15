@@ -428,12 +428,6 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             <div className="hero-fade-in h-[3px] w-10 bg-brand-gold rounded-full mt-3 mb-3"
                  style={{ animationDelay: '220ms' }} />
 
-            {/* Sous-titre */}
-            <p className="hero-fade-in text-[12px] text-white/52 font-serif leading-[1.7] max-w-[380px]"
-               style={{ animationDelay: '270ms' }}>
-              {t('hero.desc', lang)}
-            </p>
-
             {/* Boutons compacts */}
             <div className="hero-fade-in mt-4 flex flex-wrap items-stretch gap-2"
                  style={{ animationDelay: '350ms' }}>

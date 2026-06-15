@@ -26,6 +26,8 @@ import { Ecole }              from './views/Ecole.tsx';
 import { Contact }            from './views/Contact.tsx';
 import { Blog }               from './views/Blog.tsx';
 import { FAQ }                from './views/FAQ.tsx';
+import { Tenues }            from './views/Tenues.tsx';
+import { Visite }            from './views/Visite.tsx';
 
 // Protected views (rendus SANS navbar/footer publics)
 import { EspaceParent }   from './views/EspaceParent.tsx';
@@ -134,6 +136,10 @@ export default function App() {
         return <Blog />;
       case '#/faq':
         return <FAQ />;
+      case '#/tenues':
+        return <Tenues />;
+      case '#/visite':
+        return <Visite />;
       default:
         return <Home onNavigate={handleNavigate} />;
     }

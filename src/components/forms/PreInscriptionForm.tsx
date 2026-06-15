@@ -34,21 +34,23 @@ const LEVELS_FR = [
   { value: 'PS',  label: 'Petite Section (2-3 ans)' },
   { value: 'MS',  label: 'Moyenne Section (3-4 ans)' },
   { value: 'GS',  label: 'Grande Section (5-6 ans)' },
-  { value: 'CP',  label: 'CPI / CP (6-7 ans)' },
-  { value: 'CE1', label: 'CE1 (7-8 ans)' },
-  { value: 'CE2', label: 'CE2 (8-9 ans)' },
-  { value: 'CM1', label: 'CM1 (9-10 ans)' },
-  { value: 'CM2', label: 'CM2 (10-11 ans)' },
+  { value: 'CP1', label: 'CP1 — CPI (6-7 ans)' },
+  { value: 'CP2', label: 'CP2 — CPII (7-8 ans)' },
+  { value: 'CE1', label: 'CE1 (8-9 ans)' },
+  { value: 'CE2', label: 'CE2 (9-10 ans)' },
+  { value: 'CM1', label: 'CM1 (10-11 ans)' },
+  { value: 'CM2', label: 'CM2 (11-12 ans)' },
 ];
 const LEVELS_EN = [
   { value: 'PS',  label: 'Nursery PS (2-3 years)' },
   { value: 'MS',  label: 'Middle Kindergarten MS (3-4 years)' },
   { value: 'GS',  label: 'Senior Kindergarten GS (5-6 years)' },
-  { value: 'CP',  label: 'Grade 1 CP (6-7 years)' },
-  { value: 'CE1', label: 'Grade 2 CE1 (7-8 years)' },
-  { value: 'CE2', label: 'Grade 3 CE2 (8-9 years)' },
-  { value: 'CM1', label: 'Grade 4 CM1 (9-10 years)' },
-  { value: 'CM2', label: 'Grade 5 CM2 (10-11 years)' },
+  { value: 'CP1', label: 'Grade 1 CP1 (6-7 years)' },
+  { value: 'CP2', label: 'Grade 2 CP2 (7-8 years)' },
+  { value: 'CE1', label: 'Grade 3 CE1 (8-9 years)' },
+  { value: 'CE2', label: 'Grade 4 CE2 (9-10 years)' },
+  { value: 'CM1', label: 'Grade 5 CM1 (10-11 years)' },
+  { value: 'CM2', label: 'Grade 6 CM2 (11-12 years)' },
 ];
 
 const COMMUNES = [

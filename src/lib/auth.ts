@@ -88,10 +88,11 @@ export async function checkSession(): Promise<boolean> {
 /** fetch authentifié vers l'API Express — ajoute automatiquement le Bearer */
 export async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
   const token = getStoredToken();
+  const isFormData = options.body instanceof FormData;
   return fetch(path, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },

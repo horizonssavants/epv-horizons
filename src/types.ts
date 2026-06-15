@@ -28,6 +28,7 @@ export interface Prospect {
   codeParrainagePersonnel: string; // EPV-NOM01 format
   statut: StatutProspect;
   notesAdmin?: string;
+  photoUrl?: string;
   updatedAt: string;
 }
 

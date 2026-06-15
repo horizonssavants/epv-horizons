@@ -48,7 +48,7 @@ export const Admissions: React.FC = () => {
   };
 
   useEffect(() => {
-    const targetDate = new Date("2026-06-15T18:00:00").getTime();
+    const targetDate = new Date("2026-07-01T08:00:00").getTime();
     const interval = setInterval(() => {
       const now = new Date().getTime();
       const difference = targetDate - now;
@@ -163,7 +163,7 @@ export const Admissions: React.FC = () => {
     },
     {
       title: "Quels sont les effectifs admis par classe ?",
-      content: "Afin de privilégier l'excellence pédagogique, nous bloquons strictement les effectifs à 15 élèves maximum en classe de Maternelle (PS, MS, GS) et 20 élèves maximum en classe de Primaire (CP au CM2). Les inscriptions cessent automatiquement dès que les capacités limites d'Abidjan sont atteintes.",
+      content: "Afin de privilégier l'excellence pédagogique, nous bloquons strictement les effectifs à 25 élèves maximum par classe, toutes sections confondues (Maternelle PS/MS/GS et Primaire CP au CM2). Les inscriptions cessent automatiquement dès que les capacités limites sont atteintes.",
     },
   ] : [
     {
@@ -204,7 +204,7 @@ export const Admissions: React.FC = () => {
     },
     {
       title: "What are the class sizes?",
-      content: "To prioritize pedagogical excellence, we strictly cap class sizes at 15 students maximum in Kindergarten classes (PS, MS, GS) and 20 students maximum in Primary classes (Grade 1 to Grade 5). Enrollment automatically closes once maximum capacity is reached.",
+      content: "To prioritize pedagogical excellence, we strictly cap class sizes at 25 students maximum per class, across all levels (Kindergarten PS/MS/GS and Primary Grade 1 to Grade 5). Enrollment automatically closes once maximum capacity is reached.",
     },
   ];
 
@@ -616,8 +616,8 @@ export const Admissions: React.FC = () => {
             </h2>
             <p className="font-serif text-sm text-brand-muted mt-2 max-w-xl mx-auto">
               {fr
-                ? <>Effectifs restreints à <strong>15 élèves max</strong> en Maternelle et <strong>20 max</strong> en Primaire.</>
-                : <>Class sizes capped at <strong>15 students max</strong> in Kindergarten and <strong>20 max</strong> in Primary.</>}
+                ? <>Effectifs restreints à <strong>25 élèves max</strong> par classe, toutes sections confondues.</>
+                : <>Class sizes capped at <strong>25 students max</strong> per class across all levels.</>}
             </p>
           </div>
 
@@ -690,7 +690,8 @@ export const Admissions: React.FC = () => {
                   item.section === "PS" ? "Petite Section (PS)" :
                   item.section === "MS" ? "Moyenne Section (MS)" :
                   item.section === "GS" ? "Grande Section (GS)" :
-                  item.section === "CP" ? "CPI / CP" :
+                  item.section === "CP1" ? "CP1 — CPI" :
+                  item.section === "CP2" ? "CP2 — CPII" :
                   item.section === "CE1" ? "CE1" :
                   item.section === "CE2" ? "CE2" :
                   item.section === "CM1" ? "CM1" : "CM2";

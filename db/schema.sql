@@ -53,7 +53,8 @@ CREATE TABLE IF NOT EXISTS prospects (
   code_parrainage_utilise   TEXT,
   code_parrainage_personnel TEXT NOT NULL,
   statut                    TEXT NOT NULL DEFAULT 'Prospect',
-  notes_admin               TEXT
+  notes_admin               TEXT,
+  photo_url                 TEXT
 );
 
 CREATE TABLE IF NOT EXISTS rendezvous (

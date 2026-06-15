@@ -11,7 +11,9 @@ export const translations: Record<Lang, Record<string, string>> = {
     'nav.home':        'Accueil',
     'nav.programmes':  'Nos Programmes',
     'nav.admissions':  'Admissions',
-    'nav.ecole':       "L'École",
+    'nav.ecole':       'Vie scolaire',
+    'nav.tenues':      'Tenues Scolaires',
+    'nav.visite':      'École en Images',
     'nav.blog':        'Blog',
     'nav.faq':         'FAQ',
     'nav.contact':     'Contact',
@@ -30,7 +32,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'bnav.parent':     'Parent',
 
     // ── Footer ───────────────────────────────────────────────────
-    'footer.tagline':  "Former les leaders de demain, dès aujourd'hui.",
+    'footer.tagline':  "Nous faisons des sachants de demain.",
     'footer.address':  'Bingerville Mtn Kro, Abidjan',
     'footer.phone':    '07 78 98 14 56 / 05 85 41 51 51',
     'footer.email':    'contact@horizonssavants.com',
@@ -124,7 +126,9 @@ export const translations: Record<Lang, Record<string, string>> = {
     'nav.home':        'Home',
     'nav.programmes':  'Our Programs',
     'nav.admissions':  'Admissions',
-    'nav.ecole':       'The School',
+    'nav.ecole':       'School Life',
+    'nav.tenues':      'School Uniforms',
+    'nav.visite':      'School in Pictures',
     'nav.blog':        'Blog',
     'nav.faq':         'FAQ',
     'nav.contact':     'Contact',
@@ -143,7 +147,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'bnav.parent':     'Parent',
 
     // ── Footer ───────────────────────────────────────────────────
-    'footer.tagline':  "Shaping tomorrow's leaders, starting today.",
+    'footer.tagline':  "We are building tomorrow's knowledgeable minds.",
     'footer.address':  'Bingerville Mtn Kro, Abidjan',
     'footer.phone':    '07 78 98 14 56 / 05 85 41 51 51',
     'footer.email':    'contact@horizonssavants.com',

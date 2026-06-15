@@ -252,21 +252,24 @@ async function initDB() {
   const schema = fs.readFileSync(schemaPath, 'utf-8');
   await q(schema);
 
-  // Seed places (capacités max uniquement — compteurs calculés dynamiquement)
+  // Migrations incrémentales (safe sur DB existante)
+  await q('ALTER TABLE prospects ADD COLUMN IF NOT EXISTS photo_url TEXT');
+
+  // Seed places (capacités max — 30 élèves par classe toutes sections)
   const capacites = [
-    { s:'PS',  max:15 },{ s:'MS',  max:15 },{ s:'GS',  max:15 },
-    { s:'CP',  max:20 },{ s:'CE1', max:20 },{ s:'CE2', max:20 },
-    { s:'CM1', max:20 },{ s:'CM2', max:20 },
+    { s:'PS',  max:25 },{ s:'MS',  max:25 },{ s:'GS',  max:25 },
+    { s:'CP1', max:25 },{ s:'CP2', max:25 },{ s:'CE1', max:25 },{ s:'CE2', max:25 },
+    { s:'CM1', max:25 },{ s:'CM2', max:25 },
   ];
   for (const c of capacites) {
-    await q('INSERT INTO places (section,capacite_max,inscrits_confirmes,pre_inscrits) VALUES ($1,$2,0,0) ON CONFLICT DO NOTHING',
+    await q('INSERT INTO places (section,capacite_max,inscrits_confirmes,pre_inscrits) VALUES ($1,$2,0,0) ON CONFLICT (section) DO UPDATE SET capacite_max = EXCLUDED.capacite_max',
       [c.s, c.max]);
   }
 
   // Tarifs dans configuration
   await q(`INSERT INTO configuration (cle, valeur, description) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING`, [
     'tarifs',
-    JSON.stringify({ PS:1350000, MS:1350000, GS:1350000, CP:1650000, CE1:1650000, CE2:1650000, CM1:1880000, CM2:1880000 }),
+    JSON.stringify({ PS:1350000, MS:1350000, GS:1350000, CP1:1650000, CP2:1650000, CE1:1650000, CE2:1650000, CM1:1880000, CM2:1880000 }),
     'Tarifs annuels de scolarité par section (FCFA)',
   ]);
 
@@ -310,7 +313,8 @@ async function initDB() {
       PS:  ['Extrait de naissance original', 'Carnet de vaccination à jour', '8 photos d\'identité récentes (4×4)'],
       MS:  ['Extrait de naissance original', 'Carnet de vaccination à jour', '8 photos d\'identité récentes (4×4)'],
       GS:  ['Extrait de naissance original', 'Carnet de vaccination à jour', '8 photos d\'identité récentes (4×4)'],
-      CP:  ['Extrait de naissance original', '4 photos d\'identité récentes (4×4)', 'Bulletins de l\'année précédente'],
+      CP1: ['Extrait de naissance original', '4 photos d\'identité récentes (4×4)', 'Bulletins de l\'année précédente'],
+      CP2: ['Extrait de naissance original', '4 photos d\'identité récentes (4×4)', 'Bulletins de l\'année précédente'],
       CE1: ['Extrait de naissance original', '4 photos d\'identité récentes (4×4)', 'Bulletins de l\'année précédente'],
       CE2: ['Extrait de naissance original', '4 photos d\'identité récentes (4×4)', 'Bulletins de l\'année précédente'],
       CM1: ['Extrait de naissance original', '4 photos d\'identité récentes (4×4)', 'Bulletins de l\'année précédente'],
@@ -1379,6 +1383,33 @@ app.patch('/api/prospects/:id/status', requireAdmin, async (req, res) => {
   } catch (e) { console.error(e); res.status(500).json({ success: false, error: 'Erreur serveur.' }); }
 });
 
+// ─── Photo élève — upload vers Cloudflare R2 ─────────────────────────────────
+
+app.post('/api/prospects/:id/photo', requireAdmin, upload.single('photo'), async (req: any, res) => {
+  const { id } = req.params;
+  if (!req.file) return res.status(400).json({ error: 'Fichier manquant.' });
+  try {
+    const { rows } = await q('SELECT photo_url FROM prospects WHERE id=$1', [id]);
+    if (!rows.length) return res.status(404).json({ error: 'Élève introuvable.' });
+    if (rows[0].photo_url) await deleteFromR2(rows[0].photo_url).catch(() => {});
+    const url = await uploadToR2(req.file.buffer, req.file.mimetype, 'eleves');
+    await q('UPDATE prospects SET photo_url=$1, updated_at=NOW() WHERE id=$2', [url, id]);
+    await logAction('UPDATE', 'Dossier', `Photo élève mise à jour — id:${id}`);
+    res.json({ url });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/prospects/:id/photo', requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { rows } = await q('SELECT photo_url FROM prospects WHERE id=$1', [id]);
+    if (!rows.length) return res.status(404).json({ error: 'Élève introuvable.' });
+    if (rows[0].photo_url) await deleteFromR2(rows[0].photo_url).catch(() => {});
+    await q('UPDATE prospects SET photo_url=NULL, updated_at=NOW() WHERE id=$1', [id]);
+    res.json({ ok: true });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
 // ─── Rendezvous ───────────────────────────────────────────────────────────────
 
 // Créneaux publics — uniquement dateHeure + statut (aucune donnée personnelle)
@@ -2021,6 +2052,14 @@ app.get('/api/notes/classe/:section/:trimestre', requireAdmin, async (req, res) 
     const notesMap: Record<string, any[]> = {};
     for (const n of notes) { const no = rowToObj(n) as any; (notesMap[no.prospectId] = notesMap[no.prospectId] || []).push(no); }
     res.json({ prospects: rowsToObjs(prospects), notes: notesMap });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
+// Récupérer les notes d'un élève par ID
+app.get('/api/notes/eleve/:prospectId', requireAdmin, async (req, res) => {
+  try {
+    const { rows } = await q('SELECT * FROM notes WHERE prospect_id=$1 ORDER BY matiere', [req.params.prospectId]);
+    res.json(rowsToObjs(rows));
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 

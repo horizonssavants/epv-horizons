@@ -37,11 +37,11 @@ interface Composition {
 
 // ─── Constantes ──────────────────────────────────────────────────────────────
 
-const SECTIONS = ['PS','MS','GS','CP','CE1','CE2','CM1','CM2'];
+const SECTIONS = ['PS','MS','GS','CP1','CP2','CE1','CE2','CM1','CM2'];
 const TRIMESTRES = ['T1','T2','T3'];
 const SECTION_LABEL: Record<string,string> = {
   PS:'Petite Section (PS)', MS:'Moyenne Section (MS)', GS:'Grande Section (GS)',
-  CP:'CP (CPI)', CE1:'CE1', CE2:'CE2', CM1:'CM1', CM2:'CM2',
+  CP1:'CP1 (CPI)', CP2:'CP2 (CPII)', CE1:'CE1', CE2:'CE2', CM1:'CM1', CM2:'CM2',
 };
 const MATIERES: Record<string,string[]> = {
   mat: ['Éveil','Langage oral','Anglais','Mathématiques','Arts plastiques','EPS','Vie collective'],
@@ -438,9 +438,9 @@ const SUBTABS: { id: SubTab; label: string; Icon: any }[] = [
 // COMPOSANT PRINCIPAL
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export function BulletinsTab({ onToast }: { onToast: (m: string) => void }) {
+export function BulletinsTab({ onToast, onSelectEleve }: { onToast: (m: string) => void; onSelectEleve?: (id: string) => void }) {
   const [sub,       setSub]       = useState<SubTab>('liste');
-  const [section,   setSection]   = useState('CP');
+  const [section,   setSection]   = useState('CP1');
   const [trimestre, setTrimestre] = useState('T1');
   const [loading,   setLoading]   = useState(false);
 
@@ -451,7 +451,7 @@ export function BulletinsTab({ onToast }: { onToast: (m: string) => void }) {
   const [notesEdit,   setNotesEdit]   = useState<Record<string,Record<string,number|undefined>>>({});
   const [saving,      setSaving]      = useState<string|null>(null);
   const [showNewComp, setShowNewComp] = useState(false);
-  const [newComp,     setNewComp]     = useState({ titre:'', section:'CP', trimestre:'T1', dateDebut:'', matieres:[] as string[] });
+  const [newComp,     setNewComp]     = useState({ titre:'', section:'CP1', trimestre:'T1', dateDebut:'', matieres:[] as string[] });
   const [showNotes,   setShowNotes]   = useState<Record<string,boolean>>({});
 
   const matieres = getMatieres(section);
@@ -544,7 +544,7 @@ export function BulletinsTab({ onToast }: { onToast: (m: string) => void }) {
     await apiFetch('/api/compositions', { method:'POST', body: JSON.stringify(newComp) });
     onToast('Composition créée ✓');
     setShowNewComp(false);
-    setNewComp({ titre:'', section:'CP', trimestre:'T1', dateDebut:'', matieres:[] });
+    setNewComp({ titre:'', section:'CP1', trimestre:'T1', dateDebut:'', matieres:[] });
     loadCompositions();
   }
 
@@ -684,9 +684,14 @@ export function BulletinsTab({ onToast }: { onToast: (m: string) => void }) {
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {eleves.map((e, i) => (
-                      <tr key={e.id} className={`hover:bg-blue-50/40 transition-colors ${i%2===0?'bg-white':'bg-slate-50/50'}`}>
+                      <tr key={e.id}
+                        onClick={() => onSelectEleve?.(e.id)}
+                        className={`hover:bg-blue-50/40 transition-colors ${onSelectEleve ? 'cursor-pointer' : ''} ${i%2===0?'bg-white':'bg-slate-50/50'}`}>
                         <td className="px-4 py-3 text-xs font-bold text-slate-400 text-center">{String(i+1).padStart(2,'0')}</td>
-                        <td className="px-4 py-3 font-bold text-[#0D2E5C] text-sm">{e.nomEnfant}</td>
+                        <td className="px-4 py-3 font-bold text-[#0D2E5C] text-sm flex items-center gap-1.5">
+                          {e.nomEnfant}
+                          {onSelectEleve && <Eye size={11} className="text-slate-300" />}
+                        </td>
                         <td className="px-4 py-3 text-sm text-slate-700">{e.prenomEnfant}</td>
                         <td className="px-4 py-3 text-xs font-mono text-slate-600">{fmtDate(e.dateNaissance)}</td>
                         <td className="px-4 py-3 text-xs text-slate-600">{e.commune || '—'}</td>
@@ -769,8 +774,14 @@ export function BulletinsTab({ onToast }: { onToast: (m: string) => void }) {
                       <tr key={p.id} className={`${i%2===0?'bg-white':'bg-slate-50/50'}`}>
                         <td className="px-4 py-2 text-xs text-slate-400 font-bold text-center">{i+1}</td>
                         <td className="px-4 py-2">
-                          <div className="font-bold text-[#0D2E5C] text-sm">{p.nomEnfant} {p.prenomEnfant}</div>
-                          <div className="text-[10px] text-slate-400">{fmtDate(p.dateNaissance)}</div>
+                          <button onClick={() => onSelectEleve?.(p.id)}
+                            className={`text-left group ${onSelectEleve ? 'cursor-pointer' : ''}`}>
+                            <div className="font-bold text-[#0D2E5C] text-sm flex items-center gap-1.5">
+                              {p.nomEnfant} {p.prenomEnfant}
+                              {onSelectEleve && <Eye size={10} className="text-slate-300 group-hover:text-[#0D2E5C] transition-colors" />}
+                            </div>
+                            <div className="text-[10px] text-slate-400">{fmtDate(p.dateNaissance)}</div>
+                          </button>
                         </td>
                         {matieres.map(mat => (
                           <td key={mat} className="px-1 py-2">
@@ -871,7 +882,8 @@ export function BulletinsTab({ onToast }: { onToast: (m: string) => void }) {
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {bulletins.map((b, i) => (
-                      <tr key={b.id} className={`hover:bg-blue-50/30 transition-colors ${i%2===0?'bg-white':'bg-slate-50/50'}`}>
+                      <tr key={b.id}
+                        className={`hover:bg-blue-50/30 transition-colors ${i%2===0?'bg-white':'bg-slate-50/50'}`}>
                         <td className="px-4 py-3 text-center">
                           {b.rang && b.rang <= 3 ? (
                             <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black mx-auto ${
@@ -881,7 +893,13 @@ export function BulletinsTab({ onToast }: { onToast: (m: string) => void }) {
                             <span className="text-xs text-slate-500 font-semibold">{b.rang ?? '—'}</span>
                           )}
                         </td>
-                        <td className="px-4 py-3 font-bold text-[#0D2E5C] text-sm">{b.nomEnfant}</td>
+                        <td className="px-4 py-3">
+                          <button onClick={() => onSelectEleve?.(b.prospectId)}
+                            className={`font-bold text-[#0D2E5C] text-sm flex items-center gap-1.5 group ${onSelectEleve ? 'cursor-pointer hover:underline' : ''}`}>
+                            {b.nomEnfant}
+                            {onSelectEleve && <Eye size={10} className="text-slate-300 group-hover:text-[#0D2E5C] transition-colors" />}
+                          </button>
+                        </td>
                         <td className="px-4 py-3 text-sm text-slate-700">{b.prenomEnfant}</td>
                         {matieres.map(mat => {
                           const n = (b.notesDetail||[]).find((x:any) => x.matiere===mat);

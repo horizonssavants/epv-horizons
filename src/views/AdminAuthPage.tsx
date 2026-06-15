@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, Eye, EyeOff, ShieldCheck, LockKeyhole } from 'lucide-react';
+import { ChevronLeft, Eye, EyeOff } from 'lucide-react';
 import { signInNeon } from '../lib/auth.ts';
 
 interface AdminAuthPageProps {
@@ -157,32 +157,12 @@ export const AdminAuthPage: React.FC<AdminAuthPageProps> = ({ onSuccess, onBack 
 
           {/* En-tête */}
           <div className="text-center mb-8">
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.15, duration: 0.5 }}
-              className="relative inline-flex items-center justify-center mb-5"
-            >
-              <div className="absolute inset-0 bg-brand-gold/20 blur-2xl rounded-full scale-[2] pointer-events-none" />
-              <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center"
-                style={{ background: 'rgba(245,166,35,0.12)', border: '1px solid rgba(245,166,35,0.25)' }}>
-                <LockKeyhole size={30} className="text-brand-gold" strokeWidth={1.8} />
-              </div>
-            </motion.div>
-
             <h1 className="font-sans font-extrabold text-xl text-white uppercase tracking-[0.08em] mb-1">
               Portail Administrateur
             </h1>
             <p className="text-white/35 text-[11px] font-sans">
               Accès réservé à l'administration EPV
             </p>
-
-            <div className="flex items-center justify-center gap-1.5 mt-3">
-              <ShieldCheck size={10} className="text-brand-gold/70" />
-              <span className="text-[8px] font-sans uppercase tracking-[0.25em] text-white/20">
-                Connexion sécurisée
-              </span>
-            </div>
           </div>
 
           {/* Formulaire */}
