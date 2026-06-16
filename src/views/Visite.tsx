@@ -1,74 +1,75 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, ChevronRight, Utensils, Monitor, HeartPulse, Camera, Sun, BookOpen, Star, PencilLine } from 'lucide-react';
+import { useLang } from '../lib/LanguageContext.tsx';
 
 /* ─── Data ───────────────────────────────────────────────────────────────────── */
 
 interface Space {
   id: string;
-  label: string;
-  description: string;
+  label: { fr: string; en: string };
+  description: { fr: string; en: string };
   Icon: React.FC<{ size?: number; className?: string }>;
   images: string[];
-  tag: string;
+  tag: { fr: string; en: string };
 }
 
 const SPACES: Space[] = [
   {
     id: 'cour',
-    label: 'Cour de l\'École',
-    description: 'Un espace de vie et de jeu spacieux où les élèves s\'épanouissent pendant les récréations, dans un environnement sécurisé.',
+    label:       { fr: 'Cour de l\'École',       en: 'School Courtyard'    },
+    description: { fr: 'Un espace de vie et de jeu spacieux où les élèves s\'épanouissent pendant les récréations, dans un environnement sécurisé.', en: 'A spacious play and social area where students thrive during recess, in a safe and secure environment.' },
     Icon: Sun,
     images: ['/visite/cour-ecole.jpg'],
-    tag: 'Vie scolaire',
+    tag: { fr: 'Vie scolaire', en: 'School Life' },
   },
   {
     id: 'petite-section',
-    label: 'Petite Section',
-    description: 'Des salles de classe chaleureuses et colorées, aménagées pour éveiller la curiosité des plus jeunes (PS, MS) dans un cadre bienveillant.',
+    label:       { fr: 'Petite Section',          en: 'Nursery Class'       },
+    description: { fr: 'Des salles de classe chaleureuses et colorées, aménagées pour éveiller la curiosité des plus jeunes (PS, MS) dans un cadre bienveillant.', en: 'Warm and colorful classrooms designed to spark curiosity in our youngest learners (PS, MS) in a nurturing environment.' },
     Icon: Star,
     images: ['/visite/petite_section.jpg', '/visite/petit-section-2.jpg', '/visite/salle_petite%20section.jpg'],
-    tag: 'Maternelle · PS / MS',
+    tag: { fr: 'Maternelle · PS / MS', en: 'Kindergarten · PS / MS' },
   },
   {
     id: 'grande-section',
-    label: 'Grande Section',
-    description: 'Des espaces d\'apprentissage adaptés à la Grande Section, favorisant l\'autonomie et la préparation à l\'entrée au primaire.',
+    label:       { fr: 'Grande Section',          en: 'Senior Kindergarten' },
+    description: { fr: 'Des espaces d\'apprentissage adaptés à la Grande Section, favorisant l\'autonomie et la préparation à l\'entrée au primaire.', en: 'Learning spaces tailored for the Senior Kindergarten level, fostering independence and readiness for primary school.' },
     Icon: BookOpen,
     images: ['/visite/grande_sections.jpg'],
-    tag: 'Maternelle · GS',
+    tag: { fr: 'Maternelle · GS', en: 'Kindergarten · GS' },
   },
   {
     id: 'primaire',
-    label: 'Classes du Primaire',
-    description: 'Des salles de classe équipées et bien aménagées pour accompagner les élèves du CP au CM2 vers l\'excellence académique.',
+    label:       { fr: 'Classes du Primaire',     en: 'Primary Classrooms'  },
+    description: { fr: 'Des salles de classe équipées et bien aménagées pour accompagner les élèves du CP au CM2 vers l\'excellence académique.', en: 'Well-equipped and thoughtfully arranged classrooms guiding students from CP1 to CM2 towards academic excellence.' },
     Icon: PencilLine,
     images: ['/visite/classe-cm1.jpg', '/visite/classe-cm2.jpg'],
-    tag: 'Primaire · CM1 / CM2',
+    tag: { fr: 'Primaire · CM1 / CM2', en: 'Primary · CM1 / CM2' },
   },
   {
     id: 'cantine',
-    label: 'Cantine',
-    description: 'Un espace de restauration lumineux et agréable, conçu pour offrir aux élèves des repas équilibrés dans un cadre convivial.',
+    label:       { fr: 'Cantine',                 en: 'Cafeteria'           },
+    description: { fr: 'Un espace de restauration lumineux et agréable, conçu pour offrir aux élèves des repas équilibrés dans un cadre convivial.', en: 'A bright and welcoming dining space designed to offer students balanced meals in a friendly atmosphere.' },
     Icon: Utensils,
     images: ['/visite/cantine.jpg', '/visite/cantine-2.jpg'],
-    tag: 'Restauration',
+    tag: { fr: 'Restauration', en: 'Dining' },
   },
   {
     id: 'informatique',
-    label: 'Salle Informatique',
-    description: 'Salle équipée de matériel récent pour initier les élèves aux technologies du numérique dès le plus jeune âge.',
+    label:       { fr: 'Salle Informatique',      en: 'Computer Lab'        },
+    description: { fr: 'Salle équipée de matériel récent pour initier les élèves aux technologies du numérique dès le plus jeune âge.', en: 'A room equipped with modern technology to introduce students to digital skills from an early age.' },
     Icon: Monitor,
     images: ['/visite/salle_informatique.jpg'],
-    tag: 'Numérique',
+    tag: { fr: 'Numérique', en: 'Digital' },
   },
   {
     id: 'infirmerie',
-    label: 'Infirmerie',
-    description: 'Suivi médical et bien-être des élèves assurés par un personnel qualifié. Un espace sûr et rassurant pour chaque enfant.',
+    label:       { fr: 'Infirmerie',              en: 'Medical Room'        },
+    description: { fr: 'Suivi médical et bien-être des élèves assurés par un personnel qualifié. Un espace sûr et rassurant pour chaque enfant.', en: 'Medical monitoring and student well-being ensured by qualified staff. A safe and reassuring space for every child.' },
     Icon: HeartPulse,
     images: ['/visite/infimerie.jpg', '/visite/infimerie-2.jpg', '/visite/infimerie-3.jpg'],
-    tag: 'Santé & Bien-être',
+    tag: { fr: 'Santé & Bien-être', en: 'Health & Well-being' },
   },
 ];
 
@@ -84,6 +85,9 @@ const KB = [
 
 /* ─── Main page ───────────────────────────────────────────────────────────────── */
 export const Visite: React.FC = () => {
+  const { lang } = useLang();
+  const fr = lang === 'fr';
+  const L = (o: { fr: string; en: string }) => o[lang as 'fr' | 'en'];
   const [spaceIdx, setSpaceIdx] = useState(0);
   const [imgIdx,   setImgIdx]   = useState(0);
   const [dir,      setDir]      = useState<1 | -1>(1);
@@ -149,13 +153,12 @@ export const Visite: React.FC = () => {
               <Camera size={11} style={{ color: 'rgba(255,255,255,0.28)' }} />
               <span className="text-[8px] font-semibold uppercase tracking-[0.45em]"
                     style={{ color: 'rgba(255,255,255,0.28)' }}>
-                Visite de l'établissement
+                {fr ? 'Visite de l\'établissement' : 'School Tour'}
               </span>
             </div>
             <h1 className="text-white font-extrabold text-2xl lg:text-3xl leading-tight"
                 style={{ letterSpacing: '-0.02em' }}>
-              École en<br />
-              <span style={{ color: ACCENT }}>Images</span>
+              {fr ? <>École en<br /><span style={{ color: ACCENT }}>Images</span></> : <>School in<br /><span style={{ color: ACCENT }}>Pictures</span></>}
             </h1>
             <p className="text-[11px] mt-2" style={{ color: 'rgba(255,255,255,0.25)' }}>
               EPV Horizons Savants · Abidjan
@@ -186,11 +189,11 @@ export const Visite: React.FC = () => {
                   <div className="relative min-w-0">
                     <p className="text-[9px] font-semibold uppercase tracking-[0.22em] leading-none mb-0.5 truncate"
                        style={{ color: active ? ACCENT : 'rgba(255,255,255,0.25)' }}>
-                      {s.tag}
+                      {L(s.tag)}
                     </p>
                     <p className="text-[12px] font-bold leading-tight truncate"
                        style={{ color: active ? '#fff' : 'rgba(255,255,255,0.45)' }}>
-                      {s.label}
+                      {L(s.label)}
                     </p>
                   </div>
                   {s.images.length > 1 && (
@@ -223,23 +226,23 @@ export const Visite: React.FC = () => {
                 </div>
                 <span className="text-[10px] font-semibold uppercase tracking-[0.25em]"
                       style={{ color: ACCENT }}>
-                  {space.tag}
+                  {L(space.tag)}
                 </span>
               </div>
               <h2 className="text-white font-extrabold text-lg mb-2"
                   style={{ letterSpacing: '-0.01em' }}>
-                {space.label}
+                {L(space.label)}
               </h2>
               <p className="text-[12px] leading-[1.75]"
                  style={{ color: 'rgba(255,255,255,0.38)' }}>
-                {space.description}
+                {L(space.description)}
               </p>
 
               {space.images.length > 1 && (
                 <div className="flex items-center gap-2 mt-4">
                   <span className="text-[9px] uppercase tracking-[0.28em]"
                         style={{ color: 'rgba(255,255,255,0.20)' }}>
-                    Photo
+                    {fr ? 'Photo' : 'Photo'}
                   </span>
                   {space.images.map((_, i) => (
                     <button key={i} onClick={() => { setImgDir(i > imgIdx ? 1 : -1); setImgIdx(i); }}
@@ -261,14 +264,14 @@ export const Visite: React.FC = () => {
               whileHover={{ y: -2 }} whileTap={{ scale: 0.92 }}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg cursor-pointer text-[9px] font-semibold uppercase tracking-wider"
               style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.38)' }}>
-              <ChevronLeft size={11} /> Préc.
+              <ChevronLeft size={11} /> {fr ? 'Préc.' : 'Prev.'}
             </motion.button>
             <motion.button
               onClick={() => goSpace((spaceIdx + 1) % SPACES.length, 1)}
               whileHover={{ y: -2 }} whileTap={{ scale: 0.92 }}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg cursor-pointer text-[9px] font-semibold uppercase tracking-wider"
               style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.38)' }}>
-              Suiv. <ChevronRight size={11} />
+              {fr ? 'Suiv.' : 'Next'} <ChevronRight size={11} />
             </motion.button>
           </div>
         </div>
@@ -287,7 +290,7 @@ export const Visite: React.FC = () => {
             >
               <motion.img
                 src={space.images[imgIdx]}
-                alt={`${space.label} — photo ${imgIdx + 1}`}
+                alt={`${L(space.label)} — photo ${imgIdx + 1}`}
                 className="absolute inset-0 w-full h-full object-cover"
                 animate={{ scale: kb.scale as any, x: kb.x as any, y: kb.y as any }}
                 transition={{ duration: 14, ease: 'linear', repeat: Infinity, repeatType: 'reverse' }}
@@ -312,11 +315,11 @@ export const Visite: React.FC = () => {
             >
               <p className="text-[8px] font-semibold uppercase tracking-[0.40em] mb-1"
                  style={{ color: 'rgba(201,168,76,0.85)' }}>
-                {space.tag}
+                {L(space.tag)}
               </p>
               <h3 className="text-white font-extrabold text-2xl lg:text-3xl"
                   style={{ letterSpacing: '-0.02em', textShadow: '0 2px 24px rgba(0,0,0,0.7)' }}>
-                {space.label}
+                {L(space.label)}
               </h3>
             </motion.div>
           </AnimatePresence>

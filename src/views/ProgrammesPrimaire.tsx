@@ -66,8 +66,8 @@ export const ProgrammesPrimaire: React.FC = () => {
             </p>
             <p>
               {fr
-                ? <>Sous la conduite d'un corps professoral d'élite, notre enseignement primaire garantit des classes limitées à <strong>20 élèves maximum</strong>. Cette densité d'élite permet d'allouer à chaque enfant le temps d'assimilation requis, éradiquant l'échec et stimulant le dépassement de soi.</>
-                : <>Under the guidance of a handpicked elite faculty, our primary teaching guarantees classes limited to <strong>20 students maximum</strong>. This elite ratio allows each child the time needed for assimilation, eradicating failure and stimulating self-improvement.</>}
+                ? <>Sous la conduite d'un corps professoral d'élite, notre enseignement primaire garantit des classes limitées à <strong>25 élèves maximum</strong>. Cette densité d'élite permet d'allouer à chaque enfant le temps d'assimilation requis, éradiquant l'échec et stimulant le dépassement de soi.</>
+                : <>Under the guidance of a handpicked elite faculty, our primary teaching guarantees classes limited to <strong>25 students maximum</strong>. This elite ratio allows each child the time needed for assimilation, eradicating failure and stimulating self-improvement.</>}
             </p>
           </section>
 
@@ -158,7 +158,7 @@ export const ProgrammesPrimaire: React.FC = () => {
         {/* Highlights summary banner */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 font-sans text-center select-none border-t border-brand-border/40">
           <div className="pt-4">
-            <strong className="block text-2xl font-extrabold text-brand-blue-medium">20 max</strong>
+            <strong className="block text-2xl font-extrabold text-brand-blue-medium">25 max</strong>
             <span className="text-[10px] text-brand-muted uppercase font-bold tracking-normal block mt-1">{fr ? 'Élèves par classe' : 'Students per class'}</span>
           </div>
           <div className="pt-4">

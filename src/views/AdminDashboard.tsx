@@ -1976,7 +1976,7 @@ function AdminDocuments({ onToast }: { onToast: (m: string) => void }) {
       <CardHeader title="Bibliothèque de documents"
         sub="Documents téléchargeables par les parents dans leur Espace"
         action={
-          <button onClick={() => setForm({ titre: '', fichier: '', url: '', cat: 'Administratif', ordre: docs.length + 1 })}
+          <button onClick={() => setForm({ titre: '', fichier: '', cat: 'Administratif', ordre: docs.length + 1 })}
             className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-slate-900 text-white text-[11px] font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
             <Plus size={12} /> Ajouter
           </button>
@@ -1996,7 +1996,7 @@ function AdminDocuments({ onToast }: { onToast: (m: string) => void }) {
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">URL du fichier PDF (lien Google Drive, Dropbox, etc.)</label>
-                  <input value={form.url || ''} onChange={e => setForm((f: any) => ({...f, url: e.target.value}))}
+                  <input value={form.fichier || ''} onChange={e => setForm((f: any) => ({...f, fichier: e.target.value}))}
                     placeholder="https://drive.google.com/file/d/..."
                     className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
                 </div>
@@ -2049,8 +2049,8 @@ function AdminDocuments({ onToast }: { onToast: (m: string) => void }) {
                   <span className="text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded">{d.cat}</span>
                 </td>
                 <td className="px-4 py-3">
-                  {d.url ? (
-                    <a href={d.url} target="_blank" rel="noreferrer"
+                  {d.fichier ? (
+                    <a href={d.fichier} target="_blank" rel="noreferrer"
                       className="text-blue-600 hover:underline text-[10px] font-mono flex items-center gap-1">
                       <ExternalLink size={11} /> Voir
                     </a>

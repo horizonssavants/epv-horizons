@@ -5,7 +5,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, MotionValue, useMotionValue, useSpring, useTransform } from 'motion/react';
-import { StatCounter } from '../components/ui/StatCounter.tsx';
 import { PhotoGallery } from '../components/ui/PhotoGallery.tsx';
 import { Button } from '../components/ui/Button.tsx';
 import { ShieldAlert, BookOpen, Quote, ChevronRight, UserCheck, GraduationCap, Award, ArrowRight, Star, Calendar } from 'lucide-react';
@@ -24,7 +23,7 @@ const CARD_STRIDE = CARD_W + CARD_GAP; // 299px par slot
 const TESTIMONIALS = [
   { id: 1, parent: "Mme Carine Kouamé",     role: "Mère d'Ariel · Grande Section",       initials: "CK", color: "from-blue-500 to-blue-700",      quote: "Une école d'excellence d'une qualité rare en Côte d'Ivoire. L'accent mis sur le bilinguisme dès la maternelle est un vrai atout d'avenir.", stars: 5 },
   { id: 2, parent: "M. Ibrahim Touré",       role: "Père de Maya · CP",                   initials: "IT", color: "from-emerald-500 to-green-700",   quote: "Un encadrement bienveillant qui ne sacrifie pas la rigueur académique. EPV Horizons Savants réunit le meilleur des deux mondes.", stars: 5 },
-  { id: 3, parent: "Dr. Sandrine N'Guessan", role: "Mère de Marc-Aurèle · Petite Section",initials: "SN", color: "from-violet-500 to-purple-700",   quote: "Les effectifs limités à 15 élèves par classe garantissent une attention personnalisée quotidienne. Je suis extrêmement sereine pour la rentrée 2026.", stars: 5 },
+  { id: 3, parent: "Dr. Sandrine N'Guessan", role: "Mère de Marc-Aurèle · Petite Section",initials: "SN", color: "from-violet-500 to-purple-700",   quote: "Les effectifs limités à 25 élèves par classe garantissent une attention personnalisée quotidienne. Je suis extrêmement sereine pour la rentrée 2026.", stars: 5 },
   { id: 4, parent: "M. Kofi Asante",         role: "Père de Léa · CE1",                   initials: "KA", color: "from-amber-500 to-orange-600",    quote: "L'approche bilingue est remarquable. Ma fille parle anglais couramment après un an seulement. Une équipe pédagogique exceptionnelle.", stars: 5 },
   { id: 5, parent: "Mme Fatoumata Diallo",   role: "Mère de Kévin · CM1",                 initials: "FD", color: "from-rose-500 to-pink-700",       quote: "Le suivi personnalisé et les projets scientifiques ont éveillé chez mon fils une vraie passion pour les mathématiques. Bravo !", stars: 5 },
   { id: 6, parent: "M. Jean-Claude Bamba",   role: "Père d'Amara · Moyenne Section",      initials: "JB", color: "from-teal-500 to-cyan-700",       quote: "L'environnement sécurisé, les petits effectifs, la pédagogie active... EPV Horizons Savants est exactement l'école que je cherchais.", stars: 5 },
@@ -228,7 +227,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
     'EPV Horizons Savants',
     'Bingerville · Abidjan',
     'Maternelle & Primaire',
-    '15 élèves max / classe',
+    '25 élèves max / classe',
     'Programme Bilingue FR/EN',
   ] : [
     'Enrollments Open',
@@ -236,7 +235,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
     'EPV Horizons Savants',
     'Bingerville · Abidjan',
     'Kindergarten & Primary',
-    '15 students max / class',
+    '25 students max / class',
     'Bilingual Program FR/EN',
   ];
 
@@ -259,7 +258,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
       </div>
 
       {/* 1. HERO SECTION */}
-      <section className="relative overflow-hidden min-h-[92vh] flex flex-col lg:flex-row">
+      <section className="relative overflow-hidden min-h-[78vh] sm:min-h-[85vh] lg:min-h-[92vh] flex flex-col lg:flex-row">
         {/* Image de fond plein écran */}
         <img
           src="/img/classe.jpg" alt=""
@@ -272,10 +271,10 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
              style={{ background: 'linear-gradient(to right, #06192e 0%, #0D2E5C 30%, rgba(8,24,56,0.88) 48%, rgba(8,24,56,0.50) 65%, rgba(8,24,56,0.18) 82%, transparent 100%)' }} />
         {/* ══ Panneau GAUCHE ══ */}
         <div
-          className="relative z-10 flex flex-col justify-start lg:justify-center
+          className="relative z-10 flex flex-col justify-center
                      w-full lg:w-[60%]
                      pl-6 pr-4 sm:pl-10 lg:pl-12 xl:pl-16
-                     pt-10 pb-10 lg:py-0 min-h-[92vh]"
+                     pt-10 pb-10 lg:py-0 min-h-[78vh] sm:min-h-[85vh] lg:min-h-[92vh]"
         >
           {/* Lueur ambiante subtile */}
           <div className="absolute inset-0 pattern-sunburst opacity-[0.04] pointer-events-none" />
@@ -403,7 +402,6 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             >
               {t('hero.h1a', lang)}
               <span className="text-brand-gold block mt-0.5">{t('hero.h1b', lang)}</span>
-              <span className="text-white/82">{t('hero.h1c', lang)}</span>
             </h1>
 
             {/* Mot rotatif */}
@@ -428,53 +426,39 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             <div className="hero-fade-in h-[3px] w-10 bg-brand-gold rounded-full mt-3 mb-3"
                  style={{ animationDelay: '220ms' }} />
 
-            {/* Boutons compacts */}
-            <div className="hero-fade-in mt-4 flex flex-wrap items-stretch gap-2"
+            {/* Boutons */}
+            <div className="hero-fade-in mt-7 flex flex-wrap items-stretch gap-3 sm:gap-4"
                  style={{ animationDelay: '350ms' }}>
               <Button
                 variant="cta"
-                className="px-4 py-2 text-[11px] font-bold tracking-wide flex-1 sm:flex-none
+                className="px-6 py-3 text-xs font-bold tracking-wide flex-1 sm:flex-none
                            shadow-[0_5px_18px_rgba(245,166,35,0.35)]
                            hover:shadow-[0_8px_26px_rgba(245,166,35,0.50)]"
                 onClick={handleCTA}
               >
-                <GraduationCap size={13} className="shrink-0" />
+                <GraduationCap size={14} className="shrink-0" />
                 {t('hero.btn.preinsc', lang)}
               </Button>
               <Button
                 variant="secondary"
-                className="px-4 py-2 text-[11px] font-semibold flex-1 sm:flex-none
+                className="px-6 py-3 text-xs font-semibold flex-1 sm:flex-none
                            bg-white/6 text-white border-white/18
                            hover:bg-white/12 hover:border-white/35"
                 onClick={handleRdv}
               >
-                <Calendar size={13} className="shrink-0" />
+                <Calendar size={14} className="shrink-0" />
                 {t('hero.btn.rdv', lang)}
               </Button>
               <Button
                 variant="secondary"
-                className="px-4 py-2 text-[11px] font-semibold w-full sm:w-auto
+                className="px-6 py-3 text-xs font-semibold w-full sm:w-auto
                            bg-white/6 text-white border-white/18
                            hover:bg-white/12 hover:border-white/35"
                 onClick={() => { onNavigate("#/programmes"); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               >
-                <BookOpen size={13} className="shrink-0" />
+                <BookOpen size={14} className="shrink-0" />
                 {t('hero.btn.prog', lang)}
               </Button>
-            </div>
-
-            {/* Social proof */}
-            <div className="hero-fade-in mt-4 flex flex-wrap items-center gap-x-3 gap-y-1
-                            text-white/30 text-[10px] font-sans uppercase tracking-wider"
-                 style={{ animationDelay: '440ms' }}>
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse shrink-0" />
-                {t('hero.proof1', lang)}
-              </span>
-              <span className="text-white/15">·</span>
-              <span>{t('hero.proof2', lang)}</span>
-              <span className="text-white/15">·</span>
-              <span>{t('hero.proof3', lang)}</span>
             </div>
           </div>
         </div>
@@ -526,58 +510,6 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           </div>
         </div>
       </section>
-
-      {/* ══ 2. FLOATING ISLAND · Stats glassmorphism ══ */}
-      <div className="-mt-10 relative z-20 px-4 md:px-8 pb-0">
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="bg-white/92 backdrop-blur-2xl rounded-sm
-                       shadow-[0_4px_20px_rgba(13,46,92,0.12),0_1px_4px_rgba(13,46,92,0.06)]
-                       border border-white/55 px-2 md:px-5 py-1"
-          >
-            <div className="grid grid-cols-3 divide-x divide-brand-border/25">
-              {[
-                { icon: <GraduationCap size={11} className="text-brand-blue-deep md:hidden" />,
-                  iconLg: <GraduationCap size={14} className="text-brand-blue-deep hidden md:block" />,
-                  bg: 'from-blue-100 to-blue-50',
-                  value: 15,  suffix: lang === 'fr' ? ' élèves' : ' students',
-                  title: lang === 'fr' ? 'Effectifs maîtrisés' : 'Class sizes' },
-                { icon: <Star size={11} className="text-amber-600 md:hidden" />,
-                  iconLg: <Star size={14} className="text-amber-600 hidden md:block" />,
-                  bg: 'from-yellow-100 to-amber-50',
-                  value: 100, suffix: '%',
-                  title: lang === 'fr' ? 'Profs certifiés' : 'Certified' },
-                { icon: <Translate size={11} className="text-emerald-700 md:hidden" />,
-                  iconLg: <Translate size={14} className="text-emerald-700 hidden md:block" />,
-                  bg: 'from-green-100 to-emerald-50',
-                  value: 100, suffix: lang === 'fr' ? '% bilingue' : '% bilingual',
-                  title: lang === 'fr' ? 'Bilingue' : 'Bilingual' },
-              ].map((s, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, scale: 0.88 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.13, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                  className="flex items-center gap-1.5 md:gap-3 px-2 md:px-5 py-1.5 md:py-2"
-                >
-                  <div className={`w-5 h-5 md:w-7 md:h-7 rounded bg-gradient-to-br ${s.bg} flex items-center justify-center shrink-0`}>
-                    {s.icon}{s.iconLg}
-                  </div>
-                  <div className="text-left min-w-0">
-                    <StatCounter targetValue={s.value} suffix={s.suffix} sizeClass="text-sm md:text-lg" />
-                    <span className="font-sans font-bold text-[7px] md:text-[9px] text-brand-blue-deep uppercase tracking-wide block leading-tight truncate">{s.title}</span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </div>
 
       {/* ══ 3. PILIERS · Staggered Layout + Framer Motion ══ */}
       <section className="pt-24 pb-40 px-4 md:px-8 relative overflow-hidden"
@@ -777,14 +709,12 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               <div className="h-px w-12 bg-brand-gold/45 mb-7" />
               <p className="text-white/65 font-serif leading-relaxed mb-5 text-sm">
                 {lang === 'fr'
-                  ? "Pour nous, « Horizons Savants » signifie repousser les frontières classiques d'apprentissage. Notre complexe à Cocody offre plus qu'une simple éducation de base."
-                  : 'For us, "Horizons Savants" means pushing beyond the classic boundaries of learning. Our Cocody campus offers more than a basic education.'}
+                  ? "Pour nous, « Horizons Savants » signifie repousser les frontières classiques d'apprentissage. Notre complexe à Bingerville offre plus qu'une simple éducation de base."
+                  : 'For us, "Horizons Savants" means pushing beyond the classic boundaries of learning. Our Bingerville campus offers more than a basic education.'}
               </p>
-              <blockquote className="border-l-2 border-brand-gold pl-5 font-serif italic text-white/50 mb-8 text-sm">
-                {lang === 'fr'
-                  ? '"L\'éducation ne consiste pas à remplir un vase, mais à allumer un feu d\'excellence pour l\'avenir."'
-                  : '"Education is not the filling of a vessel, but the lighting of a fire of excellence for the future."'}
-              </blockquote>
+              <p className="border-l-2 border-brand-gold pl-5 font-sans font-bold uppercase tracking-widest text-brand-gold/80 mb-8 text-xs">
+                NOUS FAISONS DES SACHANTS DE DEMAIN
+              </p>
               <button
                 onClick={() => { onNavigate('#/ecole'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 className="inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-brand-gold hover:text-brand-gold-light transition-colors group"
@@ -803,7 +733,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         <div className="max-w-6xl mx-auto">
           <Reveal animation="bounceInUp" className="text-center mb-14">
             <span className="block text-[10px] font-bold uppercase tracking-[0.35em] text-brand-gold mb-5">
-              {lang === 'fr' ? 'Notre Campus à Cocody, Abidjan' : 'Our Campus in Cocody, Abidjan'}
+              {lang === 'fr' ? 'Notre Campus à Bingerville, Abidjan' : 'Our Campus in Bingerville, Abidjan'}
             </span>
             <h2 className="font-sans font-black text-brand-blue-deep uppercase tracking-[0.08em] leading-tight" style={{fontSize:"clamp(1.6rem,4vw,3rem)"}}>
               {lang === 'fr' ? 'Notre' : 'Our'}{' '}

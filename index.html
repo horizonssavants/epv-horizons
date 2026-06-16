@@ -1,21 +1,93 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EPV Horizons Savants — École Maternelle & Primaire d'Excellence Abidjan</title>
 
-    <!-- Favicon & App icons -->
+    <!-- ── Titre & Description ────────────────────────────────── -->
+    <title>EPV Horizons Savants École Maternelle & Primaire d'Excellence à Abidjan</title>
+    <meta name="description" content="EPV Horizons Savants Nous faisons des sachants de demain. École maternelle &amp; primaire d'excellence à Bingerville, Abidjan. 25 élèves max/classe. Inscriptions ouvertes rentrée septembre 2026. PS, MS, GS, CP au CM2." />
+    <meta name="keywords" content="école primaire Abidjan, école maternelle Abidjan, école bilingue Abidjan, école privée Bingerville, EPV Horizons Savants, inscription scolaire Abidjan 2026, école excellence Côte d'Ivoire, primaire bilingue Abidjan" />
+    <meta name="author" content="EPV Horizons Savants" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://www.horizonssavants.com/" />
+
+    <!-- ── Favicon & App icons ────────────────────────────────── -->
     <link rel="icon" type="image/jpeg" href="/img/logo.jpg" />
     <link rel="shortcut icon" type="image/jpeg" href="/img/logo.jpg" />
     <link rel="apple-touch-icon" href="/img/logo.jpg" />
 
-    <!-- SEO / Open Graph -->
-    <meta name="description" content="EPV Horizons Savants — École maternelle et primaire privée bilingue d'excellence à Abidjan, Côte d'Ivoire." />
-    <meta property="og:title" content="EPV Horizons Savants" />
-    <meta property="og:description" content="École maternelle & primaire d'excellence bilingue à Abidjan." />
-    <meta property="og:image" content="/img/logo.jpg" />
+    <!-- ── Open Graph (Facebook, WhatsApp, LinkedIn) ─────────── -->
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.horizonssavants.com/" />
+    <meta property="og:title" content="EPV Horizons Savants École d'Excellence à Abidjan" />
+    <meta property="og:description" content="Nous faisons des sachants de demain. École maternelle &amp; primaire d'excellence à Bingerville, Abidjan. Inscriptions ouvertes rentrée septembre 2026." />
+    <meta property="og:image" content="https://www.horizonssavants.com/img/logo.jpg" />
+    <meta property="og:image:width" content="800" />
+    <meta property="og:image:height" content="800" />
+    <meta property="og:locale" content="fr_CI" />
+    <meta property="og:site_name" content="EPV Horizons Savants" />
+
+    <!-- ── Twitter Card ───────────────────────────────────────── -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="EPV Horizons Savants École d'Excellence à Abidjan" />
+    <meta name="twitter:description" content="Nous faisons des sachants de demain. École d'excellence à Bingerville, Abidjan. Inscriptions ouvertes 2026." />
+    <meta name="twitter:image" content="https://www.horizonssavants.com/img/logo.jpg" />
+
+    <!-- ── Données structurées JSON-LD (Google) ───────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "School",
+      "name": "EPV Horizons Savants",
+      "alternateName": "École Primaire et Maternelle Horizons Savants",
+      "slogan": "Nous faisons des sachants de demain",
+      "url": "https://www.horizonssavants.com",
+      "logo": "https://www.horizonssavants.com/img/logo.jpg",
+      "image": "https://www.horizonssavants.com/img/logo.jpg",
+      "description": "École maternelle et primaire privée d'excellence à Bingerville, Abidjan (Côte d'Ivoire). Nous faisons des sachants de demain. Sections PS, MS, GS, CP1, CP2, CE1, CE2, CM1, CM2. Effectifs limités à 25 élèves par classe.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Bingerville, Ave Konan Kouassi Lambert 38",
+        "addressLocality": "Abidjan",
+        "addressCountry": "CI"
+      },
+      "telephone": ["+2250778981456", "+2250585415151"],
+      "email": "contact@horizonssavants.com",
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday","Tuesday","Thursday","Friday"],
+          "opens": "07:45",
+          "closes": "16:00"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Wednesday"],
+          "opens": "08:00",
+          "closes": "12:30"
+        }
+      ],
+      "educationalCredentialAwarded": "Certificat d'Études Primaires (CEP)",
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Niveaux scolaires",
+        "itemListElement": [
+          { "@type": "Course", "name": "Petite Section (PS)", "description": "Maternelle 3-4 ans" },
+          { "@type": "Course", "name": "Moyenne Section (MS)", "description": "Maternelle 4-5 ans" },
+          { "@type": "Course", "name": "Grande Section (GS)", "description": "Maternelle 5-6 ans" },
+          { "@type": "Course", "name": "CP1 — CPI", "description": "Primaire 6-7 ans" },
+          { "@type": "Course", "name": "CP2 — CPII", "description": "Primaire 7-8 ans" },
+          { "@type": "Course", "name": "CE1", "description": "Primaire 8-9 ans" },
+          { "@type": "Course", "name": "CE2", "description": "Primaire 9-10 ans" },
+          { "@type": "Course", "name": "CM1", "description": "Primaire 10-11 ans" },
+          { "@type": "Course", "name": "CM2", "description": "Primaire 11-12 ans" }
+        ]
+      },
+      "sameAs": []
+    }
+    </script>
+
     <!-- Polyfill crypto.randomUUID — requis par Neon Auth en HTTP (réseau local) -->
     <script>
       if (window.crypto && typeof window.crypto.randomUUID !== 'function') {
@@ -35,4 +107,3 @@
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

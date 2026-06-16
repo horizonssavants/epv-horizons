@@ -535,7 +535,7 @@ function ParcoursTab({ session, devoirs, setDevoirs, notes, absences, bilinguism
                     <td style="text-align:center">${n.t1}</td><td style="text-align:center">${n.t2 ?? '—'}</td>
                     <td style="text-align:center;color:${(n.t2||n.t1)>=n.t1?'green':'red'}">${n.t2?(n.t2-n.t1>0?'+':''+(n.t2-n.t1).toFixed(1)):''}</td></tr>`).join('')}
                     </table>
-                    <div class="footer">EPV Horizons Savants · Bingerville Mtn Kro, Abidjan · Imprimé le ${new Date().toLocaleDateString('fr-FR')}</div>
+                    <div class="footer">EPV Horizons Savants ·Bingerville, Ave Konan Kouassi Lambert 38, Abidjan · Imprimé le ${new Date().toLocaleDateString('fr-FR')}</div>
                     <br><button onclick="window.print()" style="padding:10px 20px;background:#0D2E5C;color:white;border:none;border-radius:6px;cursor:pointer;font-size:14px">Imprimer</button>
                     </body></html>`);
                     w.document.close();
@@ -1144,8 +1144,8 @@ function FinancesTab({ session, appointments, paiements, reduction, tarifs, onRd
                       <div key={doc.id} className="flex items-center gap-4 px-5 py-3.5">
                         <FileText size={15} className="text-slate-300 shrink-0" />
                         <p className="flex-1 text-xs font-medium text-slate-700">{doc.titre}</p>
-                        {doc.url ? (
-                          <a href={doc.url} target="_blank" rel="noopener noreferrer"
+                        {doc.fichier ? (
+                          <a href={doc.fichier} target="_blank" rel="noopener noreferrer"
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-200 text-slate-600 text-[10px] font-semibold hover:bg-slate-50 transition-colors">
                             <Download size={11} /> PDF
                           </a>
@@ -1704,55 +1704,40 @@ function ProfilTab({ session, sante, onSessionUpdate }: {
             <div className="space-y-4">
               <Card className="p-6">
                 <div className="flex items-center gap-3 mb-5">
-                  <Lock size={15} className="text-slate-400" />
+                  <Smartphone size={15} className="text-slate-400" />
                   <div>
-                    <p className="text-sm font-semibold text-slate-800">Changer le mot de passe</p>
-                    <p className="text-xs text-slate-400 mt-0.5">Sécurisez votre accès avec un nouveau mot de passe fort</p>
+                    <p className="text-sm font-semibold text-slate-800">Connexion sécurisée par OTP</p>
+                    <p className="text-xs text-slate-400 mt-0.5">Votre accès est protégé par un code à usage unique envoyé sur WhatsApp</p>
                   </div>
                 </div>
-
-                {pwdMsg && (
-                  <div className={`mb-4 px-4 py-2.5 rounded-lg text-xs font-semibold ${pwdMsg.type === 'ok' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'}`}>
-                    {pwdMsg.text}
-                  </div>
-                )}
-
-                <div className="space-y-4 max-w-sm">
-                  {([
-                    { key: 'old',     label: 'Mot de passe actuel (ou numéro de téléphone)' },
-                    { key: 'new',     label: 'Nouveau mot de passe (min. 6 caractères)'     },
-                    { key: 'confirm', label: 'Confirmer le nouveau mot de passe'            },
-                  ] as const).map(f => (
-                    <div key={f.key} className="space-y-1.5">
-                      <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">{f.label}</label>
-                      <div className="relative">
-                        <input
-                          type={show[f.key] ? 'text' : 'password'}
-                          value={pwd[f.key]}
-                          onChange={e => setPwd(prev => ({ ...prev, [f.key]: e.target.value }))}
-                          className="w-full border border-slate-200 rounded-md px-3 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-[#0D2E5C] transition-colors pr-10"
-                        />
-                        <button type="button" onClick={() => setShow(prev => ({ ...prev, [f.key]: !prev[f.key] }))}
-                          className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 cursor-pointer">
-                          {show[f.key] ? <EyeOff size={15} /> : <Eye size={15} />}
-                        </button>
-                      </div>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
+                    <CheckCircle size={14} className="text-emerald-500 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs font-semibold text-slate-700">Numéro WhatsApp enregistré</p>
+                      <p className="text-xs text-slate-500 mt-0.5">{session.telephone}</p>
                     </div>
-                  ))}
-                  <button onClick={handleChangePwd} disabled={pwdLoad}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors mt-2 disabled:opacity-50">
-                    {pwdLoad
-                      ? <><div className="w-3 h-3 rounded-full border-2 border-white/40 border-t-white animate-spin" /> Changement…</>
-                      : <><Shield size={13} /> Mettre à jour le mot de passe</>}
-                  </button>
+                  </div>
+                  <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
+                    <CheckCircle size={14} className="text-emerald-500 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs font-semibold text-slate-700">Authentification à deux facteurs active</p>
+                      <p className="text-xs text-slate-500 mt-0.5">Chaque connexion génère un code unique valable 10 minutes</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-lg border border-amber-100">
+                    <Info size={14} className="text-amber-500 shrink-0 mt-0.5" />
+                    <p className="text-xs text-amber-700 leading-relaxed">
+                      Pour modifier votre numéro WhatsApp, contactez directement l'administration de l'école.
+                    </p>
+                  </div>
                 </div>
               </Card>
-
               <Card className="p-5">
                 <div className="flex items-center gap-2.5">
-                  <Info size={14} className="text-slate-400 shrink-0" />
+                  <Clock size={14} className="text-slate-400 shrink-0" />
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Dernière connexion : aujourd'hui à {new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}. Si vous ne reconnaissez pas cette activité, changez immédiatement votre mot de passe.
+                    Dernière connexion : aujourd'hui à {new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}.
                   </p>
                 </div>
               </Card>
@@ -2141,7 +2126,7 @@ export const EspaceParent: React.FC = () => {
     load(`/api/devoirs?prospectId=${pid}`,       setDevoirs);
     load('/api/cantine',                          setCantine);
     load('/api/evenements',                       setEvenements);
-    load(`/api/notes?prospectId=${pid}`,          setNotes);
+    load(`/api/parent/notes?prospectId=${pid}`,    setNotes);
     load(`/api/assiduite?prospectId=${pid}`,      setAbsences);
     load(`/api/messages?prospectId=${pid}`,       setMessages);
     load('/api/transport',                        setTransport);

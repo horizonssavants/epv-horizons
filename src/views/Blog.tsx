@@ -91,9 +91,6 @@ export const Blog: React.FC = () => {
           <p>
             À <strong>EPV Horizons Savants</strong>, nous avons structuré une immersion double Français/Anglais dès la Petite Section d'Maternelle. En intégrant l'anglais à travers les jeux d'éveil, les chants d'apprentissage, et les récits de contes quotidiens, l'enfant s'approprie le vocabulaire sans barrière psychologique.
           </p>
-          <blockquote className="border-l-4 border-brand-gold pl-4 italic text-brand-blue-medium py-1">
-            "Le bilinguisme précoce ne surcharge pas le cerveau de l'élève ; au contraire, il le dote de meilleures facultés de mémorisation et de résolution logique de problèmes."
-          </blockquote>
           <p>
             Ce biculturalisme linguistique forme le socle essentiel pour faire fleurir les compétences intellectuelles indispensables aux citoyens globaux d'Abidjan pour relever les défis de demain.
           </p>
@@ -136,7 +133,7 @@ export const Blog: React.FC = () => {
     },
     {
       id: "camp-3",
-      title: "Inauguration de notre campus vert d'Excellence à Cocody Riviera M'Pouto",
+      title: "Inauguration de notre campus vert d'Excellence à Bingerville",
       summary: "Qu'est-ce qui fait d'EPV Horizons Savants le cadre propice et sécurisé par excellence pour le développement de vos enfants.",
       date: "12 Avril 2026",
       readTime: "3 min",
@@ -149,7 +146,7 @@ export const Blog: React.FC = () => {
             L'environnement physique dans lequel un enfant passe ses journées d'école agit directement sur son niveau de sérénité émotionnelle et sa concentration intellectuelle. C'est pourquoi l'architecture de notre complexe d'EPV Horizons Savants a fait l'objet d'un soin draconien.
           </p>
           <p>
-            Implanté au sein d'une zone résidentielle privilégiée de <strong>Cocody Riviera M'Pouto</strong>, notre école moderne fait cohabiter la technologie d'orientation (salles entièrement climatisées, filtres à air aérés, tablettes multimédias d'éveil) avec la beauté tranquille de la nature.
+            Implanté au sein d'une zone résidentielle privilégiée de <strong>Bingerville, Ave Konan Kouassi Lambert 38</strong>, notre école moderne fait cohabiter la technologie d'orientation (salles entièrement climatisées, filtres à air aérés, tablettes multimédias d'éveil) avec la beauté tranquille de la nature.
           </p>
           <ul className="list-disc pl-5 space-y-1 text-xs">
             <li>Jardin pédagogique écologique autonome de fleurs locales</li>
@@ -178,7 +175,7 @@ export const Blog: React.FC = () => {
             EPV Horizons Savants n'est pas simplement une école de plus à Abidjan ; c'est le fruit d'une ambition familiale et collective de parents et d'éducateurs chevronnés. Témoins des mutations globales de l'éducation, nos fondateurs ont souhaité créer un pont solide entre le programme d'enseignement rigoureux ivoirien et les pédagogies d'avant-garde mondiales.
           </p>
           <p>
-            Notre postulat d'origine est simple : tout enfant recèle un potentiel d'excellence. Le rôle de l'école est d'aménager un terreau fertilisé pour qu'il s'éveille sans frustration. Qu'il s'agisse de la structure de nos classes limitées à <strong>15 élèves au maximum</strong>, de l'immersion complète ou du recrutement de nos enseignants d'élite, chaque détail concourt à cette promesse.
+            Notre postulat d'origine est simple : tout enfant recèle un potentiel d'excellence. Le rôle de l'école est d'aménager un terreau fertilisé pour qu'il s'éveille sans frustration. Qu'il s'agisse de la structure de nos classes limitées à <strong>25 élèves au maximum</strong>, de l'immersion complète ou du recrutement de nos enseignants d'élite, chaque détail concourt à cette promesse.
           </p>
           <p className="font-bold text-[#0D2E5C]">
             « Nous croyons en une école de la bienveillance stimulante, où l'exigence académique s'accomplit dans la joie d'apprendre au quotidien. »

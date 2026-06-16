@@ -9,7 +9,7 @@ import { useLang } from '../lib/LanguageContext.tsx';
 import { Card } from '../components/ui/Card.tsx';
 import { Button } from '../components/ui/Button.tsx';
 import { Toast } from '../components/ui/Toast.tsx';
-import { Award, Heart, Users, MapPin, Clock, ShieldAlert, Download, Sparkles } from 'lucide-react';
+import { Award, Heart, Users, Clock, ShieldAlert, Download, Sparkles } from 'lucide-react';
 import { Buildings, Translate } from '@phosphor-icons/react';
 
 const containerVariants = {
@@ -57,7 +57,7 @@ export const Ecole: React.FC = () => {
       bio: fr
         ? "Normalienne diplômée de l'ENS Abidjan avec 18 ans d'expertises de direction en écoles privées d'excellence. Convaincue qu'une saine discipline scolaire alliée à un accompagnement profondément bienveillant de l'élève dessine la trajectoire de l'élite de demain."
         : "Graduate of ENS Abidjan with 18 years of leadership experience in elite private schools. Convinced that sound academic discipline combined with deeply caring student support shapes the path to tomorrow's leaders.",
-      img: "/api/img-proxy?url=https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80"
+      initials: "CK"
     },
     {
       name: "Dr. Marc-André Kouyo",
@@ -65,7 +65,7 @@ export const Ecole: React.FC = () => {
       bio: fr
         ? "Docteur en Sciences de l'Éducation de l'Université de Lille, ex-conseiller de programmes linguistiques bilingues pour l'Afrique de l'Ouest. Il anime le perfectionnement de notre pédagogie active bilingue."
         : "Doctor in Education Sciences from the University of Lille, former bilingual language program advisor for West Africa. He drives the continuous improvement of our bilingual active pedagogy.",
-      img: "/api/img-proxy?url=https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80"
+      initials: "MK"
     }
   ];
 
@@ -87,8 +87,8 @@ export const Ecole: React.FC = () => {
     {
       title: fr ? "Infrastructures d'Élite" : "Elite Facilities",
       desc: fr
-        ? "Un campus moderne climatisé de Cocody, sécurisé, à effectif verrouillé, avec un jardin écologique d'orientation d'apprentissage."
-        : "A modern air-conditioned campus in Cocody, secured with strict enrollment caps and a guided ecological learning garden.",
+        ? "Un campus moderne climatisé à Bingerville, sécurisé, à effectif verrouillé, avec un jardin écologique d'orientation d'apprentissage."
+        : "A modern air-conditioned campus in Bingerville, secured with strict enrollment caps and a guided ecological learning garden.",
       icon: <Buildings className="text-brand-green" size={22} />
     },
     {
@@ -167,16 +167,12 @@ export const Ecole: React.FC = () => {
                 <div className="relative">
                   {/* Organic blob shape */}
                   <div
-                    className="w-64 h-72 md:w-72 md:h-80 overflow-hidden shadow-[0_8px_40px_rgba(13,46,92,0.18)]"
+                    className="w-64 h-72 md:w-72 md:h-80 overflow-hidden shadow-[0_8px_40px_rgba(13,46,92,0.18)] bg-gradient-to-br from-[#0D2E5C] to-[#1A4F8B] flex items-center justify-center"
                     style={{ borderRadius: '40% 60% 60% 40% / 40% 40% 60% 60%' }}
                   >
-                    <img
-                      src={leadershipTeam[0].img}
-                      alt="Clarisse Touré Koffi"
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover object-center"
-                      loading="lazy"
-                    />
+                    <span className="font-sans font-extrabold text-6xl text-white select-none">
+                      {leadershipTeam[0].initials}
+                    </span>
                   </div>
                   <p className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[#0D2E5C] font-sans font-bold text-[10px] uppercase tracking-widest whitespace-nowrap">
                     {fr ? 'Fondatrice & Directrice' : 'Founder & Principal'}
@@ -191,33 +187,29 @@ export const Ecole: React.FC = () => {
                 </span>
 
                 {/* Citation principale */}
-                <blockquote className="relative pl-6 border-l-4 border-[#F5A623]">
-                  <span className="absolute -top-4 -left-2 font-serif text-7xl text-[#F5A623]/30 leading-none select-none">"</span>
-                  <p className="font-serif italic text-xl md:text-2xl text-[#0D2E5C] leading-snug font-semibold">
-                    {fr ? "Ouvrir un livre, c'est ouvrir un horizon pour la vie." : 'Opening a book is opening a horizon for life.'}
-                  </p>
-                  <span className="absolute -bottom-8 right-0 font-serif text-7xl text-[#F5A623]/30 leading-none select-none">"</span>
-                </blockquote>
+                <p className="pl-6 border-l-4 border-[#F5A623] font-sans font-extrabold uppercase tracking-widest text-xl md:text-2xl text-[#0D2E5C] leading-snug">
+                  NOUS FAISONS DES SACHANTS DE DEMAIN
+                </p>
 
                 <div className="space-y-4 font-serif text-brand-muted leading-relaxed text-sm pt-4">
                   {fr ? (
                     <>
                       <p>
                         <span className="float-left font-serif font-bold text-5xl text-[#0D2E5C] leading-[0.8] mr-2 mt-1">C</span>
-                        her parent d'excellence d'Abidjan, l'ouverture d'<strong className="text-[#0D2E5C] font-sans">EPV Horizons Savants</strong> pour Septembre 2026 à Cocody Riviera M'Pouto représente l'aboutissement d'un long rêve pédagogique. Notre ambition n'est pas uniquement de dispenser des enseignements d'élite conformes aux examens nationaux, mais de guider des enfants à devenir autonomes, bilingues, curieux et engagés socialement.
+                        her parent d'excellence d'Abidjan, l'ouverture d'<strong className="text-[#0D2E5C] font-sans">EPV Horizons Savants</strong> pour Septembre 2026 à Bingerville, Ave Konan Kouassi Lambert 38 représente l'aboutissement d'un long rêve pédagogique. Notre ambition n'est pas uniquement de dispenser des enseignements d'élite conformes aux examens nationaux, mais de guider des enfants à devenir autonomes, bilingues, curieux et engagés socialement.
                       </p>
                       <p>
-                        En limitant nos effectifs scolaires à <strong className="text-[#0D2E5C] font-sans">15 élèves maximum en maternelle</strong>, nous offrons une attention individualisée de tous les instants. Notre école est un havre d'épanouissement vert et climatisé, hautement surveillé, où le plaisir d'apprendre côtoie la rigueur scientifique et linguistique d'Abidjan.
+                        En limitant nos effectifs scolaires à <strong className="text-[#0D2E5C] font-sans">25 élèves maximum en maternelle</strong>, nous offrons une attention individualisée de tous les instants. Notre école est un havre d'épanouissement vert et climatisé, hautement surveillé, où le plaisir d'apprendre côtoie la rigueur scientifique et linguistique d'Abidjan.
                       </p>
                     </>
                   ) : (
                     <>
                       <p>
                         <span className="float-left font-serif font-bold text-5xl text-[#0D2E5C] leading-[0.8] mr-2 mt-1">D</span>
-                        ear excellence-minded parent, the opening of <strong className="text-[#0D2E5C] font-sans">EPV Horizons Savants</strong> for September 2026 at Cocody Riviera M'Pouto is the culmination of a long pedagogical dream. Our ambition is not simply to deliver elite teaching aligned with national exams, but to guide children toward becoming autonomous, bilingual, curious, and socially engaged individuals.
+                        ear excellence-minded parent, the opening of <strong className="text-[#0D2E5C] font-sans">EPV Horizons Savants</strong> for September 2026 at Bingerville, Ave Konan Kouassi Lambert 38 is the culmination of a long pedagogical dream. Our ambition is not simply to deliver elite teaching aligned with national exams, but to guide children toward becoming autonomous, bilingual, curious, and socially engaged individuals.
                       </p>
                       <p>
-                        By limiting our class sizes to <strong className="text-[#0D2E5C] font-sans">a maximum of 15 students in kindergarten</strong>, we provide personalized attention at every moment. Our school is a green, air-conditioned haven under high surveillance, where the joy of learning meets scientific and linguistic rigor in Abidjan.
+                        By limiting our class sizes to <strong className="text-[#0D2E5C] font-sans">a maximum of 25 students in kindergarten</strong>, we provide personalized attention at every moment. Our school is a green, air-conditioned haven under high surveillance, where the joy of learning meets scientific and linguistic rigor in Abidjan.
                       </p>
                     </>
                   )}
@@ -300,16 +292,12 @@ export const Ecole: React.FC = () => {
             {leadershipTeam.map((member, idx) => (
               <motion.div key={idx} variants={itemVariants}>
                 <div className="rounded-3xl shadow-[0_4px_30px_rgba(13,46,92,0.08)] bg-white p-6 md:p-8 flex flex-col sm:flex-row gap-6 items-start hover:shadow-[0_8px_40px_rgba(13,46,92,0.14)] transition-shadow duration-300 h-full">
-                  {/* Photo ronde double ring */}
+                  {/* Avatar initiales double ring */}
                   <div className="relative shrink-0">
-                    <div className="w-24 h-24 rounded-full ring-4 ring-[#F5A623] ring-offset-4 ring-offset-white shadow-lg overflow-hidden">
-                      <img
-                        src={member.img}
-                        alt={member.name}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover object-center"
-                        loading="lazy"
-                      />
+                    <div className="w-24 h-24 rounded-full ring-4 ring-[#F5A623] ring-offset-4 ring-offset-white shadow-lg overflow-hidden bg-gradient-to-br from-[#0D2E5C] to-[#1A4F8B] flex items-center justify-center">
+                      <span className="font-sans font-extrabold text-2xl text-white select-none">
+                        {member.initials}
+                      </span>
                     </div>
                   </div>
 
@@ -535,74 +523,6 @@ export const Ecole: React.FC = () => {
                   </motion.div>
                 </AnimatePresence>
               </div>
-            </div>
-          </div>
-        </motion.section>
-
-        {/* ── LOCALISATION ── */}
-        <motion.section
-          className="scroll-mt-20"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="rounded-3xl shadow-[0_4px_30px_rgba(13,46,92,0.08)] bg-white overflow-hidden">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
-
-              {/* Text */}
-              <div className="lg:col-span-6 p-8 md:p-12 space-y-5 flex flex-col justify-center">
-                <h2 className="font-sans font-extrabold text-2xl md:text-3xl text-[#0D2E5C] leading-tight">
-                  {fr ? <>Emplacement{' '}<span className="text-[#F5A623]">Privilégié</span>{' '}d'Apprentissage</> : <>A{' '}<span className="text-[#F5A623]">Prime</span>{' '}Learning Location</>}
-                </h2>
-                <div className="h-0.5 w-14 bg-brand-green rounded-full" />
-                <p className="text-sm text-brand-muted font-serif leading-relaxed">
-                  {fr
-                    ? "Notre complexe scolaire bénéficie d'une accessibilité aisée à l'angle du grand Boulevard de l'excellence, Cocody Riviera M'Pouto, en Côte d'Ivoire. Un havre arboré, éloigné des bruits industriels d'Abidjan pour maximiser la quiétude de l'esprit de l'élève."
-                    : "Our school complex enjoys easy access at the corner of the grand Boulevard of Excellence, Cocody Riviera M'Pouto, in Côte d'Ivoire. A leafy haven, far from industrial noise, to maximize the student's peace of mind."}
-                </p>
-
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3 p-3.5 bg-[#F4F8FF] rounded-2xl border border-[#0D2E5C]/8">
-                    <MapPin size={16} className="text-[#F5A623] shrink-0 mt-0.5" />
-                    <span className="text-xs font-sans text-[#0D2E5C] font-medium">{fr ? "Riviera M'Pouto, en face du Club équestre d'Abidjan, CIV" : "Riviera M'Pouto, opposite the Abidjan Equestrian Club, CIV"}</span>
-                  </div>
-                  <p className="text-[11px] text-brand-muted italic font-serif pl-1">
-                    {fr
-                      ? "* Un parking privé ombragé est aménagé à l'extérieur pour simplifier le dépôt sécurisé de vos enfants le matin par voiture."
-                      : "* A shaded private parking area is available outside to simplify safe morning drop-off by car."}
-                  </p>
-                </div>
-              </div>
-
-              {/* Map visual — Google Maps embed */}
-              <div className="lg:col-span-6 overflow-hidden flex flex-col">
-                <iframe
-                  title="EPV Horizons Savants — Localisation"
-                  src="https://maps.google.com/maps?q=Riviera+M%27Pouto+Abidjan+C%C3%B4te+d%27Ivoire&output=embed&hl=fr&z=15"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0, display: 'block', minHeight: 280, flex: 1 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-                <div className="px-5 py-3 bg-white border-t border-[#0D2E5C]/10 flex items-center justify-between gap-4">
-                  <span className="font-sans font-bold text-xs text-[#0D2E5C]">
-                    {fr ? "Riviera M'Pouto · Cocody, Abidjan" : "Riviera M'Pouto · Cocody, Abidjan"}
-                  </span>
-                  <a
-                    href="https://maps.google.com/?q=Riviera+M'Pouto+Abidjan"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-[11px] font-sans font-bold text-white bg-[#0D2E5C] hover:bg-[#1A4F8B] px-4 py-2 rounded-full shadow-sm transition-all shrink-0"
-                  >
-                    {fr ? "Ouvrir dans Google Maps" : 'Open in Google Maps'}
-                    <span>→</span>
-                  </a>
-                </div>
-              </div>
-
             </div>
           </div>
         </motion.section>

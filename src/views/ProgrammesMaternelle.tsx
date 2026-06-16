@@ -35,8 +35,8 @@ export const ProgrammesMaternelle: React.FC = () => {
           </h1>
           <p className="font-serif text-sm md:text-base text-brand-muted leading-relaxed max-w-4xl">
             {fr
-              ? "Découvrez notre cursus de maternelle précoce agréé, conçu spécifiquement à Cocody Riviera pour éveiller l'estime de soi, propulser la socialisation bienveillante, et ancrer un bilinguisme franco-anglais d'élite dès 2 ans."
-              : "Discover our accredited early kindergarten curriculum, specifically designed in Cocody Riviera to awaken self-esteem, foster caring socialization, and establish elite French-English bilingualism from age 2."}
+              ? "Découvrez notre cursus de maternelle précoce agréé, conçu spécifiquement à Bingerville pour éveiller l'estime de soi, propulser la socialisation bienveillante, et ancrer un bilinguisme franco-anglais d'élite dès 2 ans."
+              : "Discover our accredited early kindergarten curriculum, specifically designed in Bingerville to awaken self-esteem, foster caring socialization, and establish elite French-English bilingualism from age 2."}
           </p>
           <div className="h-1 w-20 bg-brand-gold rounded-full" />
         </div>
@@ -67,8 +67,8 @@ export const ProgrammesMaternelle: React.FC = () => {
             </h2>
             <p>
               {fr
-                ? <>À Abidjan, la quête d'une institution préscolaire alliant rigueur et bienveillance est une priorité pour les familles d'excellence. Le Programme Maternelle d'EPV Horizons Savants répond à ce besoin crucial en mariant les requis officiels de l'Éducation Nationale avec d'immenses enrichissements internationaux. Notre école se démarque par un effectif de <strong>15 élèves maximum par classe</strong>, garantissant un suivi hautement personnalisé.</>
-                : <>In Abidjan, finding a preschool institution combining rigor and caring is a priority for excellence-minded families. EPV Horizons Savants' Kindergarten Program meets this crucial need by blending official national requirements with extensive international enrichment. Our school stands out with <strong>a maximum of 15 students per class</strong>, ensuring highly personalized monitoring.</>}
+                ? <>À Abidjan, la quête d'une institution préscolaire alliant rigueur et bienveillance est une priorité pour les familles d'excellence. Le Programme Maternelle d'EPV Horizons Savants répond à ce besoin crucial en mariant les requis officiels de l'Éducation Nationale avec d'immenses enrichissements internationaux. Notre école se démarque par un effectif de <strong>25 élèves maximum par classe</strong>, garantissant un suivi hautement personnalisé.</>
+                : <>In Abidjan, finding a preschool institution combining rigor and caring is a priority for excellence-minded families. EPV Horizons Savants' Kindergarten Program meets this crucial need by blending official national requirements with extensive international enrichment. Our school stands out with <strong>a maximum of 25 students per class</strong>, ensuring highly personalized monitoring.</>}
             </p>
             <p>
               {fr
@@ -149,8 +149,8 @@ export const ProgrammesMaternelle: React.FC = () => {
             </h3>
             <p>
               {fr
-                ? "Situé dans un havre de paix à M'Pouto (Cocody Riviera), notre établissement maternelle respecte les normes ergonomiques et de sécurité les plus strictes. Les salles de classe sont lumineuses, climatisées et équipées de sanitaires intérieurs privatifs. L'enceinte fait l'objet d'une télésurveillance permanente CCTV."
-                : "Located in a peaceful haven at M'Pouto (Cocody Riviera), our kindergarten meets the strictest ergonomic and safety standards. Classrooms are bright, air-conditioned and equipped with private indoor restrooms. The premises are under permanent CCTV surveillance and strict elite security."}
+                ? "Situé dans un havre de paix à Bingerville, notre établissement maternelle respecte les normes ergonomiques et de sécurité les plus strictes. Les salles de classe sont lumineuses, climatisées et équipées de sanitaires intérieurs privatifs. L'enceinte fait l'objet d'une télésurveillance permanente CCTV."
+                : "Located in a peaceful haven in Bingerville, our kindergarten meets the strictest ergonomic and safety standards. Classrooms are bright, air-conditioned and equipped with private indoor restrooms. The premises are under permanent CCTV surveillance and strict elite security."}
             </p>
           </section>
 
@@ -159,7 +159,7 @@ export const ProgrammesMaternelle: React.FC = () => {
         {/* Highlights summary banner */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 font-sans text-center select-none border-t border-brand-border/40">
           <div className="pt-4">
-            <strong className="block text-2xl font-extrabold text-brand-green">15 max</strong>
+            <strong className="block text-2xl font-extrabold text-brand-green">25 max</strong>
             <span className="text-[10px] text-brand-muted uppercase font-bold tracking-normal block mt-1">{fr ? 'Élèves par classe' : 'Students per class'}</span>
           </div>
           <div className="pt-4">
@@ -180,8 +180,8 @@ export const ProgrammesMaternelle: React.FC = () => {
             </h3>
             <p className="text-xs text-brand-muted font-serif leading-relaxed">
               {fr
-                ? "En raison de la stricte limitation à 15 élèves par section de maternelle, les inscriptions se clôturent promptement. Déposez votre pré-inscription d'admission en 2 minutes dès aujourd'hui."
-                : "Due to the strict limit of 15 students per kindergarten class, enrollments close quickly. Submit your pre-enrollment application in 2 minutes starting today."}
+                ? "En raison de la stricte limitation à 25 élèves par section de maternelle, les inscriptions se clôturent promptement. Déposez votre pré-inscription d'admission en 2 minutes dès aujourd'hui."
+                : "Due to the strict limit of 25 students per kindergarten class, enrollments close quickly. Submit your pre-enrollment application in 2 minutes starting today."}
             </p>
           </div>
           <a href="#/admissions" className="shrink-0">
@@ -195,3 +195,4 @@ export const ProgrammesMaternelle: React.FC = () => {
     </div>
   );
 };
+

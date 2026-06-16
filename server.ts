@@ -255,7 +255,7 @@ async function initDB() {
   // Migrations incrémentales (safe sur DB existante)
   await q('ALTER TABLE prospects ADD COLUMN IF NOT EXISTS photo_url TEXT');
 
-  // Seed places (capacités max — 30 élèves par classe toutes sections)
+  // Seed places (capacités max — 25 élèves par classe toutes sections)
   const capacites = [
     { s:'PS',  max:25 },{ s:'MS',  max:25 },{ s:'GS',  max:25 },
     { s:'CP1', max:25 },{ s:'CP2', max:25 },{ s:'CE1', max:25 },{ s:'CE2', max:25 },
@@ -293,7 +293,7 @@ async function initDB() {
       telephone: '07 78 98 14 56 / 05 85 41 51 51',
       email: 'contact@horizonssavants.com',
       rentree: '1er Septembre 2026',
-      effectifMax: '15 élèves/classe (maternelle)',
+      effectifMax: '25 élèves/classe (maternelle)',
       directeur: 'Directeur Académique EPV',
     }),
     'Informations générales de l\'établissement',
@@ -538,15 +538,15 @@ async function seedOperational(isEmpty: (t: string) => Promise<boolean>) {
 
   // ── Documents téléchargeables ──
   if (await isEmpty('documents')) {
-    for (const [id,titre,fichier,cat,ordre] of [
-      ['doc-1','Règlement intérieur & Charte 2025/2026',      'reglement_interieur_2026.pdf', 'Réglementaire', 1],
-      ['doc-2','Projet pédagogique EPV — Programme bilingue', 'projet_pedagogique.pdf',       'Réglementaire', 2],
-      ['doc-3','Certificat de scolarité 2025/2026',           'certificat_scolarite.pdf',     'Administratif', 3],
-      ['doc-4','Calendrier académique 2025/2026',             'calendrier_academique.pdf',    'Administratif', 4],
-      ['doc-5','Liste des fournitures — Niveau CP',           'fournitures_cp.pdf',           'Scolaire',      5],
-      ['doc-6','Fiche médicale & Protocole d\'urgence',       'fiche_medicale.pdf',           'Médical',       6],
-    ]) await q(`INSERT INTO documents (id,titre,fichier,cat,actif,ordre,created_at,updated_at) VALUES ($1,$2,$3,$4,true,$5,NOW(),NOW()) ON CONFLICT DO NOTHING`,
-        [id, titre, fichier, cat, ordre]);
+    for (const [id,titre,cat,ordre] of [
+      ['doc-1','Règlement intérieur & Charte 2025/2026',      'Réglementaire', 1],
+      ['doc-2','Projet pédagogique EPV — Programme bilingue', 'Réglementaire', 2],
+      ['doc-3','Certificat de scolarité 2025/2026',           'Administratif', 3],
+      ['doc-4','Calendrier académique 2025/2026',             'Administratif', 4],
+      ['doc-5','Liste des fournitures — Niveau CP',           'Scolaire',      5],
+      ['doc-6','Fiche médicale & Protocole d\'urgence',       'Médical',       6],
+    ]) await q(`INSERT INTO documents (id,titre,fichier,cat,actif,ordre,created_at,updated_at) VALUES ($1,$2,'',$3,true,$4,NOW(),NOW()) ON CONFLICT DO NOTHING`,
+        [id, titre, cat, ordre]);
   }
 
   // ── Comptes utilisateurs ─────────────────────────────────────────────────────
@@ -2208,9 +2208,11 @@ app.post('/api/bulletins/publier-classe', requireAdmin, async (req, res) => {
 // Parent — consulter ses bulletins
 app.get('/api/parent/bulletins', requireAuth, async (req: any, res) => {
   try {
+    const prospectId = req.neonUser.prospectId || req.query.prospectId;
+    if (!prospectId) return res.status(400).json({ error: 'prospectId requis.' });
     const { rows } = await q(
       `SELECT * FROM bulletins WHERE prospect_id=$1 AND publie=TRUE ORDER BY trimestre DESC`,
-      [req.user.prospectId]
+      [prospectId]
     );
     res.json(rowsToObjs(rows));
   } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -2219,7 +2221,9 @@ app.get('/api/parent/bulletins', requireAuth, async (req: any, res) => {
 // Parent — consulter les notes de son enfant
 app.get('/api/parent/notes', requireAuth, async (req: any, res) => {
   try {
-    const { rows } = await q('SELECT * FROM notes WHERE prospect_id=$1', [req.user.prospectId]);
+    const prospectId = req.neonUser.prospectId || req.query.prospectId;
+    if (!prospectId) return res.status(400).json({ error: 'prospectId requis.' });
+    const { rows } = await q('SELECT * FROM notes WHERE prospect_id=$1 ORDER BY matiere', [prospectId]);
     res.json(rowsToObjs(rows));
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });

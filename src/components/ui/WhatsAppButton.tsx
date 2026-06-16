@@ -9,12 +9,14 @@ import { MessageSquare, X } from 'lucide-react';
 export const WhatsAppButton: React.FC = () => {
   const [showBubble, setShowBubble] = useState(false);
 
-  // Trigger bubble help hint after short delay
+  // Trigger bubble help hint after short delay, then auto-dismiss almost instantly
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const showTimer = setTimeout(() => {
       setShowBubble(true);
+      const hideTimer = setTimeout(() => setShowBubble(false), 10);
+      return () => clearTimeout(hideTimer);
     }, 4000);
-    return () => clearTimeout(timer);
+    return () => clearTimeout(showTimer);
   }, []);
 
   const whatsappUrl = "https://wa.me/2250778981456?text=Bonjour%20EPV%20Horizons%20Savants%2C%20je%20souhaite%20des%20renseignements%20pour%20la%20rentr%C3%A9e%202026.";

@@ -32,11 +32,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     'bnav.parent':     'Parent',
 
     // ── Footer ───────────────────────────────────────────────────
-    'footer.tagline':  "Nous faisons des sachants de demain.",
-    'footer.address':  'Bingerville Mtn Kro, Abidjan',
-    'footer.phone':    '07 78 98 14 56 / 05 85 41 51 51',
-    'footer.email':    'contact@horizonssavants.com',
-    'footer.hours':    'Lun à Ven : 7h30 à 17h00',
+    'footer.tagline':  "NOUS FAISONS DES SACHANTS DE DEMAIN",
+    'footer.address':  'Bingerville, Ave Konan Kouassi Lambert 38, Abidjan',
     'footer.nav':      'Navigation',
     'footer.programs': 'Programmes',
     'footer.mat':      'Maternelle (PS, MS, GS)',
@@ -48,17 +45,14 @@ export const translations: Record<Lang, Record<string, string>> = {
     // ── Home — Hero ──────────────────────────────────────────────
     'hero.badge1':     'Inscriptions Ouvertes',
     'hero.badge2':     'Rentrée Septembre 2026',
-    'hero.h1a':        'Construisons ensemble',
-    'hero.h1b':        "l'avenir d'excellence",
-    'hero.h1c':        'de vos enfants',
+    'hero.h1a':        'NOUS FAISONS DES SACHANTS',
+    'hero.h1b':        'DE DEMAIN',
+    'hero.h1c':        '',
     'hero.vision':     'Notre vision :',
     'hero.desc':       "École maternelle & primaire d'excellence à Abidjan · rigueur internationale, bilinguisme précoce et encadrement bienveillant.",
     'hero.btn.preinsc':'Pré-inscription',
     'hero.btn.rdv':    'Prendre RDV',
     'hero.btn.prog':   'Nos Programmes',
-    'hero.proof1':     'Rentrée confirmée',
-    'hero.proof2':     'Cocody, Abidjan',
-    'hero.proof3':     '15 élèves / classe max',
 
     // ── Home — Sections ──────────────────────────────────────────
     'home.pillars':    'Nos Trois Piliers Fondateurs',
@@ -147,8 +141,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     'bnav.parent':     'Parent',
 
     // ── Footer ───────────────────────────────────────────────────
-    'footer.tagline':  "We are building tomorrow's knowledgeable minds.",
-    'footer.address':  'Bingerville Mtn Kro, Abidjan',
+    'footer.tagline':  "NOUS FAISONS DES SACHANTS DE DEMAIN",
+    'footer.address':  'Bingerville, Ave Konan Kouassi Lambert 38, Abidjan',
     'footer.phone':    '07 78 98 14 56 / 05 85 41 51 51',
     'footer.email':    'contact@horizonssavants.com',
     'footer.hours':    'Mon to Fri: 7:30am to 5:00pm',
@@ -163,17 +157,14 @@ export const translations: Record<Lang, Record<string, string>> = {
     // ── Home — Hero ──────────────────────────────────────────────
     'hero.badge1':     'Enrollments Open',
     'hero.badge2':     'School Year September 2026',
-    'hero.h1a':        "Let's build together",
-    'hero.h1b':        'the future of excellence',
-    'hero.h1c':        'for your children',
+    'hero.h1a':        'NOUS FAISONS DES SACHANTS',
+    'hero.h1b':        'DE DEMAIN',
+    'hero.h1c':        '',
     'hero.vision':     'Our vision:',
     'hero.desc':       'Excellence kindergarten & primary school in Abidjan · international standards, early bilingualism and caring guidance.',
     'hero.btn.preinsc':'Pre-enrollment',
     'hero.btn.rdv':    'Book Appointment',
     'hero.btn.prog':   'Our Programs',
-    'hero.proof1':     'Enrollment confirmed',
-    'hero.proof2':     'Cocody, Abidjan',
-    'hero.proof3':     '15 students / class max',
 
     // ── Home — Sections ──────────────────────────────────────────
     'home.pillars':    'Our Three Founding Pillars',

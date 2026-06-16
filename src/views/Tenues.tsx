@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, ChevronRight, Shirt, Award } from 'lucide-react';
+import { useLang } from '../lib/LanguageContext.tsx';
 
 /* ─── Data ─────────────────────────────────────────────────────────────────── */
 
@@ -80,6 +81,8 @@ const KITS: Kit[] = [
 
 /* ─── Drag-to-rotate card (FIFA style) ─────────────────────────────────────── */
 function OutfitCard({ kit }: { kit: Kit }) {
+  const { lang } = useLang();
+  const fr = lang === 'fr';
   const [imgIdx,     setImgIdx]     = useState(0);
   const [scaleX,     setScaleX]     = useState(1);
   const [tiltY,      setTiltY]      = useState(0);
@@ -187,7 +190,7 @@ function OutfitCard({ kit }: { kit: Kit }) {
              fontFamily: 'Inter, Poppins, sans-serif',
            }}>
         <ChevronLeft size={7} />
-        <span>Glisser pour tourner</span>
+        <span>{fr ? 'Glisser pour tourner' : 'Drag to rotate'}</span>
         <ChevronRight size={7} />
       </div>
     </div>
@@ -223,6 +226,8 @@ function PieceRow({ piece, index }: { piece: Piece; index: number }) {
 
 /* ─── Main page ─────────────────────────────────────────────────────────────── */
 export const Tenues: React.FC = () => {
+  const { lang } = useLang();
+  const fr = lang === 'fr';
   const [activeIdx, setActiveIdx] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
   const kit = KITS[activeIdx];
@@ -276,11 +281,11 @@ export const Tenues: React.FC = () => {
           </p>
           <h1 className="text-white font-extrabold text-xl lg:text-3xl leading-tight"
               style={{ fontFamily: 'Inter, Poppins, sans-serif', letterSpacing: '-0.02em' }}>
-            Collection Uniformes
+            {fr ? 'Collection Uniformes' : 'School Uniform Collection'}
           </h1>
           <p className="text-white/28 text-[10px] mt-1"
              style={{ fontFamily: 'Inter, Poppins, sans-serif' }}>
-            Année scolaire 2025 – 2026
+            {fr ? 'Année scolaire 2025 – 2026' : 'School Year 2025 – 2026'}
           </p>
         </motion.div>
       </div>
@@ -391,7 +396,7 @@ export const Tenues: React.FC = () => {
               <div className="h-px flex-1" style={{ background: 'rgba(255,255,255,0.08)' }} />
               <span className="text-[7.5px] uppercase tracking-[0.30em] font-semibold"
                     style={{ color: 'rgba(255,255,255,0.20)', fontFamily: 'Inter, Poppins, sans-serif' }}>
-                Pièces incluses
+                {fr ? 'Pièces incluses' : 'Included items'}
               </span>
               <div className="h-px flex-1" style={{ background: 'rgba(255,255,255,0.08)' }} />
             </div>
@@ -471,7 +476,7 @@ export const Tenues: React.FC = () => {
       <div className="relative z-10 text-center pb-4">
         <p className="text-[7px] uppercase tracking-[0.30em]"
            style={{ color: 'rgba(255,255,255,0.10)', fontFamily: 'Inter, Poppins, sans-serif' }}>
-          EPV Horizons Savants · Tenues officielles 2025–2026 · Abidjan
+          EPV Horizons Savants · {fr ? 'Tenues officielles 2025–2026' : 'Official Uniforms 2025–2026'} · Abidjan
         </p>
       </div>
     </div>

@@ -39,7 +39,7 @@ export const Programmes: React.FC = () => {
         <div className="space-y-3 font-serif">
           <p><strong>Pédagogie et Éveil :</strong> Introduction à l'acquisition du langage matériel, socialisation bienveillante intensive, motricité fine et manipulation active inspirée des méthodes Montessori.</p>
           <ul className="list-disc pl-5 space-y-1 text-xs">
-            <li>Effectif : 15 élèves maximum par éducateur</li>
+            <li>Effectif : 25 élèves maximum par éducateur</li>
             <li>Immersion : Comptines, histoires de contes et rituels quotidiens d'éveil en Anglais (30%)</li>
             <li>Infrastructures : Dortoirs climatisés douillets, salle de motricité fine, aire de jeux extérieure ombragée</li>
           </ul>
@@ -118,7 +118,7 @@ export const Programmes: React.FC = () => {
         <div className="space-y-3 font-serif">
           <p><strong>Pedagogy & Awakening:</strong> Introduction to language acquisition, intensive caring socialization, fine motor skills and active manipulation inspired by Montessori methods.</p>
           <ul className="list-disc pl-5 space-y-1 text-xs">
-            <li>Class size: 15 students maximum per educator</li>
+            <li>Class size: 25 students maximum per educator</li>
             <li>Immersion: Nursery rhymes, storytelling and daily English awakening rituals (30%)</li>
             <li>Facilities: Air-conditioned dormitories, fine motor skills room, shaded outdoor play area</li>
           </ul>
@@ -237,8 +237,8 @@ export const Programmes: React.FC = () => {
           </h1>
           <p className="mt-6 text-sm text-white/65 font-serif leading-relaxed max-w-2xl mx-auto">
             {fr
-              ? "Notre projet éducatif réconcilie exigence intellectuelle et bienveillance comportementale. L'organisation en petits collectifs d'Abidjan de 15 élèves max assure une totale assimilation académique quotidienne."
-              : "Our educational project reconciles intellectual rigor with caring pedagogy. Small class sizes of 15 students maximum ensure complete daily academic assimilation."}
+              ? "Notre projet éducatif réconcilie exigence intellectuelle et bienveillance comportementale. L'organisation en petits collectifs d'Abidjan de 25 élèves max assure une totale assimilation académique quotidienne."
+              : "Our educational project reconciles intellectual rigor with caring pedagogy. Small class sizes of 25 students maximum ensure complete daily academic assimilation."}
           </p>
         </motion.div>
       </div>
@@ -312,7 +312,7 @@ export const Programmes: React.FC = () => {
                   </div>
 
                   <div className="pt-4 border-t border-brand-border/40 flex items-center justify-between">
-                    <span className="text-[11px] font-semibold text-brand-blue-medium">{fr ? '15 élèves max / classe' : '15 students max / class'}</span>
+                    <span className="text-[11px] font-semibold text-brand-blue-medium">{fr ? '25 élèves max / classe' : '25 students max / class'}</span>
                     <a href="#/programmes/maternelle" className="text-brand-green hover:text-brand-blue-deep font-bold text-xs uppercase tracking-wider flex items-center gap-1 transition-colors">
                       {fr ? 'Voir le programme →' : 'View program →'}
                     </a>
@@ -375,7 +375,7 @@ export const Programmes: React.FC = () => {
                   </div>
 
                   <div className="pt-4 border-t border-brand-border/40 flex items-center justify-between">
-                    <span className="text-[11px] font-semibold text-brand-blue-medium">{fr ? '20 élèves max / classe' : '20 students max / class'}</span>
+                    <span className="text-[11px] font-semibold text-brand-blue-medium">{fr ? '25 élèves max / classe' : '25 students max / class'}</span>
                     <a href="#/programmes/primaire" className="text-brand-blue-deep hover:text-brand-gold font-bold text-xs uppercase tracking-wider flex items-center gap-1 transition-colors">
                       {fr ? 'Voir le programme →' : 'View program →'}
                     </a>
@@ -420,8 +420,8 @@ export const Programmes: React.FC = () => {
                 {([
                   { val: '2', label: fr ? 'Cycles scolaires' : 'School cycles' },
                   { val: '6', label: fr ? 'Niveaux au total' : 'Total levels' },
-                  { val: '15', label: fr ? 'Élèves max · Maternelle' : 'Students max · Kindergarten' },
-                  { val: '20', label: fr ? 'Élèves max · Primaire' : 'Students max · Primary' },
+                  { val: '25', label: fr ? 'Élèves max · Maternelle' : 'Students max · Kindergarten' },
+                  { val: '25', label: fr ? 'Élèves max · Primaire' : 'Students max · Primary' },
                 ] as { val: string; label: string }[]).map((s) => (
                   <div key={s.label} className="flex items-center gap-3">
                     <span className="font-mono font-extrabold text-3xl text-brand-gold leading-none w-12 shrink-0">{s.val}</span>

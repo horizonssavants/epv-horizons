@@ -87,8 +87,8 @@ export const Contact: React.FC = () => {
             style={{ color: 'rgba(255,255,255,0.65)' }}
           >
             {fr
-              ? "Une question d'ordre pédagogique ou d'admissions ? Contactez-nous par courrier, par téléphone, ou visitez nos locaux à Bingerville Mtn Kro."
-              : 'A pedagogical or admission question? Contact us by email, phone, or visit our premises in Bingerville Mtn Kro.'}
+              ? "Une question d'ordre pédagogique ou d'admissions ? Contactez-nous par courrier, par téléphone, ou visitez nos locaux à Bingerville, Ave Konan Kouassi Lambert 38."
+              : 'A pedagogical or admission question? Contact us by email, phone, or visit our premises in Bingerville, Ave Konan Kouassi Lambert 38.'}
           </motion.p>
         </div>
       </section>
@@ -126,7 +126,7 @@ export const Contact: React.FC = () => {
                       {fr ? 'Adresse' : 'Address'}
                     </p>
                     <p className="font-serif text-xs text-gray-500 leading-relaxed">
-                      Bingerville Mtn Kro<br />Cité Côtes de Grâces<br />Abidjan, Côte d'Ivoire
+                      Bingerville, Ave Konan Kouassi Lambert 38<br />Abidjan, Côte d'Ivoire
                     </p>
                   </div>
                 </div>
@@ -190,17 +190,17 @@ export const Contact: React.FC = () => {
               <div className="rounded-2xl overflow-hidden shadow-[0_2px_16px_rgba(13,46,92,0.07)]">
                 <iframe
                   title="EPV Horizons Savants — Localisation"
-                  src="https://maps.google.com/maps?q=Bingerville+Mtn+Kro+Cit%C3%A9+C%C3%B4tes+de+Gr%C3%A2ces+Abidjan+C%C3%B4te+d%27Ivoire&output=embed&hl=fr"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.2880363103195!2d-3.894524925016189!3d5.372973394605878!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfc1f3026262acff%3A0xdf46db16a1a955b3!2sEPV%20HORIZONS%20SAVANTS!5e0!3m2!1sen!2sci!4v1781556186800!5m2!1sen!2sci"
                   width="100%"
-                  height="240"
+                  height="300"
                   style={{ border: 0, display: 'block' }}
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                 />
                 <div className="px-5 py-3 bg-white border-t border-[#0D2E5C]/10 flex items-center justify-between gap-4">
-                  <p className="font-sans font-bold text-xs text-[#0D2E5C]">EPV Horizons Savants · Bingerville Mtn Kro</p>
-                  <a href="https://maps.google.com/?q=Bingerville+Mtn+Kro+Cité+Côtes+de+Grâces+Abidjan"
+                  <p className="font-sans font-bold text-xs text-[#0D2E5C]">EPV Horizons Savants · Bingerville, Ave Konan Kouassi Lambert 38</p>
+                  <a href="https://www.google.com/maps/place/EPV+HORIZONS+SAVANTS/@5.372973,-3.894525,17z"
                     target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 font-sans font-semibold text-xs text-white px-4 py-2 rounded-full shrink-0"
                     style={{ backgroundColor: '#0D2E5C' }}>

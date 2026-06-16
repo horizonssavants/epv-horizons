@@ -314,8 +314,8 @@ export const Admissions: React.FC = () => {
                 <div className="h-0.5 w-12 bg-brand-gold/60 rounded-full mt-3 mb-5" />
                 {([
                   { val: '4',    label: fr ? 'étapes simples' : 'simple steps' },
-                  { val: '15',   label: fr ? 'élèves max · Maternelle' : 'students max · Kindergarten' },
-                  { val: '20',   label: fr ? 'élèves max · Primaire' : 'students max · Primary' },
+                  { val: '25',   label: fr ? 'élèves max · Maternelle' : 'students max · Kindergarten' },
+                  { val: '25',   label: fr ? 'élèves max · Primaire' : 'students max · Primary' },
                   { val: '30m',  label: fr ? 'confirmation de rendez-vous' : 'appointment confirmed' },
                 ] as { val: string; label: string }[]).map((s) => (
                   <div key={s.label} className="flex items-center gap-3 py-2.5 border-b border-white/10 last:border-0">

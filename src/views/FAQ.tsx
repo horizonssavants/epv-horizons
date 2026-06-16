@@ -82,7 +82,7 @@ export const FAQ: React.FC = () => {
       id: "adm-1",
       category: "Admissions & Inscriptions",
       question: "Quelle est la taille maximale des effectifs par classe ?",
-      answer: "À EPV Horizons Savants, nous croyons à l'accompagnement d'excellence sur-mesure. C'est pourquoi nous appliquons un numerus clausus extrêmement strict de 15 élèves maximum par section de Maternelle et de Primaire. Ce format restreint garantit une surveillance bienveillante et un suivi comportemental individualisé."
+      answer: "À EPV Horizons Savants, nous croyons à l'accompagnement d'excellence sur-mesure. C'est pourquoi nous appliquons un numerus clausus extrêmement strict de 25 élèves maximum par section de Maternelle et de Primaire. Ce format restreint garantit une surveillance bienveillante et un suivi comportemental individualisé."
     },
     {
       id: "adm-2",
@@ -124,7 +124,7 @@ export const FAQ: React.FC = () => {
       id: "log-2",
       category: "Vie Pratique & Logistique",
       question: "Où se situe exactement le campus d'EPV Horizons Savants à Abidjan ?",
-      answer: "Notre campus d'élite sécurisé se situe dans le quartier résidentiel de M'Pouto à Cocody Riviera, à Abidjan. Clôturé, ombragé, avec CCTV et sécurité à l'entrée."
+      answer: "Notre campus d'élite sécurisé se situe à Bingerville, Ave Konan Kouassi Lambert 38, Abidjan. Clôturé, ombragé, avec CCTV et sécurité à l'entrée."
     },
     {
       id: "esp-1",
@@ -137,7 +137,7 @@ export const FAQ: React.FC = () => {
       id: "adm-1",
       category: "Admissions & Enrollment",
       question: "What is the maximum class size?",
-      answer: "At EPV Horizons Savants, we believe in bespoke excellence. That is why we enforce a strict quota of 15 students per class at both Kindergarten and Primary levels. This small format guarantees caring supervision and individualized behavioral monitoring."
+      answer: "At EPV Horizons Savants, we believe in bespoke excellence. That is why we enforce a strict quota of 25 students per class at both Kindergarten and Primary levels. This small format guarantees caring supervision and individualized behavioral monitoring."
     },
     {
       id: "adm-2",
@@ -179,7 +179,7 @@ export const FAQ: React.FC = () => {
       id: "log-2",
       category: "Practical Life & Logistics",
       question: "Where exactly is the EPV Horizons Savants campus in Abidjan?",
-      answer: "Our secure elite campus is located in the peaceful residential neighborhood of M'Pouto, Cocody Riviera, Abidjan. The grounds are fenced, shaded, with CCTV cameras and a security officer at the entrance."
+      answer: "Our secure elite campus is located in Bingerville, Ave Konan Kouassi Lambert 38, Abidjan. The grounds are fenced, shaded, with CCTV cameras and a security officer at the entrance."
     },
     {
       id: "esp-1",

@@ -43,8 +43,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, id }) => {
                 <span className="text-brand-gold">Horizons Savants</span>
               </span>
             </div>
-            <p className="text-xs font-serif italic text-brand-border/70 leading-relaxed max-w-xs mt-3">
-              {fr ? '"Ouvrir un livre, c\'est ouvrir un horizon."' : '"Opening a book opens a horizon."'}
+            <p className="text-xs font-sans font-bold tracking-widest text-brand-gold/90 leading-relaxed max-w-xs mt-3 uppercase">
+              NOUS FAISONS DES SACHANTS DE DEMAIN
             </p>
             <div className="text-[11px] leading-relaxed text-brand-border/60">
               {fr
@@ -77,7 +77,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, id }) => {
             <div className="space-y-3 leading-relaxed text-brand-border/80">
               <p className="flex items-start gap-2.5">
                 <MapPin size={15} className="text-brand-gold shrink-0 mt-0.5" />
-                <span>Bingerville Mtn Kro, Cité Côtes de Grâces, Abidjan</span>
+                <span>Bingerville, Ave Konan Kouassi Lambert 38, Abidjan</span>
               </p>
               <p className="flex items-center gap-2.5">
                 <Phone size={15} className="text-brand-gold shrink-0" />
