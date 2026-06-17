@@ -1,7 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { checkSession, signOutNeon, apiFetch as authFetch } from '../lib/auth.ts';
@@ -199,7 +195,7 @@ function CardHeader({ title, sub, action }: { title: string; sub?: string; actio
   return (
     <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-3 shrink-0">
       <div>
-        <h3 className="text-sm font-semibold text-slate-800">{title}</h3>
+        <h3 className="text-sm font-semibold text-[#2C2C2C]">{title}</h3>
         {sub && <p className="text-[11px] text-slate-400 mt-0.5">{sub}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
@@ -215,7 +211,7 @@ function StatBadge({ label, statut }: { label: string; statut: string }) {
   );
 }
 
-function MiniChart({ values, color = '#0F172A', fill = false }: { values: number[]; color?: string; fill?: boolean }) {
+function MiniChart({ values, color = '#0D2E5C', fill = false }: { values: number[]; color?: string; fill?: boolean }) {
   if (values.length < 2) return null;
   const W = 80; const H = 28; const P = 3;
   const min = Math.min(...values); const max = Math.max(...values);
@@ -246,10 +242,10 @@ function KpiCard({ label, value, sub, trend, Icon, chart }: {
         <div className="w-8 h-8 rounded-md bg-slate-50 border border-slate-100 flex items-center justify-center">
           <Icon size={15} className="text-slate-400" />
         </div>
-        {chart && <MiniChart values={chart} color="#0F172A" fill />}
+        {chart && <MiniChart values={chart} color="#0D2E5C" fill />}
       </div>
       <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">{label}</p>
-      <p className="text-2xl font-bold text-slate-900 mt-1">{value}</p>
+      <p className="text-2xl font-bold text-[#2C2C2C] mt-1">{value}</p>
       <div className="flex items-center gap-2 mt-1.5">
         {trend && (
           <span className={`flex items-center gap-0.5 text-[10px] font-semibold ${
@@ -301,7 +297,7 @@ function PageLayout({ title, sub, actions, children }: {
     <div className="p-6 space-y-5 max-w-screen-xl mx-auto">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-base font-semibold text-slate-900">{title}</h1>
+          <h1 className="text-base font-semibold text-[#2C2C2C]">{title}</h1>
           {sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}
         </div>
         {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
@@ -422,13 +418,13 @@ function ProspectDrawer({ prospect, appointments, onClose, onStatus, onToast, on
                   <React.Fragment key={step.s}>
                     <div className="flex flex-col items-center gap-1">
                       <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all
-                        ${done ? 'bg-slate-900 border-slate-900' : 'bg-white border-slate-200'}`}>
+                        ${done ? 'bg-[#0D2E5C] border-[#0D2E5C]' : 'bg-white border-slate-200'}`}>
                         {done && <CheckCircle size={12} className="text-white" />}
                       </div>
-                      <span className={`text-[9px] font-semibold ${done ? 'text-slate-800' : 'text-slate-300'}`}>{step.label}</span>
+                      <span className={`text-[9px] font-semibold ${done ? 'text-[#0D2E5C]' : 'text-slate-300'}`}>{step.label}</span>
                     </div>
                     {i < STEPS.length - 1 && (
-                      <div className={`flex-1 h-px mb-4 ${i < stepIdx ? 'bg-slate-900' : 'bg-slate-200'}`} />
+                      <div className={`flex-1 h-px mb-4 ${i < stepIdx ? 'bg-[#0D2E5C]' : 'bg-slate-200'}`} />
                     )}
                   </React.Fragment>
                 );
@@ -593,7 +589,7 @@ function SaisiePedagogique({ prospect, onToast, onRefresh }: {
         {[['note','Note'],['devoir','Devoir']].map(([v,l]) => (
           <button key={v} onClick={() => setSub(v as any)}
             className={`px-3 py-1.5 rounded-md text-[10px] font-semibold border cursor-pointer transition-colors
-              ${sub===v?'bg-slate-900 text-white border-slate-900':'border-slate-200 text-slate-500 hover:bg-slate-50'}`}>
+              ${sub===v?'bg-[#0D2E5C] text-white border-[#0D2E5C]':'border-slate-200 text-slate-500 hover:bg-slate-50'}`}>
             {l}
           </button>
         ))}
@@ -629,7 +625,7 @@ function SaisiePedagogique({ prospect, onToast, onRefresh }: {
           </>
         )}
         <button onClick={sub === 'note' ? submitNote : submitDevoir}
-          className="w-full py-2 rounded-md bg-slate-900 text-white text-[10px] font-semibold cursor-pointer hover:bg-slate-700 transition-colors flex items-center justify-center gap-1.5">
+          className="w-full py-2 rounded-md bg-[#0D2E5C] text-white text-[10px] font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors flex items-center justify-center gap-1.5">
           <CheckCircle size={12} /> Enregistrer {sub === 'note' ? 'la note' : 'le devoir'}
         </button>
       </div>
@@ -919,7 +915,7 @@ function DashboardTab({ prospects, appointments, quotas, contacts, tarifs, onTab
               <p className="text-xs text-slate-400 text-center py-6">Aucun dossier</p>
             ) : recent.map(p => (
               <div key={p.id} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors">
-                <div className="w-7 h-7 rounded-md bg-slate-900 flex items-center justify-center text-white text-[10px] font-bold shrink-0">
+                <div className="w-7 h-7 rounded-md bg-[#0D2E5C] flex items-center justify-center text-white text-[10px] font-bold shrink-0">
                   {p.sectionVisee}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -1127,7 +1123,7 @@ function AnnuaireTab({ prospects, appointments, onProspectStatus, onToast, onRef
                     <p className="text-[10px] text-slate-400 mt-0.5">{fmtDate(p.dateNaissance)}</p>
                   </td>
                   <td className={tdClass}>
-                    <span className="inline-flex items-center justify-center w-9 h-6 rounded bg-slate-900 text-white text-[10px] font-bold">
+                    <span className="inline-flex items-center justify-center w-9 h-6 rounded bg-[#0D2E5C] text-white text-[10px] font-bold">
                       {p.sectionVisee}
                     </span>
                   </td>
@@ -1180,7 +1176,7 @@ function AnnuaireTab({ prospects, appointments, onProspectStatus, onToast, onRef
               {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => (
                 <button key={i} onClick={() => setPage(i)}
                   className={`w-7 h-7 rounded border text-[11px] font-semibold cursor-pointer transition-colors
-                    ${page === i ? 'bg-slate-900 text-white border-slate-900' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+                    ${page === i ? 'bg-[#0D2E5C] text-white border-[#0D2E5C]' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
                   {i + 1}
                 </button>
               ))}
@@ -1257,7 +1253,7 @@ function InscriptionsTab({ appointments, prospects, onRdvStatus, onToast }: Data
           {[{id:'calendar',label:'Calendrier'},{id:'kanban',label:'Kanban'}].map(v => (
             <button key={v.id} onClick={() => setView(v.id as any)}
               className={`px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer
-                ${view === v.id ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-50'}`}>
+                ${view === v.id ? 'bg-[#0D2E5C] text-white' : 'text-slate-500 hover:bg-slate-50'}`}>
               {v.label}
             </button>
           ))}
@@ -1298,8 +1294,8 @@ function InscriptionsTab({ appointments, prospects, onRdvStatus, onToast }: Data
                   return (
                     <button key={i} onClick={() => setSelectedDay(active ? null : d)}
                       className={`relative aspect-square flex flex-col items-center justify-center rounded-md text-xs font-semibold cursor-pointer transition-all
-                        ${active  ? 'bg-slate-900 text-white' :
-                          isToday(d) ? 'border-2 border-slate-900 text-slate-900' :
+                        ${active  ? 'bg-[#0D2E5C] text-white' :
+                          isToday(d) ? 'border-2 border-[#0D2E5C] text-[#0D2E5C]' :
                           hasRdv ? 'bg-blue-50 text-blue-700 hover:bg-blue-100' :
                           'hover:bg-slate-50 text-slate-600'}`}>
                       {d}
@@ -1534,7 +1530,7 @@ function StatistiquesTab({ prospects }: DataProps) {
                   <span className="font-mono text-slate-500 shrink-0">{count} ({total>0?Math.round((count/total)*100):0}%)</span>
                 </div>
                 <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                  <motion.div className="h-full rounded-full bg-slate-900"
+                  <motion.div className="h-full rounded-full bg-[#0D2E5C]"
                     initial={{ width:0 }} animate={{ width:`${Math.round((count/maxSrc)*100)}%` }} transition={{ duration:0.6 }} />
                 </div>
               </div>
@@ -1547,10 +1543,10 @@ function StatistiquesTab({ prospects }: DataProps) {
           <div className="p-5 space-y-3.5">
             {sectionData.map(({ s, count }) => (
               <div key={s} className="flex items-center gap-3">
-                <span className="w-9 h-6 rounded bg-slate-900 text-white text-[10px] font-bold flex items-center justify-center shrink-0">{s}</span>
+                <span className="w-9 h-6 rounded bg-[#0D2E5C] text-white text-[10px] font-bold flex items-center justify-center shrink-0">{s}</span>
                 <div className="flex-1">
                   <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                    <motion.div className="h-full rounded-full bg-slate-700"
+                    <motion.div className="h-full rounded-full bg-[#1A4F8B]"
                       initial={{ width:0 }} animate={{ width:`${Math.round((count/maxSec)*100)}%` }} transition={{ duration:0.6 }} />
                   </div>
                 </div>
@@ -1631,7 +1627,7 @@ function MessagerieTab({ contacts, notifications, prospects, onContactStatus, on
       sub="Communication avec les familles et journal des notifications"
       actions={
         <button onClick={() => setShowCompose(v => !v)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold hover:bg-slate-700 cursor-pointer transition-colors">
+          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold hover:bg-[#1A4F8B] cursor-pointer transition-colors">
           {showCompose ? <><X size={13} /> Annuler</> : <><Send size={13} /> Nouveau message</>}
         </button>
       }
@@ -1640,7 +1636,7 @@ function MessagerieTab({ contacts, notifications, prospects, onContactStatus, on
       <AnimatePresence>
         {showCompose && (
           <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
-            <Card className="p-5 border-2 border-slate-900">
+            <Card className="p-5 border-2 border-[#0D2E5C]">
               <p className="text-sm font-semibold text-slate-800 mb-4">Envoyer un message groupé aux parents</p>
               <div className="grid md:grid-cols-2 gap-4 mb-4">
                 <div>
@@ -1672,7 +1668,7 @@ function MessagerieTab({ contacts, notifications, prospects, onContactStatus, on
               </div>
               <div className="flex gap-2">
                 <button onClick={handleBroadcast} disabled={sending || !msgContenu.trim()}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors disabled:opacity-50">
                   {sending
                     ? <><div className="w-3 h-3 rounded-full border-2 border-white/40 border-t-white animate-spin" /> Envoi…</>
                     : <><Send size={13} /> Envoyer à {nbDest} parent{nbDest > 1 ? 's' : ''}</>}
@@ -1694,7 +1690,7 @@ function MessagerieTab({ contacts, notifications, prospects, onContactStatus, on
         ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id as any)}
             className={`px-4 py-2.5 text-xs font-semibold border-b-2 -mb-px transition-colors cursor-pointer
-              ${tab === t.id ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-700'}`}>
+              ${tab === t.id ? 'border-[#0D2E5C] text-[#0D2E5C]' : 'border-transparent text-slate-400 hover:text-slate-700'}`}>
             {t.label}
           </button>
         ))}
@@ -1719,7 +1715,7 @@ function MessagerieTab({ contacts, notifications, prospects, onContactStatus, on
                         <button onClick={() => setActiveId(isOpen ? null : msg.id)}
                           className="w-full px-5 py-3.5 text-left flex items-start gap-4 hover:bg-slate-50 cursor-pointer transition-colors">
                           <div className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 text-xs font-bold
-                            ${treated ? 'bg-slate-100 text-slate-400' : 'bg-slate-900 text-white'}`}>
+                            ${treated ? 'bg-slate-100 text-slate-400' : 'bg-[#0D2E5C] text-white'}`}>
                             {(msg.nom || '?')[0].toUpperCase()}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -1806,7 +1802,7 @@ function QRTab({ onToast }: DataProps) {
   const [nom,      setNom]      = useState('');
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const fullUrl = `${qrUrl}?utm_source=${qrSource}`;
-  const qrSrc   = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&color=0F172A&data=${encodeURIComponent(fullUrl)}`;
+  const qrSrc   = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&color=0D2E5C&data=${encodeURIComponent(fullUrl)}`;
 
   useEffect(() => {
     apiFetch('/api/qr_campaigns').then(setCampaigns).catch(() => {});
@@ -1861,7 +1857,7 @@ function QRTab({ onToast }: DataProps) {
                 <p className="text-[11px] font-mono text-slate-700 break-all leading-relaxed">{fullUrl}</p>
               </div>
               <button onClick={handleSave}
-                className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-md bg-slate-900 text-white text-xs font-semibold hover:bg-slate-700 cursor-pointer transition-colors">
+                className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold hover:bg-[#1A4F8B] cursor-pointer transition-colors">
                 <CheckCircle size={13} /> Enregistrer la campagne
               </button>
             </div>
@@ -1873,7 +1869,7 @@ function QRTab({ onToast }: DataProps) {
               </div>
               <div className="flex gap-2">
                 <a href={qrSrc} target="_blank" rel="noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold hover:bg-slate-700 cursor-pointer transition-colors">
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold hover:bg-[#1A4F8B] cursor-pointer transition-colors">
                   <Download size={12} /> Télécharger
                 </a>
                 <button onClick={() => onToast('Lien copié dans le presse-papiers.')}
@@ -1932,6 +1928,8 @@ function AdminDocuments({ onToast }: { onToast: (m: string) => void }) {
   const [docs,    setDocs]    = useState<any[]>([]);
   const [form,    setForm]    = useState<any | null>(null);
   const [saving,  setSaving]  = useState(false);
+  const [docFile, setDocFile] = useState<File | null>(null);
+  const docFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     apiFetch('/api/documents').then(setDocs).catch(console.error);
@@ -1942,17 +1940,52 @@ function AdminDocuments({ onToast }: { onToast: (m: string) => void }) {
     setSaving(true);
     try {
       if (form.id) {
-        await apiPatch(`/api/documents/${form.id}`, form);
-        setDocs(prev => prev.map(d => d.id === form.id ? { ...d, ...form } : d));
+        // Mise à jour : si nouveau fichier → upload R2 d'abord
+        if (docFile) {
+          const fd = new FormData();
+          fd.append('fichier', docFile);
+          fd.append('titre', form.titre);
+          fd.append('cat', form.cat ?? 'Général');
+          fd.append('ordre', String(form.ordre ?? 0));
+          const r = await authFetch('/api/documents/upload', { method: 'POST', body: fd });
+          const data = await r.json();
+          if (r.ok) {
+            await apiDelete(`/api/documents/${form.id}`);
+            setDocs(prev => prev.filter(d => d.id !== form.id).concat(data));
+          }
+        } else {
+          await apiPatch(`/api/documents/${form.id}`, form);
+          setDocs(prev => prev.map(d => d.id === form.id ? { ...d, ...form } : d));
+        }
         onToast('Document mis à jour.');
       } else {
-        const r = await apiPost('/api/documents', { ...form, actif: true });
-        let data: any = {};
-        try { data = await r.json(); } catch {}
-        if (r.ok) setDocs(prev => [...prev, data]);
-        onToast('Document ajouté.');
+        if (docFile) {
+          // Upload fichier vers R2
+          const fd = new FormData();
+          fd.append('fichier', docFile);
+          fd.append('titre', form.titre);
+          fd.append('cat', form.cat ?? 'Général');
+          fd.append('ordre', String(form.ordre ?? docs.length + 1));
+          const r = await authFetch('/api/documents/upload', { method: 'POST', body: fd });
+          const data = await r.json();
+          if (r.ok) setDocs(prev => [...prev, data]);
+          onToast('Document uploadé dans R2.');
+        } else if (form.fichier?.trim()) {
+          // URL externe (Google Drive, etc.)
+          const r = await apiPost('/api/documents', { ...form, actif: true });
+          let data: any = {};
+          try { data = await r.json(); } catch {}
+          if (r.ok) setDocs(prev => [...prev, data]);
+          onToast('Document ajouté (URL externe).');
+        } else {
+          onToast('Sélectionnez un fichier ou entrez une URL.');
+          setSaving(false);
+          return;
+        }
       }
       setForm(null);
+      setDocFile(null);
+      if (docFileRef.current) docFileRef.current.value = '';
     } catch { onToast('Erreur lors de la sauvegarde.'); }
     finally { setSaving(false); }
   };
@@ -1977,7 +2010,7 @@ function AdminDocuments({ onToast }: { onToast: (m: string) => void }) {
         sub="Documents téléchargeables par les parents dans leur Espace"
         action={
           <button onClick={() => setForm({ titre: '', fichier: '', cat: 'Administratif', ordre: docs.length + 1 })}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-slate-900 text-white text-[11px] font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
+            className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-[#0D2E5C] text-white text-[11px] font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors">
             <Plus size={12} /> Ajouter
           </button>
         }
@@ -1995,10 +2028,18 @@ function AdminDocuments({ onToast }: { onToast: (m: string) => void }) {
                     className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">URL du fichier PDF (lien Google Drive, Dropbox, etc.)</label>
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Uploader un fichier vers R2 (PDF, Word, etc. — max 20 Mo)</label>
+                  <input ref={docFileRef} type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg"
+                    onChange={e => setDocFile(e.target.files?.[0] ?? null)}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none bg-white file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-[#0D2E5C] file:text-white cursor-pointer" />
+                  {docFile && <p className="text-[10px] text-[#2D8C3C] mt-1 font-semibold">✓ {docFile.name} ({(docFile.size/1024).toFixed(0)} Ko)</p>}
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">— ou — URL externe (Google Drive, Dropbox…)</label>
                   <input value={form.fichier || ''} onChange={e => setForm((f: any) => ({...f, fichier: e.target.value}))}
                     placeholder="https://drive.google.com/file/d/..."
-                    className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                    disabled={!!docFile}
+                    className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 disabled:opacity-40 disabled:bg-slate-50" />
                 </div>
                 <div>
                   <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Catégorie</label>
@@ -2015,7 +2056,7 @@ function AdminDocuments({ onToast }: { onToast: (m: string) => void }) {
               </div>
               <div className="flex gap-2">
                 <button onClick={handleSave} disabled={saving}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors disabled:opacity-50">
                   <CheckCircle size={12} /> {saving ? 'Enregistrement…' : 'Enregistrer'}
                 </button>
                 <button onClick={() => setForm(null)}
@@ -2139,7 +2180,7 @@ function ConfigurationTab({ onToast, onRefresh, config, tarifs }: DataProps) {
         <Card className="p-5">
           <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-4">Compte administrateur</p>
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-10 h-10 rounded-md bg-slate-900 flex items-center justify-center text-white font-bold text-sm">
+            <div className="w-10 h-10 rounded-md bg-[#0D2E5C] flex items-center justify-center text-white font-bold text-sm">
               {adminNom[0] || 'A'}
             </div>
             <div>
@@ -2170,7 +2211,7 @@ function ConfigurationTab({ onToast, onRefresh, config, tarifs }: DataProps) {
             editTarifs ? (
               <div className="flex gap-2">
                 <button onClick={handleSaveTarifs} disabled={savingT}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-slate-900 text-white text-[11px] font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-[#0D2E5C] text-white text-[11px] font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors disabled:opacity-50">
                   <CheckCircle size={12} /> {savingT ? 'Enregistrement…' : 'Enregistrer'}
                 </button>
                 <button onClick={() => { setLocalTarifs(tarifs); setEditTarifs(false); }}
@@ -2202,7 +2243,7 @@ function ConfigurationTab({ onToast, onRefresh, config, tarifs }: DataProps) {
                 return (
                   <tr key={s} className="hover:bg-slate-50 transition-colors">
                     <td className="px-5 py-3.5">
-                      <span className="font-bold text-[10px] bg-slate-900 text-white px-2 py-0.5 rounded">{s}</span>
+                      <span className="font-bold text-[10px] bg-[#0D2E5C] text-white px-2 py-0.5 rounded">{s}</span>
                     </td>
                     <td className="px-5 py-3.5 text-slate-500">{cycle}</td>
                     <td className="px-5 py-3.5">
@@ -2330,7 +2371,7 @@ function AssiduiteTab({ prospects, appointments, onProspectStatus, onToast, onRe
           'Responsable': `${s.prenomParent} ${s.nomParent}`,
           'Téléphone': s.telephone,
         })), `assiduite_${selectedSection}_${selectedDate}.csv`)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
+          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors">
           <Download size={13} /> Exporter CSV
         </button>
       }
@@ -2411,7 +2452,7 @@ function AssiduiteTab({ prospects, appointments, onProspectStatus, onToast, onRe
           </table></div>
           <div className="px-5 py-3 border-t border-slate-100 flex justify-end">
             <button onClick={handleSave} disabled={saving}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+              className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors disabled:opacity-50">
               <CheckCircle size={13} /> {saving ? 'Enregistrement…' : 'Enregistrer le pointage'}
             </button>
           </div>
@@ -2488,7 +2529,7 @@ function EnseignantsTab({ onToast }: DataProps) {
     <PageLayout title="Enseignants" sub={`${teachers.length} membres du corps enseignant — Année 2025/2026`}
       actions={
         <button onClick={() => setForm({ ...EMPTY_TEACHER })}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
+          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors">
           <Plus size={13} /> Ajouter un enseignant
         </button>
       }
@@ -2496,7 +2537,7 @@ function EnseignantsTab({ onToast }: DataProps) {
       <AnimatePresence>
         {form && (
           <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
-            <Card className="p-5 border-2 border-slate-900">
+            <Card className="p-5 border-2 border-[#0D2E5C]">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm font-semibold text-slate-800">{form.id ? 'Modifier l\'enseignant' : 'Nouvel enseignant'}</p>
                 <button onClick={() => setForm(null)} className="p-1.5 rounded hover:bg-slate-100 cursor-pointer"><X size={15} className="text-slate-400" /></button>
@@ -2533,7 +2574,7 @@ function EnseignantsTab({ onToast }: DataProps) {
               </div>
               <div className="flex gap-2">
                 <button onClick={handleSave} disabled={saving}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors disabled:opacity-50">
                   <CheckCircle size={13} /> {saving ? 'Enregistrement…' : 'Enregistrer'}
                 </button>
                 <button onClick={() => setForm(null)}
@@ -2664,7 +2705,7 @@ function RhTab({ onToast }: DataProps) {
     <PageLayout title="Personnel administratif" sub={`${staff.length} membres du personnel non-enseignant`}
       actions={
         <button onClick={() => setForm({ ...EMPTY_STAFF })}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
+          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors">
           <Plus size={13} /> Ajouter un membre
         </button>
       }
@@ -2672,7 +2713,7 @@ function RhTab({ onToast }: DataProps) {
       <AnimatePresence>
         {form && (
           <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
-            <Card className="p-5 border-2 border-slate-900">
+            <Card className="p-5 border-2 border-[#0D2E5C]">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm font-semibold text-slate-800">{form.id ? 'Modifier le membre' : 'Nouveau membre du personnel'}</p>
                 <button onClick={() => setForm(null)} className="p-1.5 rounded hover:bg-slate-100 cursor-pointer"><X size={15} className="text-slate-400" /></button>
@@ -2706,7 +2747,7 @@ function RhTab({ onToast }: DataProps) {
               </div>
               <div className="flex gap-2">
                 <button onClick={handleSave} disabled={saving}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors disabled:opacity-50">
                   <CheckCircle size={13} /> {saving ? 'Enregistrement…' : 'Enregistrer'}
                 </button>
                 <button onClick={() => setForm(null)}
@@ -2822,7 +2863,7 @@ function ScolaritesTab({ prospects, tarifs, appointments, onProspectStatus, onTo
         {[['ALL','Tous'],['solde','Avec solde'],['ok','À jour']].map(([v,l]) => (
           <button key={v} onClick={() => setFilter(v)}
             className={`px-3 py-1.5 rounded-md text-xs font-semibold border cursor-pointer transition-colors
-              ${filter === v ? 'bg-slate-900 text-white border-slate-900' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+              ${filter === v ? 'bg-[#0D2E5C] text-white border-[#0D2E5C]' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
             {l}
           </button>
         ))}
@@ -2849,7 +2890,7 @@ function ScolaritesTab({ prospects, tarifs, appointments, onProspectStatus, onTo
                     <p className="text-[10px] text-slate-400 mt-0.5">{p.prenomParent} {p.nomParent}</p>
                   </td>
                   <td className="px-4 py-3.5">
-                    <span className="font-bold text-[10px] bg-slate-900 text-white px-2 py-0.5 rounded">{p.sectionVisee}</span>
+                    <span className="font-bold text-[10px] bg-[#0D2E5C] text-white px-2 py-0.5 rounded">{p.sectionVisee}</span>
                   </td>
                   {[{v:t1,s:paiements.t1},{v:t2,s:paiements.t2},{v:t3,s:paiements.t3}].map((tr,i) => (
                     <td key={i} className="px-4 py-3.5">
@@ -2931,7 +2972,7 @@ function FacturationTab({ prospects, tarifs, onToast }: DataProps) {
     <PageLayout title="Facturation" sub="Historique et état des factures — Toutes classes"
       actions={
         <button onClick={() => onToast('Génération de facture groupée...')}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
+          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors">
           <Plus size={13} /> Émettre factures
         </button>
       }
@@ -2946,7 +2987,7 @@ function FacturationTab({ prospects, tarifs, onToast }: DataProps) {
         {[['ALL','Toutes'],['payée','Payées'],['en_attente','En attente'],['non_émise','Non émises']].map(([v,l]) => (
           <button key={v} onClick={() => setFilterStatut(v)}
             className={`px-3 py-1.5 rounded-md text-xs font-semibold border cursor-pointer transition-colors
-              ${filterStatut === v ? 'bg-slate-900 text-white border-slate-900' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+              ${filterStatut === v ? 'bg-[#0D2E5C] text-white border-[#0D2E5C]' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
             {l}
           </button>
         ))}
@@ -3045,7 +3086,7 @@ function DepensesTab({ onToast }: DataProps) {
     <PageLayout title="Dépenses" sub="Suivi des charges de l'établissement"
       actions={
         <button onClick={() => setForm({ ...EMPTY_DEPENSE })}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
+          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors">
           <Plus size={13} /> Enregistrer une dépense
         </button>
       }
@@ -3053,7 +3094,7 @@ function DepensesTab({ onToast }: DataProps) {
       <AnimatePresence>
         {form && (
           <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
-            <Card className="p-5 border-2 border-slate-900">
+            <Card className="p-5 border-2 border-[#0D2E5C]">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm font-semibold text-slate-800">Nouvelle dépense</p>
                 <button onClick={() => setForm(null)} className="p-1.5 rounded hover:bg-slate-100 cursor-pointer"><X size={15} className="text-slate-400" /></button>
@@ -3094,7 +3135,7 @@ function DepensesTab({ onToast }: DataProps) {
               </div>
               <div className="flex gap-2">
                 <button onClick={handleSave} disabled={saving}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors disabled:opacity-50">
                   <CheckCircle size={13} /> {saving ? 'Enregistrement…' : 'Enregistrer'}
                 </button>
                 <button onClick={() => setForm(null)}
@@ -3136,7 +3177,7 @@ function DepensesTab({ onToast }: DataProps) {
         {[['ALL','Toutes catégories'], ...cats.map(c=>[c,c])].map(([v,l]) => (
           <button key={v} onClick={() => setFilter(v)}
             className={`px-3 py-1.5 rounded-md text-xs font-semibold border cursor-pointer transition-colors
-              ${filter === v ? 'bg-slate-900 text-white border-slate-900' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+              ${filter === v ? 'bg-[#0D2E5C] text-white border-[#0D2E5C]' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
             {l}
           </button>
         ))}
@@ -3228,7 +3269,7 @@ function NewslettersTab({ prospects, onToast }: DataProps) {
     <PageLayout title="Newsletters" sub="Communication groupée vers les familles"
       actions={
         <button onClick={() => setView(v => v === 'list' ? 'compose' : 'list')}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
+          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors">
           {view === 'list' ? <><Plus size={13} /> Rédiger</> : <><X size={13} /> Annuler</>}
         </button>
       }
@@ -3262,7 +3303,7 @@ function NewslettersTab({ prospects, onToast }: DataProps) {
               </div>
               <div className="flex gap-2 pt-2">
                 <button onClick={handleSend} disabled={sending}
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors disabled:opacity-50">
                   {sending
                     ? <><div className="w-3 h-3 rounded-full border-2 border-white/40 border-t-white animate-spin" /> Envoi en cours…</>
                     : <><Send size={13} /> Envoyer à {nbDest} destinataire{nbDest>1?'s':''}</> }
@@ -3365,7 +3406,7 @@ function BlogTab({ onToast }: DataProps) {
     <PageLayout title="Blog — CMS" sub="Gestion des articles publiés sur le site public"
       actions={
         <button onClick={() => setForm({ ...EMPTY_ARTICLE })}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
+          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors">
           <Plus size={13} /> Nouvel article
         </button>
       }
@@ -3373,7 +3414,7 @@ function BlogTab({ onToast }: DataProps) {
       <AnimatePresence>
         {form && (
           <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
-            <Card className="p-5 border-2 border-slate-900">
+            <Card className="p-5 border-2 border-[#0D2E5C]">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm font-semibold text-slate-800">{form.id ? 'Modifier l\'article' : 'Nouvel article'}</p>
                 <button onClick={() => setForm(null)} className="p-1.5 rounded hover:bg-slate-100 cursor-pointer"><X size={15} className="text-slate-400" /></button>
@@ -3414,7 +3455,7 @@ function BlogTab({ onToast }: DataProps) {
               </div>
               <div className="flex gap-2">
                 <button onClick={handleSave} disabled={saving}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors disabled:opacity-50">
                   <CheckCircle size={13} /> {saving ? 'Enregistrement…' : 'Enregistrer'}
                 </button>
                 <button onClick={() => setForm(null)}
@@ -3532,7 +3573,7 @@ function FaqTab({ onToast }: DataProps) {
     <PageLayout title="FAQ — CMS" sub="Questions fréquentes affichées sur le site public"
       actions={
         <button onClick={() => setForm({ ...EMPTY_FAQ, ordre: faqs.length + 1 })}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
+          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors">
           <Plus size={13} /> Nouvelle question
         </button>
       }
@@ -3540,7 +3581,7 @@ function FaqTab({ onToast }: DataProps) {
       <AnimatePresence>
         {form && (
           <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
-            <Card className="p-5 border-2 border-slate-900">
+            <Card className="p-5 border-2 border-[#0D2E5C]">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm font-semibold text-slate-800">{form.id ? 'Modifier la question' : 'Nouvelle question'}</p>
                 <button onClick={() => setForm(null)} className="p-1.5 rounded hover:bg-slate-100 cursor-pointer"><X size={15} className="text-slate-400" /></button>
@@ -3572,7 +3613,7 @@ function FaqTab({ onToast }: DataProps) {
               </div>
               <div className="flex gap-2">
                 <button onClick={handleSave} disabled={saving}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors disabled:opacity-50">
                   <CheckCircle size={13} /> {saving ? 'Enregistrement…' : 'Enregistrer'}
                 </button>
                 <button onClick={() => setForm(null)}
@@ -3595,7 +3636,7 @@ function FaqTab({ onToast }: DataProps) {
         {[['ALL','Toutes'], ...cats.map(c=>[c,c])].map(([v,l]) => (
           <button key={v} onClick={() => setFilterCat(v)}
             className={`px-3 py-1.5 rounded-md text-xs font-semibold border cursor-pointer transition-colors
-              ${filterCat===v?'bg-slate-900 text-white border-slate-900':'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+              ${filterCat===v?'bg-[#0D2E5C] text-white border-[#0D2E5C]':'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
             {l}
           </button>
         ))}
@@ -3660,8 +3701,10 @@ function GalerieTab({ onToast }: DataProps) {
   const [galerie,   setGalerie]   = useState<any[]>([]);
   const [filterCat, setFilterCat] = useState('ALL');
   const [showForm,  setShowForm]  = useState(false);
-  const [form,      setForm]      = useState({ titre:'', url:'', cat:'Vie de classe', classe:'', date: new Date().toISOString().slice(0,10) });
+  const [form,      setForm]      = useState({ titre:'', cat:'Vie de classe', classe:'', date: new Date().toISOString().slice(0,10) });
+  const [galFile,   setGalFile]   = useState<File | null>(null);
   const [saving,    setSaving]    = useState(false);
+  const galFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { apiFetch('/api/galerie').then(setGalerie).catch(console.error); }, []);
 
@@ -3669,17 +3712,24 @@ function GalerieTab({ onToast }: DataProps) {
   const filtered = galerie.filter((g: any) => filterCat === 'ALL' || g.cat === filterCat);
 
   const handleAdd = async () => {
-    if (!form.titre.trim() || !form.url.trim()) { onToast('Titre et URL requis.'); return; }
+    if (!form.titre.trim()) { onToast('Titre requis.'); return; }
+    if (!galFile) { onToast('Sélectionnez une photo à uploader.'); return; }
     setSaving(true);
     try {
-      const r = await apiPost('/api/galerie', form);
-      let data: any = {};
-      try { data = await r.json(); } catch {}
+      const fd = new FormData();
+      fd.append('photo', galFile);
+      fd.append('titre', form.titre);
+      fd.append('cat',   form.cat);
+      fd.append('classe', form.classe);
+      const r = await authFetch('/api/galerie/upload', { method: 'POST', body: fd });
+      const data = await r.json();
       if (r.ok) setGalerie(prev => [data, ...prev]);
       setShowForm(false);
-      setForm({ titre:'', url:'', cat:'Vie de classe', classe:'', date: new Date().toISOString().slice(0,10) });
-      onToast('Photo ajoutée à la galerie.');
-    } catch { onToast('Erreur lors de l\'ajout.'); }
+      setForm({ titre:'', cat:'Vie de classe', classe:'', date: new Date().toISOString().slice(0,10) });
+      setGalFile(null);
+      if (galFileRef.current) galFileRef.current.value = '';
+      onToast('Photo uploadée dans R2 et ajoutée à la galerie.');
+    } catch { onToast('Erreur upload.'); }
     finally { setSaving(false); }
   };
 
@@ -3694,7 +3744,7 @@ function GalerieTab({ onToast }: DataProps) {
     <PageLayout title="Galerie — CMS" sub="Médiathèque photographique de l'établissement"
       actions={
         <button onClick={() => setShowForm(v => !v)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
+          className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors">
           {showForm ? <><X size={13} /> Annuler</> : <><Plus size={13} /> Ajouter une photo</>}
         </button>
       }
@@ -3702,14 +3752,15 @@ function GalerieTab({ onToast }: DataProps) {
       <AnimatePresence>
         {showForm && (
           <motion.div initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
-            <Card className="p-5 border-2 border-slate-900">
-              <p className="text-sm font-semibold text-slate-800 mb-4">Ajouter une photo par URL</p>
+            <Card className="p-5 border-2 border-[#0D2E5C]">
+              <p className="text-sm font-semibold text-[#2C2C2C] mb-4">Uploader une photo vers R2</p>
               <div className="grid md:grid-cols-2 gap-4 mb-4">
                 <div className="md:col-span-2">
-                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">URL de l'image</label>
-                  <input value={form.url} onChange={e => setForm(f => ({...f, url:e.target.value}))}
-                    placeholder="https://example.com/photo.jpg"
-                    className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-md focus:outline-none focus:border-slate-400" />
+                  <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Fichier image (JPG, PNG, WebP — max 20 Mo)</label>
+                  <input ref={galFileRef} type="file" accept="image/*"
+                    onChange={e => setGalFile(e.target.files?.[0] ?? null)}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 bg-white file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-[#0D2E5C] file:text-white cursor-pointer" />
+                  {galFile && <p className="text-[10px] text-[#2D8C3C] mt-1 font-semibold">✓ {galFile.name} ({(galFile.size/1024).toFixed(0)} Ko)</p>}
                 </div>
                 <div>
                   <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Titre</label>
@@ -3736,7 +3787,7 @@ function GalerieTab({ onToast }: DataProps) {
                 </div>
               </div>
               <button onClick={handleAdd} disabled={saving}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-slate-900 text-white text-xs font-semibold cursor-pointer hover:bg-slate-700 transition-colors disabled:opacity-50">
+                className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#0D2E5C] text-white text-xs font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors disabled:opacity-50">
                 <CheckCircle size={13} /> {saving ? 'Ajout…' : 'Ajouter à la galerie'}
               </button>
             </Card>
@@ -3754,7 +3805,7 @@ function GalerieTab({ onToast }: DataProps) {
         {[['ALL','Toutes'], ...cats.map(c=>[c,c])].map(([v,l]) => (
           <button key={v} onClick={() => setFilterCat(v)}
             className={`px-3 py-1.5 rounded-md text-xs font-semibold border cursor-pointer transition-colors
-              ${filterCat===v?'bg-slate-900 text-white border-slate-900':'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+              ${filterCat===v?'bg-[#0D2E5C] text-white border-[#0D2E5C]':'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
             {l}
           </button>
         ))}
@@ -3782,7 +3833,7 @@ function GalerieTab({ onToast }: DataProps) {
               <p className="text-[9px] text-white font-semibold truncate">{g.titre}</p>
               <span className="text-[8px] text-white/60">{g.cat}</span>
             </div>
-            <div className="absolute inset-0 bg-slate-900/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+            <div className="absolute inset-0 bg-[#0D2E5C]/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
               {g.url && (
                 <a href={g.url} target="_blank" rel="noreferrer"
                   className="p-1.5 rounded bg-white/20 text-white hover:bg-white/30 cursor-pointer transition-colors">
@@ -3836,7 +3887,7 @@ function TemoignagesTab({ onToast }: DataProps) {
         {temos.map(t => (
           <Card key={t.id} className={`p-5 ${t.statut==='refusé'?'opacity-50':''}`}>
             <div className="flex items-start gap-4">
-              <div className="w-9 h-9 rounded-md bg-slate-900 flex items-center justify-center text-white font-bold text-sm shrink-0">
+              <div className="w-9 h-9 rounded-md bg-[#0D2E5C] flex items-center justify-center text-white font-bold text-sm shrink-0">
                 {t.parent[0]}
               </div>
               <div className="flex-1 min-w-0">
@@ -3928,12 +3979,12 @@ function LogsTab({ onToast }: DataProps) {
 
       <Card className="p-3.5 flex gap-2 flex-wrap items-center">
         <button onClick={() => setFilterAction('ALL')}
-          className={`px-3 py-1.5 rounded-md text-xs font-semibold border cursor-pointer transition-colors ${filterAction==='ALL'?'bg-slate-900 text-white border-slate-900':'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+          className={`px-3 py-1.5 rounded-md text-xs font-semibold border cursor-pointer transition-colors ${filterAction==='ALL'?'bg-[#0D2E5C] text-white border-[#0D2E5C]':'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
           Toutes les actions
         </button>
         {actionTypes.map(a => (
           <button key={a} onClick={() => setFilterAction(a)}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold border cursor-pointer transition-colors ${filterAction===a?'bg-slate-900 text-white border-slate-900':'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+            className={`px-3 py-1.5 rounded-md text-xs font-semibold border cursor-pointer transition-colors ${filterAction===a?'bg-[#0D2E5C] text-white border-[#0D2E5C]':'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
             {a}
           </button>
         ))}
@@ -4077,20 +4128,20 @@ export const AdminDashboard: React.FC = () => {
 
   if (isAdmin === null) {
     return (
-      <div className="min-h-screen bg-[#F1F5F9] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#0D2E5C] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-[#F1F5F9] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
         <div className="w-full max-w-sm bg-white border border-slate-200 rounded-lg p-8 text-center">
           <p className="text-sm font-semibold text-slate-700 mb-1">Session expirée</p>
           <p className="text-xs text-slate-400 mb-5">Reconnectez-vous pour accéder à la console d'administration.</p>
           <button onClick={() => { window.location.hash='#/admin'; }}
-            className="w-full py-2.5 rounded-md bg-slate-900 text-white text-sm font-semibold cursor-pointer hover:bg-slate-700 transition-colors">
+            className="w-full py-2.5 rounded-md bg-[#0D2E5C] text-white text-sm font-semibold cursor-pointer hover:bg-[#1A4F8B] transition-colors">
             Se reconnecter
           </button>
         </div>
@@ -4101,14 +4152,14 @@ export const AdminDashboard: React.FC = () => {
   const currentLabel = NAV_GROUPS.flatMap(g => g.items).find(i => i.id === tab)?.label || tab;
 
   return (
-    <div className="min-h-screen bg-[#F1F5F9] flex">
+    <div className="min-h-screen bg-[#F9FAFB] flex">
 
       {/* ══ SIDEBAR ════════════════════════════════════════════════════════ */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      <aside className={`fixed top-0 left-0 bottom-0 z-40 w-[220px] bg-[#0F172A] flex flex-col transition-transform duration-300
+      <aside className={`fixed top-0 left-0 bottom-0 z-40 w-[220px] bg-[#0D2E5C] flex flex-col transition-transform duration-300
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
 
         {/* Logo */}
@@ -4133,13 +4184,13 @@ export const AdminDashboard: React.FC = () => {
                     <button key={id} onClick={() => { setTab(id); setSidebarOpen(false); }}
                       className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-left text-[12px] font-medium transition-all cursor-pointer
                         ${active
-                          ? 'bg-white/10 text-white border-l-2 border-[#F5A623]'
-                          : 'text-white/40 hover:text-white/75 hover:bg-white/5'}`}>
+                          ? 'bg-[#F5A623]/15 text-white border-l-2 border-[#F5A623]'
+                          : 'text-white/50 hover:text-white hover:bg-white/8'}`}>
                       <Icon size={13} className="shrink-0" />
                       <span className="flex-1 truncate">{label}</span>
                       {badge !== undefined && badge > 0 && (
                         <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full min-w-[16px] text-center
-                          ${active ? 'bg-[#F5A623] text-[#0F172A]' : 'bg-white/15 text-white'}`}>
+                          ${active ? 'bg-[#F5A623] text-[#0D2E5C]' : 'bg-white/15 text-white'}`}>
                           {badge}
                         </span>
                       )}
@@ -4215,7 +4266,7 @@ export const AdminDashboard: React.FC = () => {
               </button>
             )}
             <div className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-slate-200 text-[11px] font-medium text-slate-700">
-              <div className="w-5 h-5 rounded bg-slate-900 flex items-center justify-center text-white text-[9px] font-bold">A</div>
+              <div className="w-5 h-5 rounded bg-[#0D2E5C] flex items-center justify-center text-white text-[9px] font-bold">A</div>
               admin@epv.ci
             </div>
             <button onClick={handleLogout}
